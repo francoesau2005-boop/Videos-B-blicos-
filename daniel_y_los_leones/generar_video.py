@@ -5,6 +5,7 @@ Uso:
   python3 generar_video.py                 # sin voz: tiempos estimados
   python3 generar_video.py --voz voz.m4a   # con la narración grabada
   python3 generar_video.py --muestra       # solo una hoja con todas las escenas
+  python3 generar_video.py --voz voz.wav --sin-subtitulos
 """
 import argparse
 import math
@@ -642,6 +643,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--voz")
     ap.add_argument("--muestra", action="store_true")
+    ap.add_argument("--sin-subtitulos", action="store_true")
     ap.add_argument("--salida", default=os.path.join(AQUI, "daniel_y_los_leones.mp4"))
     a = ap.parse_args()
 
@@ -702,7 +704,7 @@ def main():
                            send[i - 1] - sstart[i - 1], i - 1)
             frame = Image.blend(prev, frame, lt / XF)
         cur = [c for c in ch if c[0][1] - 0.05 <= t <= c[-1][2] + 0.25]
-        if cur:
+        if cur and not a.sin_subtitulos:
             draw_caption(frame, cur[-1], t)
         if t < 0.4:
             frame = Image.blend(Image.new("RGB", (W, H)), frame, t / 0.4)
