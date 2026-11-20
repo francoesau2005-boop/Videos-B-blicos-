@@ -2,475 +2,516 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CUADRA - Rey Pollo</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1d26">
+<title>Rey Pollo SV</title>
 <style>
+/* Una app de caja: barra superior fija, pantallas por pestaña y navegación inferior */
 :root {
-  --bg:#0c1720;
-  --panel:#192d38;
-  --line:#405c67;
-  --gold:#ffd38f;
-  --green:#a9f0cd;
-  --red:#ffb8bc;
+  --bg:#0b161d;
+  --bg2:#0f1d26;
+  --card:#15262f;
+  --card2:#1b3039;
+  --line:#2b4550;
+  --fg:#eef6f7;
+  --mu:#97b0b8;
+  --gold:#ffcf7d;
+  --gold-d:#3a2c14;
+  --green:#8fe9c0;
+  --green-d:#143a2d;
+  --red:#ffa3aa;
+  --red-d:#4a2329;
+  --orange:#ffd29a;
+  --orange-d:#4a3420;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --nav-h:64px;
 }
-* {box-sizing:border-box}
+* {box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html {scroll-behavior:smooth}
 body {
-  margin:0;background:var(--bg);color:#eef6f7;
-  font-family:Arial,sans-serif;font-size:13px;
+  margin:0;background:var(--bg);color:var(--fg);
+  font-family:var(--font);font-size:14px;line-height:1.4;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 16px);
 }
-header {
-  padding:21px 15px;
-  background:linear-gradient(125deg,#263e49,#3b352b);
+input,select,button {font-family:inherit}
+
+/* ---------- barra superior ---------- */
+.top {
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg,#132833,#0f1d26);
+  border-bottom:1px solid var(--line);
+  padding:calc(10px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 10px max(14px,env(safe-area-inset-left,0px));
+  display:flex;align-items:center;gap:10px;
 }
-.logo {font-size:28px;font-weight:900;letter-spacing:-1px}
-.logo span {color:var(--gold)}
-.sub {color:#b5cbd1;font-size:11px;margin:6px 0}
-main {padding:10px;max-width:850px;margin:auto}
-h2 {font-size:19px;margin:4px 0 12px}
-h3 {font-size:15px;margin:8px 0}
-.panel {
-  background:var(--panel);border:1px solid var(--line);
-  border-radius:13px;padding:13px 10px;margin-bottom:12px;
+.brand {display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+.brand svg {flex:none}
+.brand-name {font-size:19px;font-weight:800;letter-spacing:-.4px;white-space:nowrap}
+.brand-name span {color:var(--gold)}
+.brand-sub {font-size:10px;color:var(--mu);letter-spacing:.8px;text-transform:uppercase}
+.date-chip {
+  background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  color:var(--fg);padding:8px 9px;font-size:13px;width:auto;max-width:150px;
 }
-button {
-  cursor:pointer;background:#2c4652;color:white;
-  border:1px solid #58727b;border-radius:9px;
-  padding:11px;font-weight:700;font-size:12px;
-  touch-action:manipulation;
-}
-button:active {filter:brightness(1.3)}
-button:disabled {opacity:.5}
-.gold {
-  background:var(--gold);border-color:var(--gold);
-  color:#302515;
-}
-.danger {background:#57383e;color:#ffd1d3}
-input,select {
-  background:#102631;border:1px solid #526b77;
-  color:white;border-radius:7px;padding:10px;
-  font-size:13px;min-width:0;width:100%;
-}
-input:focus {outline:1px solid var(--gold)}
-input.bad {border-color:#ff7b84;background:#3a1f25}
-label {font-size:11px;color:#c2d3d8}
-.actions {display:flex;gap:7px;margin:10px 0}
-.actions button {flex:1}
-.nav {
-  display:flex;gap:7px;overflow-x:auto;
-  margin:12px 0;padding-bottom:5px;
-}
-.nav button {white-space:nowrap;border-radius:22px}
-.nav .active {background:var(--gold);color:#302515}
-.stats {
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:6px;margin:12px 0;
-}
-.stat {
-  background:#243c47;border:1px solid var(--line);
-  padding:12px 6px;border-radius:11px;min-width:0;
-}
-.stat small {font-size:9px;color:#c1d2d6}
-.stat b {
-  display:block;font-size:clamp(14px,4vw,22px);
-  margin-top:6px;white-space:nowrap;
-}
-.stat:last-child {background:#493d2e}
-.stat:last-child b {color:var(--gold)}
-.scroll {overflow-x:auto;border-radius:9px}
-table {width:100%;border-collapse:collapse;table-layout:fixed}
-th {background:#304753;font-size:9px;padding:11px 2px}
-td {
-  padding:8px 3px;text-align:center;
-  border-bottom:1px solid #38525e;
-}
-td:first-child {text-align:left;font-weight:bold;font-size:11px}
-td input {padding:9px 2px;text-align:center;font-weight:bold}
-td:first-child input {text-align:left;padding:8px 6px;margin-bottom:4px}
-td:first-child button {width:100%;padding:7px}
-.price {display:block;color:var(--gold);font-size:10px}
-.sold {
-  color:var(--green);background:#254b40;
-  border-radius:6px;padding:9px 2px;display:block;
-}
-.sold.err {color:#ffd6d9;background:#513538}
-.amount {color:var(--gold);font-weight:900}
-tfoot td {background:#4c3d2e;color:var(--gold);font-weight:bold}
-.row {
-  display:flex;justify-content:space-between;
-  align-items:center;gap:10px;
-  padding:13px 0;border-bottom:1px solid #3e5763;
-}
-.row b {font-size:16px}
-.total-box {
-  display:flex;justify-content:space-between;align-items:center;
-  padding:16px 12px;border:1px solid #a17d49;
-  background:#4b3b2a;border-radius:10px;margin:13px 0;
-}
-.total-box b {font-size:24px;color:var(--gold)}
-.note {
-  font-size:11px;line-height:1.6;
-  background:#1c3934;color:#d5f5e4;
-  border:1px solid #456b5b;border-radius:9px;
-  padding:11px;margin:12px 0;
-}
-.warning {
-  background:#513538;border:1px solid #95636b;
-  color:#ffd6d9;padding:11px;border-radius:9px;margin:10px 0;
-}
-.result {
-  background:#29414b;padding:12px;
-  border:1px solid #55717c;border-radius:9px;
-  font-weight:bold;margin-top:10px;
-}
-.sell {background:#513e2d;color:#ffe0ad}
-.add {background:#1e503d;color:#b7f8d6}
-.ok {background:#254b40;color:var(--green)}
-.two {display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.cut {
-  padding:12px;margin:11px 0;border-radius:11px;
-  border:1px solid #415c68;background:#132a35;
-}
-.cut-values {
-  display:grid;grid-template-columns:repeat(3,1fr);
-  background:#0b222c;padding:13px 5px;
-  border-radius:9px;text-align:center;margin:11px 0;
-}
-.cut-values small {display:block;font-size:10px;color:#b9cbd1}
-.cut-values b {font-size:22px}
-.cut-values div:last-child b {color:var(--gold)}
-.expense {
-  display:grid;grid-template-columns:1fr 85px 40px;
-  gap:6px;margin:7px 0;
-}
+
+main {max-width:760px;margin:0 auto;padding:14px max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px))}
+.screen {display:flex;flex-direction:column;gap:12px;animation:in .18s ease-out}
+@keyframes in {from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen{animation:none}html{scroll-behavior:auto}}
 .hidden {display:none!important}
-.clock {
-  font-size:54px;text-align:center;font-weight:900;
-  letter-spacing:-2px;margin:17px 0;font-variant-numeric:tabular-nums;
+
+.title {display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+h1 {font-size:22px;margin:2px 0 0;letter-spacing:-.4px}
+h2 {font-size:16px;margin:0}
+.hint {color:var(--mu);font-size:12px;margin:0}
+
+.card {
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:14px;display:flex;flex-direction:column;gap:10px;
 }
+.card-head {display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+/* ---------- botones e inputs ---------- */
+button {
+  cursor:pointer;background:var(--card2);color:var(--fg);
+  border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;font-weight:700;font-size:13px;
+  touch-action:manipulation;transition:transform .08s,filter .15s;
+}
+button:active {transform:scale(.97);filter:brightness(1.25)}
+button:disabled {opacity:.4}
+button:focus-visible,input:focus-visible,select:focus-visible {outline:2px solid var(--gold);outline-offset:2px}
+.btn-gold {background:var(--gold);border-color:var(--gold);color:#2b1f0b}
+.btn-ghost {background:transparent}
+.btn-danger {background:var(--red-d);border-color:#7a3c45;color:var(--red)}
+.btn-sm {padding:8px 11px;font-size:12px;border-radius:10px}
+.row-btns {display:flex;gap:8px}
+.row-btns > * {flex:1}
+.row-btns > .btn-reset {flex:0 0 58px;font-size:18px}
+input,select {
+  background:#0c1b23;border:1px solid #33515d;color:var(--fg);
+  border-radius:10px;padding:11px 10px;font-size:15px;width:100%;min-width:0;
+}
+input:focus {border-color:var(--gold);outline:none}
+input.bad {border-color:var(--red);background:#2a151a}
+input[type=number] {font-variant-numeric:tabular-nums}
+label {font-size:12px;color:var(--mu)}
+
+/* ---------- resumen ---------- */
+.summary {display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:8px}
+.kpi {background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 10px;min-width:0}
+.kpi small {display:block;font-size:10px;letter-spacing:.7px;color:var(--mu);text-transform:uppercase}
+.kpi b {display:block;font-size:clamp(15px,4.6vw,22px);margin-top:4px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.kpi.main {background:linear-gradient(140deg,#4a3818,#2c2412);border-color:#7d6233}
+.kpi.main b {color:var(--gold)}
+
+/* ---------- tabla de productos ---------- */
+.scroll {overflow-x:auto;margin:0 -4px}
+table {width:100%;border-collapse:collapse;table-layout:fixed}
+th {font-size:10px;letter-spacing:.6px;color:var(--mu);font-weight:700;padding:6px 2px 8px;text-transform:uppercase}
+td {padding:6px 3px;text-align:center;border-top:1px solid #223a44;vertical-align:middle}
+td:first-child {text-align:left;font-weight:700;font-size:13px;padding-left:4px}
+td input {padding:10px 2px;text-align:center;font-weight:700}
+td:first-child input {text-align:left;padding:9px 8px;margin-bottom:5px;font-size:13px}
+td:first-child button {width:100%}
+.price {display:block;color:var(--gold);font-size:11px;font-weight:600;margin-top:2px}
+.sold {display:block;border-radius:8px;padding:10px 2px;font-weight:800;background:var(--green-d);color:var(--green);font-variant-numeric:tabular-nums}
+.sold.empty {background:transparent;color:#5b7984}
+.sold.err {background:var(--red-d);color:var(--red)}
+.amount {color:var(--gold);font-weight:800;font-size:13px;font-variant-numeric:tabular-nums}
+tfoot td {border-top:2px solid #7d6233;color:var(--gold);font-weight:800;padding:12px 4px}
+
+/* ---------- caja ---------- */
+.expense {display:grid;grid-template-columns:1fr 92px 44px;gap:6px}
+.line {display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-variant-numeric:tabular-nums}
+.line b {font-size:16px}
+.deliver {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px;border-radius:12px;background:linear-gradient(140deg,#4a3818,#2c2412);border:1px solid #7d6233;
+}
+.deliver b {font-size:26px;color:var(--gold);font-variant-numeric:tabular-nums}
+.counted {display:flex;align-items:center;gap:10px}
+.counted label {flex:1;font-size:14px;color:var(--fg);font-weight:600}
+.counted input {max-width:150px;font-size:18px;font-weight:800;text-align:right}
+.result {padding:13px;border-radius:12px;font-weight:800;text-align:center;font-size:15px;background:var(--card2);border:1px solid var(--line)}
+.result.ok {background:var(--green-d);color:var(--green);border-color:#2f6b55}
+.result.over {background:var(--orange-d);color:var(--orange);border-color:#7d5a31}
+.result.short,.result.warn {background:var(--red-d);color:var(--red);border-color:#7a3c45}
+.hist-row {display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 2px;border-top:1px solid #223a44;cursor:pointer}
+.hist-row small {display:block;color:var(--mu);font-size:11px;margin-top:2px}
+.hist-row b {color:var(--gold);font-variant-numeric:tabular-nums}
+
+/* ---------- pollos ---------- */
+.stepper {display:grid;grid-template-columns:64px 1fr 64px;gap:8px;align-items:center}
+.stepper button {font-size:26px;padding:10px 0;border-radius:14px}
+.stepper input {font-size:34px;font-weight:900;text-align:center;padding:10px 4px}
+.chips {display:flex;gap:6px;flex-wrap:wrap}
+.chip {padding:8px 13px;border-radius:999px;font-size:13px}
+.chip.on {background:var(--gold);color:#2b1f0b;border-color:var(--gold)}
+.cut-row {display:grid;grid-template-columns:1fr 84px 86px;gap:8px;align-items:center;padding:10px 0;border-top:1px solid #223a44}
+.cut-row:first-of-type {border-top:none}
+.cut-name b {display:block;font-size:15px}
+.cut-name small {color:var(--mu);font-size:12px}
+.cut-row input {text-align:center;font-weight:800;font-size:17px}
+.cut-in {text-align:center;border-radius:10px;background:var(--gold-d);padding:9px 2px;border:1px solid #6b5228}
+.cut-in small {display:block;font-size:9px;color:var(--gold);letter-spacing:.6px}
+.cut-in b {font-size:22px;color:var(--gold);font-variant-numeric:tabular-nums}
+.cut-head {display:grid;grid-template-columns:1fr 84px 86px;gap:8px;font-size:10px;color:var(--mu);letter-spacing:.6px;text-transform:uppercase;text-align:center}
+.cut-head span:first-child {text-align:left}
+.cut-edit {display:grid;grid-template-columns:1fr 70px 44px;gap:6px}
+
+/* ---------- libro vs sistema ---------- */
+.quick {display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.big-result {
+  text-align:center;padding:16px;border-radius:14px;font-size:26px;font-weight:900;
+  background:var(--card2);border:1px solid var(--line);letter-spacing:-.3px;
+}
+.big-result small {display:block;font-size:12px;font-weight:600;letter-spacing:0;margin-top:2px;opacity:.85}
+.tag-sell {background:var(--orange-d);color:var(--orange);border-color:#7d5a31}
+.tag-add {background:var(--green-d);color:var(--green);border-color:#2f6b55}
+.tag-ok {background:#1d3340;color:#bfe3ef}
+.cmp-row {display:grid;grid-template-columns:1fr 66px 66px 92px;gap:6px;align-items:center;padding:7px 0;border-top:1px solid #223a44}
+.cmp-row b {font-size:13px}
+.cmp-row input {text-align:center;font-weight:800;padding:10px 2px}
+.cmp-act {text-align:center;border-radius:9px;padding:9px 2px;font-size:12px;font-weight:800;background:transparent;color:#5b7984}
+.cmp-head {display:grid;grid-template-columns:1fr 66px 66px 92px;gap:6px;font-size:10px;color:var(--mu);letter-spacing:.6px;text-transform:uppercase;text-align:center}
+.cmp-head span:first-child {text-align:left}
+.counts {display:flex;gap:6px;flex-wrap:wrap}
+.pill {border-radius:999px;padding:5px 11px;font-size:12px;font-weight:800}
+
+/* ---------- alarma ---------- */
+.ring-wrap {position:relative;width:min(260px,72vw);aspect-ratio:1;margin:6px auto 0}
+.ring-wrap svg {width:100%;height:100%;transform:rotate(-90deg)}
+.ring-bg {fill:none;stroke:#203842;stroke-width:14}
+.ring-fg {fill:none;stroke:url(#ringGrad);stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset .25s linear}
+.ring-center {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.clock {font-size:clamp(44px,15vw,60px);font-weight:900;letter-spacing:-2px;font-variant-numeric:tabular-nums;line-height:1}
 .clock.alerting {color:var(--gold)}
 .clock.done {color:var(--green)}
-.track {
-  height:9px;border-radius:20px;background:#324b57;
-  overflow:hidden;margin:12px 0;
-}
-.track div {
-  height:100%;width:0;
-  background:linear-gradient(90deg,#83eac0,#ffd38f);
-}
-.keys {display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.keys button {font-size:19px;min-height:48px}
-.keys .operator {background:#685136;color:#ffe3b3}
-.keys .equals {background:var(--gold);color:#332517}
-.screen {
-  background:#0b212c;padding:15px;
-  border-radius:10px;text-align:right;margin:12px 0;
-}
-.screen b {font-size:30px;word-break:break-all}
-.notice-status {
-  margin-bottom:11px;padding:12px;
-  border-radius:9px;background:#56373b;
-  color:#ffdade;border:1px solid #a46a71;
-}
-.hist-row {cursor:pointer}
-.hist-row small {display:block;color:#b5cbd1;font-size:10px;margin-top:3px}
-footer {text-align:center;color:#9ab0b8;padding:20px;font-size:11px}
+#elapsed {font-size:12px;color:var(--mu)}
+#timer-status {text-align:center;font-weight:700;min-height:20px;margin:0}
+.alert-mark {fill:var(--gold)}
+.two {display:grid;grid-template-columns:1fr 1fr;gap:10px}
+details {border-top:1px solid #223a44;padding-top:10px}
+summary {cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker {display:none}
+summary::after {content:"▾";color:var(--mu)}
+details[open] summary::after {content:"▴"}
+details > div {display:flex;flex-direction:column;gap:10px;margin-top:10px}
+input[type=range] {accent-color:var(--gold);padding:0}
+.warn-note {font-size:12px;color:var(--mu);line-height:1.5}
 
-/* Ventanas propias (los confirm() del sistema no funcionan en muchos APK) */
+/* ---------- calculadora ---------- */
+.calc-screen {background:#081419;border:1px solid var(--line);border-radius:16px;padding:16px;text-align:right;min-height:104px;display:flex;flex-direction:column;justify-content:flex-end}
+#expression {color:var(--mu);font-size:15px;word-break:break-all;min-height:20px}
+#answer {font-size:40px;font-weight:900;word-break:break-all;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.keys {display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.keys button {font-size:22px;min-height:60px;border-radius:16px}
+.keys .op {background:#3a2e1b;color:var(--gold);border-color:#5c4726}
+.keys .eq {background:var(--gold);color:#2b1f0b;border-color:var(--gold)}
+.keys .fn {background:#1f2f38;color:#bcd2d9}
+
+/* ---------- navegación inferior ---------- */
+.nav {
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:rgba(12,24,31,.97);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,1fr);
+  padding:6px max(4px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px));
+}
+.nav button {
+  background:none;border:none;border-radius:12px;padding:6px 2px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:11px;font-weight:700;color:var(--mu);
+}
+.nav button svg {width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav button.active {color:var(--gold);background:#1c2c2a}
+
+/* ---------- ventanas y avisos ---------- */
 #modal {
-  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;
-  display:flex;align-items:center;justify-content:center;padding:14px;
+  position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;
+  display:flex;align-items:flex-end;justify-content:center;padding:10px;
 }
-#modal .card {
-  background:var(--panel);border:1px solid var(--line);border-radius:14px;
-  width:100%;max-width:620px;max-height:92vh;overflow:auto;padding:14px;
+#modal .sheet {
+  background:var(--card);border:1px solid var(--line);border-radius:20px;
+  width:100%;max-width:640px;max-height:90vh;overflow:auto;padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+  margin-bottom:env(safe-area-inset-bottom,0px);
+  animation:up .2s ease-out;
 }
-#modal .card p {line-height:1.5}
+@keyframes up {from{transform:translateY(30px);opacity:.5}to{transform:none;opacity:1}}
+#modal h3 {margin:0;font-size:17px}
 #toast {
-  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
-  background:var(--gold);color:#302515;font-weight:700;
-  padding:10px 16px;border-radius:20px;z-index:60;
-  opacity:0;transition:opacity .2s;pointer-events:none;
-  max-width:90vw;text-align:center;
+  position:fixed;left:50%;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 14px);
+  transform:translateX(-50%);background:var(--gold);color:#2b1f0b;font-weight:800;
+  padding:10px 18px;border-radius:999px;z-index:60;opacity:0;transition:opacity .2s;
+  pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.4);
 }
 #toast.show {opacity:1}
+.notice {padding:12px;border-radius:12px;background:var(--red-d);color:var(--red);border:1px solid #7a3c45}
+footer {text-align:center;color:#58737c;font-size:11px;padding:18px 0 4px}
 
-/* Reporte (se ve como hoja y es lo único que se imprime) */
-#print-area {background:#fff;color:#111;border-radius:8px;padding:14px;font-size:12px}
-#print-area h1 {font-size:18px;margin:0 0 2px}
+/* ---------- reporte (lo único que se imprime) ---------- */
+#print-area {background:#fff;color:#111;border-radius:10px;padding:14px;font-size:12px}
+#print-area h1 {font-size:18px;margin:0 0 2px;color:#111}
 #print-area h4 {font-size:13px;margin:14px 0 6px;border-bottom:2px solid #111;padding-bottom:3px}
 #print-area table {table-layout:auto}
 #print-area th {background:#eee;color:#111;font-size:10px;padding:6px 4px}
-#print-area td {border-bottom:1px solid #ccc;padding:5px 4px;font-size:11px;color:#111}
-#print-area td:first-child {font-size:11px}
+#print-area td {border-top:none;border-bottom:1px solid #ccc;padding:5px 4px;font-size:11px;color:#111;text-align:left}
 #print-area .big {font-size:16px;font-weight:900}
 #print-area .rep-day {page-break-inside:avoid;margin-bottom:18px}
 @media print {
   body * {visibility:hidden}
-  #print-area, #print-area * {visibility:visible}
-  #print-area {position:absolute;left:0;top:0;width:100%;border-radius:0}
-  #modal {position:static;background:none}
+  #print-area,#print-area * {visibility:visible}
+  #print-area {position:absolute;left:0;top:0;width:100%}
 }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">CUA<span>DRA</span></div>
-  <div class="sub">CONTROL DE INVENTARIO Y CAJA · REY POLLO</div>
-  <h2 style="margin-top:24px">Cuadre del día</h2>
-  <label>FECHA</label>
-  <input id="date" type="date" style="max-width:180px;margin-top:5px">
+<header class="top">
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+      <circle cx="17" cy="17" r="16" fill="#263e49" stroke="#ffcf7d" stroke-width="1.5"/>
+      <path d="M9 21.5 8 12.5l4.6 3.6L17 9.5l4.4 6.6 4.6-3.6-1 9z" fill="#ffcf7d"/>
+      <rect x="9" y="22.8" width="16" height="2.6" rx="1.2" fill="#ffcf7d"/>
+    </svg>
+    <div>
+      <div class="brand-name">Rey Pollo <span>SV</span></div>
+      <div class="brand-sub">Inventario y caja</div>
+    </div>
+  </div>
+  <input id="date" class="date-chip" type="date" aria-label="Fecha del cuadre">
 </header>
 
 <main>
-<div class="notice-status" id="js-status">
-  ⚠ Esperando JavaScript. Si este aviso permanece,
-  activa JavaScript en tu generador de APK.
+<div class="notice" id="js-status">
+  ⚠ Esperando JavaScript. Si este aviso permanece, activa JavaScript en tu generador de APK.
 </div>
 
-<div class="stats">
-  <div class="stat"><small>VENTAS</small><b id="sale">$0.00</b></div>
-  <div class="stat"><small>GASTOS</small><b id="cost">$0.00</b></div>
-  <div class="stat"><small>A ENTREGAR</small><b id="net">$0.00</b></div>
-</div>
-
-<nav class="nav">
-  <button class="active" data-tab="cuadre">Cuadre y caja</button>
-  <button data-tab="compare">Comparar</button>
-  <button data-tab="tools">Alarma y calculadora</button>
-</nav>
-
-<section id="cuadre">
-
-<div class="panel">
-  <h2>01 · Productos y ventas</h2>
-  <div class="actions">
-    <button class="gold" id="new-day">↻ Nuevo cuadre</button>
-    <button id="edit">Editar precios</button>
+<!-- ================= CUADRE ================= -->
+<section id="cuadre" class="screen">
+  <div class="summary">
+    <div class="kpi"><small>Ventas</small><b id="sale">$0.00</b></div>
+    <div class="kpi"><small>Gastos</small><b id="cost">$0.00</b></div>
+    <div class="kpi main"><small>A entregar</small><b id="net">$0.00</b></div>
   </div>
 
-  <div class="scroll">
-    <table>
-      <colgroup>
-        <col style="width:29%">
-        <col style="width:16%">
-        <col style="width:15%">
-        <col style="width:16%">
-        <col style="width:24%">
-      </colgroup>
-      <thead>
-        <tr>
-          <th>PRODUCTO</th><th>ENTRA</th>
-          <th>VENTA</th><th>EXISTE</th><th>TOTAL</th>
-        </tr>
-      </thead>
-      <tbody id="products"></tbody>
-      <tfoot>
-        <tr>
-          <td colspan="4">TOTAL VENDIDO</td>
-          <td id="table-total">$0.00</td>
-        </tr>
-      </tfoot>
-    </table>
+  <div class="card">
+    <div class="card-head">
+      <h2>Productos y ventas</h2>
+      <button id="edit" class="btn-sm">Editar precios</button>
+    </div>
+    <div class="scroll">
+      <table>
+        <colgroup>
+          <col style="width:30%"><col style="width:17%"><col style="width:16%"><col style="width:17%"><col style="width:20%">
+        </colgroup>
+        <thead><tr><th style="text-align:left">Producto</th><th>Entra</th><th>Venta</th><th>Existe</th><th>Total</th></tr></thead>
+        <tbody id="products"></tbody>
+        <tfoot><tr><td colspan="4">TOTAL VENDIDO</td><td id="table-total" style="text-align:center">$0.00</td></tr></tfoot>
+      </table>
+    </div>
+    <div class="row-btns" id="edit-actions">
+      <button id="add-product" class="btn-sm">+ Producto</button>
+      <button id="add-direct" class="btn-sm">+ Venta directa</button>
+    </div>
+    <p class="hint">Venta = Entra − Existe. Toca «Siguiente» en el teclado para pasar a la otra casilla.</p>
   </div>
 
-  <div class="actions">
-    <button id="add-product">+ Producto</button>
-    <button id="add-direct">+ Venta directa</button>
-  </div>
-  <p class="sub">Venta = ENTRA menos EXISTE. Los precios permanecen guardados.</p>
-</div>
-
-<div class="panel">
-  <h2>02 · Caja final</h2>
-  <div class="row">
-    <h3>Gastos y salidas</h3>
-    <button id="add-expense">+ Gasto</button>
-  </div>
-  <div id="expenses"></div>
-
-  <div class="row">
-    <span>Ventas del día</span><b id="cash-sale">$0.00</b>
-  </div>
-  <div class="row">
-    <span>Menos gastos</span><b id="cash-cost">$0.00</b>
+  <div class="card">
+    <div class="card-head">
+      <h2>Gastos y salidas</h2>
+      <button id="add-expense" class="btn-sm">+ Gasto</button>
+    </div>
+    <div id="expenses"></div>
   </div>
 
-  <div class="total-box">
-    <strong>TOTAL A ENTREGAR</strong>
-    <b id="cash-net">$0.00</b>
+  <div class="card">
+    <h2>Caja final</h2>
+    <div>
+      <div class="line"><span>Ventas del día</span><b id="cash-sale">$0.00</b></div>
+      <div class="line"><span>Menos gastos</span><b id="cash-cost">$0.00</b></div>
+    </div>
+    <div class="deliver"><strong>TOTAL A ENTREGAR</strong><b id="cash-net">$0.00</b></div>
+    <div class="counted">
+      <label for="delivered">Dinero contado</label>
+      <input id="delivered" type="number" step=".01" inputmode="decimal" placeholder="$0.00" enterkeyhint="done">
+    </div>
+    <div class="result" id="difference">Pendiente de contar</div>
+    <div class="row-btns">
+      <button class="btn-gold" id="pdf">Guardar PDF</button>
+      <button id="new-day">Cerrar día</button>
+    </div>
   </div>
 
-  <div class="row">
-    <label>Dinero contado</label>
-    <input id="delivered" type="number" step=".01" inputmode="decimal"
-      placeholder="$ 0.00" style="max-width:140px">
+  <div class="card">
+    <div class="card-head">
+      <h2>Historial</h2>
+      <button id="history-pdf" class="btn-sm">PDF historial</button>
+    </div>
+    <div id="history" class="hint">Sin cierres anteriores.</div>
   </div>
-
-  <div class="result" id="difference">Pendiente de contar</div>
-
-  <div class="actions">
-    <button class="gold" id="pdf">Guardar PDF</button>
-    <button id="history-pdf">PDF historial</button>
-  </div>
-  <p class="sub">
-    Los reportes incluyen inventario, ventas, gastos,
-    caja final y fecha.
-  </p>
-</div>
-
-<div class="panel">
-  <h3>Historial de cuadres</h3>
-  <p class="sub">Toca un cierre para ver su reporte.</p>
-  <div id="history" class="sub">Sin cierres anteriores.</div>
-</div>
 </section>
 
-<section id="compare" class="hidden">
-<div class="panel">
-  <h2>Calculadora de pollos</h2>
-  <p class="sub">Los cálculos no se guardan.</p>
-  <label>¿Cuántos pollos recibiste?</label>
-  <input id="birds" type="number" min="0" inputmode="numeric" placeholder="Ejemplo: 50">
+<!-- ================= POLLOS ================= -->
+<section id="pollos" class="screen hidden">
+  <div class="title"><h1>Calculadora de pollos</h1></div>
+  <p class="hint">Escribe cuántos pollos recibiste y cuántas piezas sobran. La app te dice cuánto ingresar.</p>
 
-  <div class="note">
-    Si recibes 50 pollos, corresponden 100 alas.
-    Con 10 alas sobrantes debes ingresar 90.
-  </div>
-  <div id="cuts"></div>
-</div>
-
-<div class="panel">
-  <h2>Libro vs. Sistema</h2>
-  <div class="note">
-    Libro 50 / Sistema 70 = <b>VENDER 20</b><br>
-    Libro 70 / Sistema 50 = <b>AGREGAR 20</b>
+  <div class="card">
+    <label for="birds">Pollos recibidos</label>
+    <div class="stepper">
+      <button id="birds-minus" aria-label="Menos">−</button>
+      <input id="birds" type="number" min="0" inputmode="numeric" placeholder="0" enterkeyhint="next">
+      <button id="birds-plus" aria-label="Más">+</button>
+    </div>
+    <div class="chips" id="birds-chips"></div>
   </div>
 
-  <div class="scroll">
-    <table>
-      <colgroup>
-        <col style="width:32%">
-        <col style="width:20%">
-        <col style="width:20%">
-        <col style="width:28%">
-      </colgroup>
-      <thead>
-        <tr>
-          <th>PRODUCTO</th><th>LIBRO</th>
-          <th>SISTEMA</th><th>ACCIÓN</th>
-        </tr>
-      </thead>
-      <tbody id="comparison"></tbody>
-    </table>
+  <div class="card">
+    <div class="cut-head"><span>Pieza</span><span>Sobran</span><span>Ingresar</span></div>
+    <div id="cuts"></div>
+    <div class="row-btns">
+      <button id="cuts-clear" class="btn-sm btn-ghost">Limpiar</button>
+      <button id="cuts-edit" class="btn-sm btn-ghost">Cambiar piezas</button>
+    </div>
+    <div id="cuts-editor" class="hidden"></div>
   </div>
-  <div class="actions">
-    <button id="extra">+ Producto</button>
-    <button id="clear-comparison">Limpiar calculadoras</button>
-  </div>
-</div>
 </section>
 
-<section id="tools" class="hidden">
-<div class="panel">
-  <h2>⏱ Temporizador de pollo</h2>
+<!-- ================= LIBRO VS SISTEMA ================= -->
+<section id="libro" class="screen hidden">
+  <div class="title"><h1>Libro vs. Sistema</h1></div>
 
-  <div class="two">
-    <div>
-      <label>Tiempo total (minutos)</label>
-      <input id="minutes" type="number" value="15" min="1" inputmode="decimal">
+  <div class="card">
+    <h2>Rápido</h2>
+    <div class="quick">
+      <div><label for="q-libro">Libro</label><input id="q-libro" type="number" inputmode="numeric" placeholder="0" enterkeyhint="next"></div>
+      <div><label for="q-sistema">Sistema</label><input id="q-sistema" type="number" inputmode="numeric" placeholder="0" enterkeyhint="done"></div>
     </div>
-    <div>
-      <label>Avisar al minuto</label>
-      <input id="alert" type="number" value="8" min="0" inputmode="decimal">
+    <div class="big-result" id="q-result">—<small>Escribe los dos números</small></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Por producto</h2>
+      <div class="counts" id="cmp-counts"></div>
     </div>
-  </div>
-
-  <div class="clock" id="clock">15:00</div>
-  <p class="sub" id="elapsed" style="text-align:center">Transcurrido: 00:00</p>
-  <div class="track"><div id="progress"></div></div>
-  <p id="timer-status" class="sub" style="text-align:center">Listo para iniciar</p>
-
-  <div class="actions">
-    <button class="gold" id="start">▶ Iniciar</button>
-    <button id="pause">Ⅱ Pausar</button>
-    <button id="reset">↻ Reiniciar</button>
-  </div>
-
-  <h3 style="margin-top:24px">Sonido de alarma</h3>
-  <select id="tone">
-    <option value="classic">Campana clásica</option>
-    <option value="digital">Pitidos digitales</option>
-    <option value="urgent">Alerta rápida</option>
-    <option value="soft">Tono suave</option>
-    <option value="custom">Mi sonido personalizado</option>
-  </select>
-
-  <div style="margin-top:12px">
-    <label>Elegir audio del teléfono (MP3, WAV, OGG)</label>
-    <input id="audio-file" type="file" accept="audio/*">
-    <p class="sub" id="audio-name">Ningún sonido seleccionado</p>
-  </div>
-
-  <div class="two" style="margin-top:12px">
-    <div>
-      <label>Duración de alarma (segundos)</label>
-      <input id="sound-length" type="number" value="2" min="1" max="30">
+    <div class="cmp-head"><span>Producto</span><span>Libro</span><span>Sistema</span><span>Acción</span></div>
+    <div id="comparison"></div>
+    <div class="row-btns">
+      <button id="extra" class="btn-sm">+ Producto</button>
+      <button id="clear-comparison" class="btn-sm btn-ghost">Limpiar</button>
     </div>
-    <div>
-      <label>Volumen</label>
-      <input id="volume" type="range" value="80" min="0" max="100">
+    <p class="hint">Sistema mayor que libro: <b>VENDER</b>. Libro mayor que sistema: <b>AGREGAR</b>.</p>
+  </div>
+</section>
+
+<!-- ================= ALARMA ================= -->
+<section id="alarma" class="screen hidden">
+  <div class="title"><h1>Temporizador</h1></div>
+  <div class="card">
+    <div class="ring-wrap">
+      <svg viewBox="0 0 240 240" aria-hidden="true">
+        <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8fe9c0"/><stop offset="1" stop-color="#ffcf7d"/></linearGradient></defs>
+        <circle class="ring-bg" cx="120" cy="120" r="104"/>
+        <circle class="ring-fg" id="ring" cx="120" cy="120" r="104" stroke-dasharray="653.45" stroke-dashoffset="653.45"/>
+        <circle class="alert-mark" id="alert-mark" cx="224" cy="120" r="6"/>
+      </svg>
+      <div class="ring-center">
+        <div class="clock" id="clock">15:00</div>
+        <div id="elapsed">Transcurrido 00:00</div>
+      </div>
     </div>
-  </div>
+    <p id="timer-status">Listo para iniciar</p>
 
-  <div class="actions">
-    <button class="gold" id="test-sound">♫ Probar sonido</button>
-    <button id="stop-sound">■ Detener</button>
-  </div>
+    <div class="chips" id="presets" style="justify-content:center"></div>
 
-  <div class="warning">
-    El reloj calcula el tiempo real, pero una página HTML
-    no puede garantizar que la alarma suene con el móvil
-    bloqueado. Mientras el temporizador corre, la app intenta
-    mantener la pantalla encendida.
-  </div>
-</div>
+    <div class="row-btns">
+      <button class="btn-gold" id="start">▶ Iniciar</button>
+      <button id="pause">Ⅱ Pausar</button>
+      <button id="reset" class="btn-reset" aria-label="Reiniciar">↻</button>
+    </div>
 
-<div class="panel">
-  <h2>▦ Calculadora</h2>
-  <div class="screen">
-    <div id="expression" class="sub">0</div>
-    <b id="answer">0</b>
+    <div class="two">
+      <div><label for="minutes">Tiempo total (min)</label><input id="minutes" type="number" value="15" min="1" inputmode="decimal"></div>
+      <div><label for="alert">Avisar al minuto</label><input id="alert" type="number" value="8" min="0" inputmode="decimal"></div>
+    </div>
+
+    <details>
+      <summary>Sonido de la alarma</summary>
+      <div>
+        <select id="tone" aria-label="Tono">
+          <option value="classic">Campana clásica</option>
+          <option value="digital">Pitidos digitales</option>
+          <option value="urgent">Alerta rápida</option>
+          <option value="soft">Tono suave</option>
+          <option value="custom">Mi sonido personalizado</option>
+        </select>
+        <div>
+          <label for="audio-file">Elegir audio del teléfono</label>
+          <input id="audio-file" type="file" accept="audio/*">
+          <p class="hint" id="audio-name">Ningún sonido seleccionado</p>
+        </div>
+        <div class="two">
+          <div><label for="sound-length">Duración (segundos)</label><input id="sound-length" type="number" value="2" min="1" max="30"></div>
+          <div><label for="volume">Volumen</label><input id="volume" type="range" value="80" min="0" max="100"></div>
+        </div>
+        <div class="row-btns">
+          <button id="test-sound">♫ Probar</button>
+          <button id="stop-sound">■ Detener</button>
+        </div>
+        <p class="warn-note">La pantalla se mantiene encendida con la app abierta. Con el teléfono bloqueado, Android puede pausar la alarma.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ================= CALCULADORA ================= -->
+<section id="calc" class="screen hidden">
+  <div class="title"><h1>Calculadora</h1></div>
+  <div class="calc-screen">
+    <div id="expression">&nbsp;</div>
+    <div id="answer">0</div>
   </div>
   <div class="keys" id="keys">
-    <button class="operator" data-key="C">C</button>
-    <button data-key="DEL">⌫</button>
-    <button data-key="(">(</button>
-    <button data-key=")">)</button>
-    <button data-key="7">7</button>
-    <button data-key="8">8</button>
-    <button data-key="9">9</button>
-    <button class="operator" data-key="/">÷</button>
-    <button data-key="4">4</button>
-    <button data-key="5">5</button>
-    <button data-key="6">6</button>
-    <button class="operator" data-key="*">×</button>
-    <button data-key="1">1</button>
-    <button data-key="2">2</button>
-    <button data-key="3">3</button>
-    <button class="operator" data-key="-">−</button>
-    <button data-key="0">0</button>
+    <button class="fn" data-key="C">C</button>
+    <button class="fn" data-key="DEL" aria-label="Borrar">⌫</button>
+    <button class="fn" data-key="%">%</button>
+    <button class="op" data-key="/">÷</button>
+    <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button>
+    <button class="op" data-key="*">×</button>
+    <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button>
+    <button class="op" data-key="-">−</button>
+    <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button>
+    <button class="op" data-key="+">+</button>
+    <button data-key="0" style="grid-column:span 2">0</button>
     <button data-key=".">.</button>
-    <button class="equals" data-key="=">=</button>
-    <button class="operator" data-key="+">+</button>
+    <button class="eq" data-key="=">=</button>
   </div>
-</div>
 </section>
 
-<footer id="storage-status">CUADRA · Rey Pollo</footer>
+<footer id="storage-status">Rey Pollo SV</footer>
 </main>
 
-<div id="modal" class="hidden"><div class="card" id="modal-card"></div></div>
+<nav class="nav" aria-label="Secciones">
+  <button data-tab="cuadre" class="active">
+    <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Cuadre
+  </button>
+  <button data-tab="pollos">
+    <svg viewBox="0 0 24 24"><path d="M15.5 4.5a4.5 4.5 0 0 0-6.4 6.3L4 16a2 2 0 1 0 2.8 2.8l.3-.3a2 2 0 1 0 2.8-2.8l5.1-5.1a4.5 4.5 0 0 0 .5-6.1z"/></svg>Pollos
+  </button>
+  <button data-tab="libro">
+    <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2zM13 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5z"/><path d="M7 8h1M16 8h1"/></svg>Libro
+  </button>
+  <button data-tab="alarma">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>Alarma
+  </button>
+  <button data-tab="calc">
+    <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18.5h.01M12 18.5h.01M16 18.5h.01"/></svg>Calcular
+  </button>
+</nav>
+
+<div id="modal" class="hidden"><div class="sheet" id="modal-card"></div></div>
 <div id="toast"></div>
 
 <script>
@@ -478,8 +519,9 @@ footer {text-align:center;color:#9ab0b8;padding:20px;font-size:11px}
 "use strict";
 
 var $ = function(id) { return document.getElementById(id); };
-var KEY = "CUADRA_LOCAL_V6";
+var KEY = "CUADRA_LOCAL_V6";          // se mantiene para no perder datos guardados
 var SOUND_KEY = "CUADRA_SOUND_V1";
+var APP = "Rey Pollo SV";
 var date = localDate();
 var editing = false;
 var storageOK = false;
@@ -487,9 +529,7 @@ var storageOK = false;
 /* ===================== utilidades ===================== */
 function localDate() {
   var d = new Date();
-  return d.getFullYear() + "-" +
-    ("0"+(d.getMonth()+1)).slice(-2) + "-" +
-    ("0"+d.getDate()).slice(-2);
+  return d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0"+d.getDate()).slice(-2);
 }
 function number(v) {
   if (v === "" || v === null || v === undefined) return null;
@@ -498,18 +538,13 @@ function number(v) {
 }
 function isInt(n) { return typeof n === "number" && isFinite(n) && Math.floor(n) === n; }
 function fmt(v) { return v == null || (typeof v === "number" && isNaN(v)) ? "" : v; }
-function money(v) {
-  return "$" + (Math.round((Number(v)||0)*100)/100).toFixed(2);
-}
+function money(v) { return "$" + (Math.round((Number(v)||0)*100)/100).toFixed(2); }
 function safe(v) {
-  return String(v == null ? "" : v).replace(/[&<>"']/g,function(c) {
-    return {"&":"&amp;","<":"&lt;",">":"&gt;",
-      '"':"&quot;","'":"&#39;"}[c];
+  return String(v == null ? "" : v).replace(/[&<>"']/g, function(c) {
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
   });
 }
-function id() {
-  return "p"+Date.now()+Math.floor(Math.random()*10000);
-}
+function id() { return "p"+Date.now()+Math.floor(Math.random()*10000); }
 function findBy(list, key, val) {
   for (var i = 0; i < list.length; i++) if (list[i][key] === val) return list[i];
   return null;
@@ -519,6 +554,7 @@ function niceDate(d) {
   var p = String(d).split("-");
   return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : d;
 }
+function closest(el, sel) { return el && el.closest ? el.closest(sel) : null; }
 
 var toastTimer;
 function toast(msg) {
@@ -529,7 +565,7 @@ function toast(msg) {
   toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2200);
 }
 
-/* Ventana propia: en muchos generadores de APK confirm()/alert() no hacen nada */
+/* Ventanas propias: en muchos APK confirm()/alert() no funcionan */
 var modalHandlers = {};
 function openModal(html, handlers) {
   $("modal-card").innerHTML = html;
@@ -543,104 +579,108 @@ function closeModal() {
 }
 $("modal").addEventListener("click", function(e) {
   if (e.target === this) { closeModal(); return; }
-  var b = e.target.closest ? e.target.closest("[data-m]") : null;
+  var b = closest(e.target, "[data-m]");
   if (!b) return;
-  var fn = modalHandlers[b.getAttribute("data-m")];
-  if (b.getAttribute("data-m") === "close") closeModal();
-  else if (fn) fn();
+  var key = b.getAttribute("data-m");
+  if (key === "close") closeModal();
+  else if (modalHandlers[key]) modalHandlers[key]();
 });
-function ask(question, yesText, onYes) {
+function ask(question, yesText, onYes, danger) {
   openModal(
     "<h3>" + question + "</h3>" +
-    '<div class="actions"><button data-m="close">Cancelar</button>' +
-    '<button class="gold" data-m="yes">' + yesText + "</button></div>",
+    '<div class="row-btns"><button data-m="close">Cancelar</button>' +
+    '<button class="' + (danger ? "btn-danger" : "btn-gold") + '" data-m="yes">' + yesText + "</button></div>",
     { yes: function(){ closeModal(); onYes(); } }
   );
 }
 
+/* «Siguiente» del teclado salta a la próxima casilla */
+document.addEventListener("keydown", function(e) {
+  if (e.key !== "Enter" || !e.target || e.target.tagName !== "INPUT") return;
+  var screen = closest(e.target, ".screen");
+  if (!screen) return;
+  var list = screen.querySelectorAll("input:not([type=file]):not([type=range]):not([type=date])");
+  for (var i = 0; i < list.length; i++) {
+    if (list[i] === e.target) {
+      e.preventDefault();
+      if (list[i+1]) { list[i+1].focus(); if (list[i+1].select) list[i+1].select(); }
+      else e.target.blur();
+      return;
+    }
+  }
+});
+
 /* ===================== datos ===================== */
+var DEFAULT_CUTS = [["Alas",2],["Piernas",2],["Muslos",2],["Pechugas",2]];
 function defaultState() {
   var names = [
-    ["Pollo",null],["Pan",null],["Papas",1],
-    ["Ensalada",1],["Soda",1],["Frutado",1],
-    ["Petit",1],["AMP",null],["Gatorade",null],
-    ["Soda 1.5 L",1.50],["Agua",.75],
+    ["Pollo",null],["Pan",null],["Papas",1],["Ensalada",1],["Soda",1],["Frutado",1],
+    ["Petit",1],["AMP",null],["Gatorade",null],["Soda 1.5 L",1.50],["Agua",.75],
     ["Promo",5],["Burguer",1.75]
   ];
   return {
-    products:names.map(function(p,i) {
-      return {id:"p"+i,name:p[0],price:p[1],
-        direct:p[0]==="Promo"};
+    products: names.map(function(p,i) {
+      return {id:"p"+i, name:p[0], price:p[1], direct:p[0]==="Promo"};
     }),
-    days:{},history:[],settings:{}
+    days:{}, history:[], settings:{}
   };
 }
 var state = defaultState();
 try {
   var stored = localStorage.getItem(KEY);
-  if(stored) {
+  if (stored) {
     var parsed = JSON.parse(stored);
-    if(parsed && parsed.products && parsed.days) state=parsed;
+    if (parsed && parsed.products && parsed.days) state = parsed;
   }
   localStorage.setItem("_test","1");
   localStorage.removeItem("_test");
-  storageOK=true;
+  storageOK = true;
 } catch(e) {}
 if (!state.history) state.history = [];
 if (!state.settings) state.settings = {};
+if (!state.settings.cuts) state.settings.cuts = DEFAULT_CUTS.slice();
 
 function save() {
-  try {
-    if(storageOK) localStorage.setItem(KEY,JSON.stringify(state));
-  } catch(e) { storageOK=false; }
-  $("storage-status").textContent=storageOK
-    ? "● Datos almacenados en este dispositivo"
-    : "● Almacenamiento desactivado. Exporta tu PDF.";
+  try { if (storageOK) localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch(e) { storageOK = false; }
+  $("storage-status").textContent = storageOK
+    ? "Rey Pollo SV · datos guardados en este teléfono"
+    : "Rey Pollo SV · el teléfono no permite guardar: exporta tu PDF";
 }
 function day() {
-  if(!state.days[date])
-    state.days[date]={rows:{},expenses:[],delivered:null};
+  if (!state.days[date]) state.days[date] = {rows:{}, expenses:[], delivered:null};
   return state.days[date];
 }
 function row(p) {
-  if(!day().rows[p.id])
-    day().rows[p.id]={entra:null,existe:null,direct:null};
+  if (!day().rows[p.id]) day().rows[p.id] = {entra:null, existe:null, direct:null};
   return day().rows[p.id];
 }
 function quantity(p) {
-  var r=row(p),a,b;
-  if(p.direct) {
-    a=number(r.direct);
-    return a===null ? null :
-      isInt(a)&&a>=0 ? a : NaN;
+  var r = row(p), a, b;
+  if (p.direct) {
+    a = number(r.direct);
+    return a === null ? null : isInt(a) && a >= 0 ? a : NaN;
   }
-  a=number(r.entra);
-  b=number(r.existe);
-  if(a===null && b===null) return null;
-  if(a===null || b===null || !isInt(a) ||
-     !isInt(b) || a<0 || b<0 || b>a)
-    return NaN;
-  return a-b;
+  a = number(r.entra); b = number(r.existe);
+  if (a === null && b === null) return null;
+  if (a === null || b === null || !isInt(a) || !isInt(b) || a < 0 || b < 0 || b > a) return NaN;
+  return a - b;
 }
 function priceOK(p) { return p.price !== null && isFinite(p.price) && p.price >= 0; }
 function totals() {
-  var sales=0,cost=0,errors=0;
+  var sales = 0, cost = 0, errors = 0;
   state.products.forEach(function(p) {
-    var q=quantity(p);
-    if(q!==q) {errors++;return;} // NaN
-    if(q!==null && q>0 && !priceOK(p)) {
-      errors++;return;
-    }
-    if(q!==null && priceOK(p))
-      sales+=Math.round(q*p.price*100);
+    var q = quantity(p);
+    if (q !== q) { errors++; return; }
+    if (q !== null && q > 0 && !priceOK(p)) { errors++; return; }
+    if (q !== null && priceOK(p)) sales += Math.round(q*p.price*100);
   });
   day().expenses.forEach(function(e) {
-    var v=number(e.value);
-    if(v!==null && v>=0) cost+=Math.round(v*100);
-    else if(v!==null) errors++;
+    var v = number(e.value);
+    if (v !== null && v >= 0) cost += Math.round(v*100);
+    else if (v !== null) errors++;
   });
-  return {sales:sales/100,cost:cost/100,
-    net:(sales-cost)/100,errors:errors};
+  return {sales:sales/100, cost:cost/100, net:(sales-cost)/100, errors:errors};
 }
 function dayHasData() {
   var d = day();
@@ -652,155 +692,149 @@ function dayHasData() {
   return false;
 }
 
+/* ===================== pestañas ===================== */
+var TABS = ["cuadre","pollos","libro","alarma","calc"];
+var currentTab = "cuadre";
+function setTab(name) {
+  if (TABS.indexOf(name) < 0) name = "cuadre";
+  currentTab = name;
+  var navs = document.querySelectorAll(".nav [data-tab]");
+  for (var j = 0; j < navs.length; j++)
+    navs[j].classList.toggle("active", navs[j].getAttribute("data-tab") === name);
+  TABS.forEach(function(n){ $(n).classList.toggle("hidden", n !== name); });
+  if (name === "libro") renderCompare();
+  if (name === "pollos") renderCuts();
+  window.scrollTo(0, 0);
+  state.settings.tab = name; save();
+}
+document.querySelector(".nav").addEventListener("click", function(e) {
+  var b = closest(e.target, "[data-tab]");
+  if (b) setTab(b.getAttribute("data-tab"));
+});
+
 /* ===================== productos ===================== */
 function renderProducts() {
-  var html="";
+  var html = "";
   state.products.forEach(function(p) {
-    var r=row(p);
-    html+='<tr data-row="'+p.id+'"><td>';
-    if(editing) {
-      html+='<input data-name="'+p.id+'" value="'+safe(p.name)+'" placeholder="Nombre">';
-      html+='<input data-price="'+p.id+'" type="number" step=".01" min="0" inputmode="decimal" placeholder="Precio" value="'+fmt(p.price)+'">';
-      html+='<button class="danger" data-remove="'+p.id+'">Eliminar</button>';
+    var r = row(p);
+    html += '<tr><td>';
+    if (editing) {
+      html += '<input data-name="'+p.id+'" value="'+safe(p.name)+'" placeholder="Nombre">';
+      html += '<input data-price="'+p.id+'" type="number" step=".01" min="0" inputmode="decimal" placeholder="Precio $" value="'+fmt(p.price)+'">';
+      html += '<button class="btn-danger btn-sm" data-remove="'+p.id+'">Eliminar</button>';
     } else {
-      html+=safe(p.name)+'<span class="price">'+
-        (p.price===null?"Sin precio":money(p.price))+
-        (p.direct?" · directa":"")+'</span>';
+      html += safe(p.name) + '<span class="price">' +
+        (p.price === null ? "Sin precio" : money(p.price)) + (p.direct ? " · directa" : "") + '</span>';
     }
-    html+='</td><td>';
-    if(!p.direct)
-      html+='<input type="number" min="0" step="1" inputmode="numeric" data-id="'+p.id+'" data-field="entra" value="'+fmt(r.entra)+'">';
-    else html+='—';
-    html+='</td><td>';
-    if(p.direct)
-      html+='<input type="number" min="0" step="1" inputmode="numeric" data-id="'+p.id+'" data-field="direct" value="'+fmt(r.direct)+'">';
-    else html+='<span class="sold" data-sold="'+p.id+'">—</span>';
-    html+='</td><td>';
-    if(!p.direct)
-      html+='<input type="number" min="0" step="1" inputmode="numeric" data-id="'+p.id+'" data-field="existe" value="'+fmt(r.existe)+'">';
-    else html+='—';
-    html+='</td><td class="amount" data-total="'+p.id+'">—</td></tr>';
+    html += '</td><td>';
+    html += p.direct ? '—' : '<input type="number" min="0" step="1" inputmode="numeric" enterkeyhint="next" data-id="'+p.id+'" data-field="entra" value="'+fmt(r.entra)+'">';
+    html += '</td><td>';
+    html += p.direct ? '<input type="number" min="0" step="1" inputmode="numeric" enterkeyhint="next" data-id="'+p.id+'" data-field="direct" value="'+fmt(r.direct)+'">'
+                     : '<span class="sold empty" data-sold="'+p.id+'">—</span>';
+    html += '</td><td>';
+    html += p.direct ? '—' : '<input type="number" min="0" step="1" inputmode="numeric" enterkeyhint="next" data-id="'+p.id+'" data-field="existe" value="'+fmt(r.existe)+'">';
+    html += '</td><td class="amount" data-total="'+p.id+'">—</td></tr>';
   });
-  $("products").innerHTML=html;
-  $("edit").textContent=editing?"✓ Guardar precios":"Editar precios";
-  $("edit").className=editing?"gold":"";
+  $("products").innerHTML = html;
+  $("edit").textContent = editing ? "✓ Listo" : "Editar precios";
+  $("edit").className = "btn-sm" + (editing ? " btn-gold" : "");
+  $("edit-actions").classList.toggle("hidden", !editing);
   update();
 }
 function renderExpenses() {
-  var html="";
+  var html = "";
   day().expenses.forEach(function(e) {
-    html+='<div class="expense">'+
-      '<input placeholder="Descripción" data-exp="'+e.id+
-      '" data-field="name" value="'+safe(e.name)+'">'+
-      '<input type="number" min="0" step=".01" inputmode="decimal" placeholder="$" data-exp="'+e.id+
-      '" data-field="value" value="'+fmt(e.value)+'">'+
-      '<button class="danger" data-del-exp="'+e.id+'">×</button></div>';
+    html += '<div class="expense">' +
+      '<input placeholder="Descripción" enterkeyhint="next" data-exp="'+e.id+'" data-field="name" value="'+safe(e.name)+'">' +
+      '<input type="number" min="0" step=".01" inputmode="decimal" placeholder="$0.00" enterkeyhint="next" data-exp="'+e.id+'" data-field="value" value="'+fmt(e.value)+'">' +
+      '<button class="btn-danger btn-sm" data-del-exp="'+e.id+'" aria-label="Quitar gasto">×</button></div>';
   });
-  $("expenses").innerHTML=html || '<p class="sub">Sin gastos.</p>';
-  $("delivered").value=fmt(day().delivered);
+  $("expenses").innerHTML = html || '<p class="hint">Sin gastos. Toca «+ Gasto» para agregar uno.</p>';
+  $("delivered").value = fmt(day().delivered);
   renderHistory();
   update();
 }
 function renderHistory() {
-  $("history").innerHTML=state.history.length ?
+  $("history").innerHTML = state.history.length ?
     state.history.slice(0,30).map(function(h,i) {
       var extra = h.sales != null
-        ? "Ventas " + money(h.sales) + " · Gastos " + money(h.cost) +
-          (h.diffText ? " · " + safe(h.diffText) : "")
+        ? "Ventas " + money(h.sales) + " · Gastos " + money(h.cost) + (h.diffText ? " · " + safe(h.diffText) : "")
         : "";
-      return '<div class="row hist-row" data-hist="'+i+'"><span>'+safe(niceDate(h.date))+
-        (extra ? '<small>'+extra+'</small>' : '') +
-        '</span><b>'+money(h.net)+'</b></div>';
-    }).join("") : "Sin cierres anteriores.";
+      return '<div class="hist-row" data-hist="'+i+'"><span><strong>'+safe(niceDate(h.date))+'</strong>' +
+        (extra ? '<small>'+extra+'</small>' : '') + '</span><b>'+money(h.net)+'</b></div>';
+    }).join("") : '<p class="hint">Sin cierres anteriores. Usa «Cerrar día» al terminar.</p>';
 }
 function diffInfo(t, paid) {
-  if (t.errors) return {text:"⚠ Revisa las cantidades o precios", cls:"warning"};
+  if (t.errors) return {text:"⚠ Revisa las casillas en rojo", cls:"warn"};
   if (paid === null || paid !== paid) return {text:"Pendiente de contar", cls:""};
-  var dif=Math.round((paid-t.net)*100)/100;
-  if (dif===0) return {text:"✓ Caja cuadrada", cls:"add"};
-  if (dif>0) return {text:"SOBRA "+money(dif), cls:"sell"};
-  return {text:"FALTA "+money(-dif), cls:"warning"};
+  var dif = Math.round((paid - t.net)*100)/100;
+  if (dif === 0) return {text:"✓ Caja cuadrada", cls:"ok"};
+  if (dif > 0) return {text:"SOBRA " + money(dif), cls:"over"};
+  return {text:"FALTA " + money(-dif), cls:"short"};
 }
 function update() {
-  var t=totals();
-  $("sale").textContent=money(t.sales);
-  $("cost").textContent=money(t.cost);
-  $("net").textContent=money(t.net);
-  $("table-total").textContent=money(t.sales);
-  $("cash-sale").textContent=money(t.sales);
-  $("cash-cost").textContent="− "+money(t.cost);
-  $("cash-net").textContent=money(t.net);
+  var t = totals();
+  $("sale").textContent = money(t.sales);
+  $("cost").textContent = money(t.cost);
+  $("net").textContent = money(t.net);
+  $("table-total").textContent = money(t.sales);
+  $("cash-sale").textContent = money(t.sales);
+  $("cash-cost").textContent = "− " + money(t.cost);
+  $("cash-net").textContent = money(t.net);
 
   state.products.forEach(function(p) {
-    var q=quantity(p);
-    var s=document.querySelector('[data-sold="'+p.id+'"]');
-    var a=document.querySelector('[data-total="'+p.id+'"]');
-    var bad = q!==q;
-    if(s) {
-      s.textContent=q===null?"—":bad?"!":q;
-      s.className = "sold" + (bad ? " err" : "");
+    var q = quantity(p), bad = q !== q;
+    var s = document.querySelector('[data-sold="'+p.id+'"]');
+    var a = document.querySelector('[data-total="'+p.id+'"]');
+    if (s) {
+      s.textContent = q === null ? "—" : bad ? "!" : q;
+      s.className = "sold" + (bad ? " err" : q === null ? " empty" : "");
     }
     var ins = document.querySelectorAll('[data-id="'+p.id+'"]');
-    for (var i=0;i<ins.length;i++) ins[i].classList.toggle("bad", bad);
-    if(a) a.textContent=q===null || bad ||
-       !priceOK(p) ? (q>0 && !priceOK(p) ? "Sin precio" : "—") : money(q*p.price);
+    for (var i = 0; i < ins.length; i++) ins[i].classList.toggle("bad", bad);
+    if (a) a.textContent = q === null || bad ? "—" : !priceOK(p) ? (q > 0 ? "Sin precio" : "—") : money(q*p.price);
   });
 
   var info = diffInfo(t, number(day().delivered));
-  var d=$("difference");
-  d.className="result" + (info.cls ? " " + info.cls : "");
-  d.textContent=info.text;
+  var d = $("difference");
+  d.className = "result" + (info.cls ? " " + info.cls : "");
+  d.textContent = info.text;
   save();
 }
 
-$("date").value=date;
-$("date").addEventListener("change",function() {
-  if(!this.value)return;
-  date=this.value;
-  renderProducts();
-  renderExpenses();
+$("date").value = date;
+$("date").addEventListener("change", function() {
+  if (!this.value) return;
+  date = this.value;
+  renderProducts(); renderExpenses();
+  toast("Mostrando " + niceDate(date));
 });
 
-/* pestañas */
-var tabButtons = document.querySelectorAll("[data-tab]");
-for (var tb = 0; tb < tabButtons.length; tb++) {
-  tabButtons[tb].addEventListener("click", function() {
-    var b = this;
-    for (var j = 0; j < tabButtons.length; j++)
-      tabButtons[j].classList.toggle("active", tabButtons[j] === b);
-    ["cuadre","compare","tools"].forEach(function(n) {
-      $(n).classList.toggle("hidden", n !== b.getAttribute("data-tab"));
-    });
-    if (b.getAttribute("data-tab")==="compare") renderCompare();
-    window.scrollTo(0, 0);
-  });
-}
-
-$("products").addEventListener("input",function(e) {
-  var x=e.target;
-  var pid=x.getAttribute("data-id") || x.getAttribute("data-price") || x.getAttribute("data-name");
-  var p=findBy(state.products,"id",pid);
-  if(!p)return;
-  if(x.hasAttribute("data-id")) row(p)[x.getAttribute("data-field")]=number(x.value);
-  else if(x.hasAttribute("data-price")) p.price=number(x.value);
-  else p.name=x.value;
+$("products").addEventListener("input", function(e) {
+  var x = e.target;
+  var pid = x.getAttribute("data-id") || x.getAttribute("data-price") || x.getAttribute("data-name");
+  var p = findBy(state.products, "id", pid);
+  if (!p) return;
+  if (x.hasAttribute("data-id")) row(p)[x.getAttribute("data-field")] = number(x.value);
+  else if (x.hasAttribute("data-price")) p.price = number(x.value);
+  else p.name = x.value;
   update();
 });
-$("products").addEventListener("click",function(e) {
-  var pid=e.target.getAttribute && e.target.getAttribute("data-remove");
-  if(!pid)return;
-  var p=findBy(state.products,"id",pid);
+$("products").addEventListener("click", function(e) {
+  var b = closest(e.target, "[data-remove]");
+  if (!b) return;
+  var pid = b.getAttribute("data-remove");
+  var p = findBy(state.products, "id", pid);
   ask("¿Eliminar «" + safe(p ? p.name : "producto") + "»?", "Eliminar", function() {
     state.products = state.products.filter(function(z){ return z.id !== pid; });
     for (var d in state.days) if (state.days[d].rows) delete state.days[d].rows[pid];
     renderProducts();
     toast("Producto eliminado");
-  });
+  }, true);
 });
 $("edit").addEventListener("click", function() {
   if (editing) {
-    var missing = state.products.filter(function(p){ return !String(p.name).trim(); });
-    missing.forEach(function(p){ p.name = "Sin nombre"; });
+    state.products.forEach(function(p){ if (!String(p.name).trim()) p.name = "Sin nombre"; });
     toast("Precios guardados");
   }
   editing = !editing;
@@ -835,8 +869,9 @@ $("expenses").addEventListener("input", function(e) {
   update();
 });
 $("expenses").addEventListener("click", function(e) {
-  var eid = e.target.getAttribute && e.target.getAttribute("data-del-exp");
-  if (!eid) return;
+  var b = closest(e.target, "[data-del-exp]");
+  if (!b) return;
+  var eid = b.getAttribute("data-del-exp");
   day().expenses = day().expenses.filter(function(z){ return z.id !== eid; });
   renderExpenses();
 });
@@ -855,43 +890,37 @@ function snapshot() {
     products: state.products.map(function(p) {
       var r = row(p), q = quantity(p);
       return {
-        name: p.name, price: p.price, direct: !!p.direct,
-        entra: r.entra, existe: r.existe,
+        name:p.name, price:p.price, direct:!!p.direct, entra:r.entra, existe:r.existe,
         qty: q !== q ? null : q,
         total: q && priceOK(p) ? Math.round(q*p.price*100)/100 : 0
       };
     }),
     expenses: d.expenses.map(function(e){ return {name:e.name, value:e.value}; }),
-    sales: t.sales, cost: t.cost, net: t.net,
-    delivered: paid, diffText: info.text, errors: t.errors
+    sales:t.sales, cost:t.cost, net:t.net, delivered:paid, diffText:info.text, errors:t.errors
   };
 }
 $("new-day").addEventListener("click", function() {
-  if (!dayHasData()) { toast("El cuadre ya está limpio"); return; }
-  ask("¿Cerrar el cuadre del " + niceDate(date) + "?<br><small class='sub'>Se guardará en el historial y se limpiarán las cantidades y gastos. Los precios se conservan.</small>",
-    "Cerrar y empezar nuevo", function() {
+  if (!dayHasData()) { toast("No hay datos para cerrar"); return; }
+  ask("¿Cerrar el día " + niceDate(date) + "?<br><span class='hint'>Se guarda en el historial y se limpian las cantidades y gastos. Los precios se conservan.</span>",
+    "Cerrar día", function() {
       var s = snapshot();
       state.history = state.history.filter(function(h){ return h.date !== s.date; });
       state.history.unshift(s);
       state.history.sort(function(a,b){ return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
-      state.days[date] = {rows:{},expenses:[],delivered:null};
-      renderProducts();
-      renderExpenses();
-      toast("Cuadre guardado en el historial");
+      state.days[date] = {rows:{}, expenses:[], delivered:null};
+      renderProducts(); renderExpenses();
+      window.scrollTo(0, 0);
+      toast("Día guardado en el historial");
     });
 });
 
 function reportDay(s) {
-  var h = '<div class="rep-day"><h1>CUADRA · Rey Pollo</h1>' +
-    '<div>Cuadre del <b>' + safe(niceDate(s.date)) + '</b>' +
-    (s.closedAt ? ' · cerrado ' + safe(s.closedAt) : '') + '</div>';
+  var h = '<div class="rep-day"><h1>' + APP + '</h1>' +
+    '<div>Cuadre del <b>' + safe(niceDate(s.date)) + '</b>' + (s.closedAt ? ' · cerrado ' + safe(s.closedAt) : '') + '</div>';
   if (s.products) {
     h += '<h4>Inventario y ventas</h4><table><tr><th>Producto</th><th>Precio</th><th>Entra</th><th>Existe</th><th>Venta</th><th>Total</th></tr>';
     s.products.forEach(function(p) {
-      if (p.direct)
-        h += '<tr><td>'+safe(p.name)+'</td><td>'+(p.price==null?"—":money(p.price))+'</td><td>—</td><td>—</td><td>'+fmt(p.qty)+'</td><td>'+(p.qty?money(p.total):"—")+'</td></tr>';
-      else
-        h += '<tr><td>'+safe(p.name)+'</td><td>'+(p.price==null?"—":money(p.price))+'</td><td>'+fmt(p.entra)+'</td><td>'+fmt(p.existe)+'</td><td>'+fmt(p.qty)+'</td><td>'+(p.qty?money(p.total):"—")+'</td></tr>';
+      h += '<tr><td>'+safe(p.name)+'</td><td>'+(p.price==null?"—":money(p.price))+'</td><td>'+(p.direct?"—":fmt(p.entra))+'</td><td>'+(p.direct?"—":fmt(p.existe))+'</td><td>'+fmt(p.qty)+'</td><td>'+(p.qty?money(p.total):"—")+'</td></tr>';
     });
     h += '<tr><td colspan="5"><b>TOTAL VENDIDO</b></td><td><b>'+money(s.sales)+'</b></td></tr></table>';
   }
@@ -913,30 +942,30 @@ function reportDay(s) {
 }
 function reportText(list) {
   return list.map(function(s) {
-    var t = "CUADRA · Rey Pollo\nCuadre del " + niceDate(s.date) + "\n";
+    var t = "*" + APP + "*\nCuadre del " + niceDate(s.date) + "\n";
     if (s.products) {
       t += "\nVENTAS\n";
-      s.products.forEach(function(p){ if (p.qty) t += "- " + p.name + ": " + p.qty + " × " + money(p.price) + " = " + money(p.total) + "\n"; });
+      s.products.forEach(function(p){ if (p.qty) t += "• " + p.name + ": " + p.qty + " × " + money(p.price) + " = " + money(p.total) + "\n"; });
     }
     if (s.expenses && s.expenses.length) {
       t += "\nGASTOS\n";
-      s.expenses.forEach(function(e){ t += "- " + (e.name||"Gasto") + ": " + money(e.value) + "\n"; });
+      s.expenses.forEach(function(e){ t += "• " + (e.name||"Gasto") + ": " + money(e.value) + "\n"; });
     }
     t += "\nVentas: " + money(s.sales) + "\nGastos: " + money(s.cost) +
-      "\nTOTAL A ENTREGAR: " + money(s.net) +
-      "\nContado: " + (s.delivered==null?"—":money(s.delivered)) +
-      "\n" + (s.diffText||"") + "\n";
+      "\n*TOTAL A ENTREGAR: " + money(s.net) + "*" +
+      "\nContado: " + (s.delivered==null?"—":money(s.delivered)) + "\n" + (s.diffText||"") + "\n";
     return t;
-  }).join("\n------------------------\n\n");
+  }).join("\n────────────\n\n");
 }
 var NATIVE = !!(window.Android && window.Android.printHtml);
 function printablePage(html, filename, autoPrint) {
   return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+safe(filename)+'</title>' +
-    '<style>body{font-family:Arial;font-size:12px;color:#111;background:#fff;padding:14px}table{width:100%;border-collapse:collapse}th{background:#eee;font-size:10px;padding:6px}td{border-bottom:1px solid #ccc;padding:5px}h1{font-size:18px;margin:0 0 2px}h4{border-bottom:2px solid #111;margin:14px 0 6px}.big{font-size:16px;font-weight:900}.rep-day{page-break-inside:avoid;margin-bottom:18px}</style>' +
+    '<style>body{font-family:Arial,sans-serif;font-size:12px;color:#111;background:#fff;padding:14px}table{width:100%;border-collapse:collapse}th{background:#eee;font-size:10px;padding:6px;text-align:left}td{border-bottom:1px solid #ccc;padding:5px}h1{font-size:18px;margin:0 0 2px}h4{border-bottom:2px solid #111;margin:14px 0 6px}.big{font-size:16px;font-weight:900}.rep-day{page-break-inside:avoid;margin-bottom:18px}</style>' +
     '</head><body>' + html + (autoPrint ? '<script>window.onload=function(){try{window.print()}catch(e){}}<\/script>' : '') + '</body></html>';
 }
 window.cuadraBack = function() {
   if (!$("modal").classList.contains("hidden")) { closeModal(); return true; }
+  if (currentTab !== "cuadre") { setTab("cuadre"); return true; }
   return false;
 };
 function showReport(html, text, filename, extraButtons, extraHandlers) {
@@ -948,14 +977,12 @@ function showReport(html, text, filename, extraButtons, extraHandlers) {
     },
     share: function() {
       if (window.Android && window.Android.shareText) { window.Android.shareText(text); return; }
-      if (navigator.share) {
-        navigator.share({title:"Cuadre Rey Pollo", text:text}).catch(function(){});
-      } else copyText(text);
+      if (navigator.share) navigator.share({title:APP, text:text}).catch(function(){});
+      else copyText(text);
     },
     download: function() {
       try {
-        var page = printablePage(html, filename, true);
-        var blob = new Blob([page], {type:"text/html"});
+        var blob = new Blob([printablePage(html, filename, true)], {type:"text/html"});
         var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = filename + ".html";
@@ -967,40 +994,37 @@ function showReport(html, text, filename, extraButtons, extraHandlers) {
   for (var k in (extraHandlers||{})) handlers[k] = extraHandlers[k];
   openModal(
     '<div id="print-area">' + html + '</div>' +
-    '<div class="actions"><button class="gold" data-m="print">🖨 Imprimir / PDF</button>' +
-    '<button data-m="share">↗ Compartir</button></div>' +
-    '<div class="actions">' + (NATIVE ? '' : '<button data-m="download">⬇ Descargar</button>') +
+    '<div class="row-btns"><button class="btn-gold" data-m="print">Guardar PDF</button>' +
+    '<button data-m="share">Compartir</button></div>' +
+    '<div class="row-btns">' + (NATIVE ? '' : '<button data-m="download">Descargar</button>') +
     (extraButtons||"") + '<button data-m="close">Cerrar</button></div>' +
-    '<p class="sub">' + (NATIVE
-      ? 'Para PDF: toca «Imprimir / PDF» y en la impresora elige «Guardar como PDF». «Compartir» lo envía como texto (WhatsApp).'
-      : 'Para PDF: toca «Imprimir / PDF» y elige «Guardar como PDF». Si tu app no lo permite, usa «Descargar» o «Compartir» (WhatsApp).') + '</p>',
+    '<p class="hint">' + (NATIVE
+      ? '«Guardar PDF» abre la impresora de Android: elige «Guardar como PDF». «Compartir» lo envía como texto por WhatsApp.'
+      : 'Para PDF elige «Guardar como PDF» al imprimir. Si no aparece, usa «Descargar» o «Compartir».') + '</p>',
     handlers
   );
 }
 function copyText(text) {
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function(){ toast("Reporte copiado"); },
-        function(){ fallbackCopy(text); });
+      navigator.clipboard.writeText(text).then(function(){ toast("Reporte copiado"); }, function(){ fallbackCopy(text); });
     } else fallbackCopy(text);
   } catch(e) { fallbackCopy(text); }
 }
 function fallbackCopy(text) {
   var ta = document.createElement("textarea");
   ta.value = text; document.body.appendChild(ta); ta.select();
-  try { document.execCommand("copy"); toast("Reporte copiado"); }
-  catch(e) { toast("No se pudo copiar"); }
+  try { document.execCommand("copy"); toast("Reporte copiado"); } catch(e) { toast("No se pudo copiar"); }
   ta.remove();
 }
 $("pdf").addEventListener("click", function() {
   var s = snapshot();
-  showReport(reportDay(s), reportText([s]), "cuadre-" + s.date);
+  showReport(reportDay(s), reportText([s]), "rey-pollo-sv-" + s.date);
 });
 $("history-pdf").addEventListener("click", function() {
-  if (!state.history.length) { toast("Aún no hay cierres. Usa «Nuevo cuadre» para cerrar un día."); return; }
-  var list = state.history;
-  var sum = {sales:0,cost:0,net:0};
-  var h = '<h1>CUADRA · Historial de cuadres</h1><div>' + list.length + ' cierres</div>' +
+  if (!state.history.length) { toast("Aún no hay días cerrados"); return; }
+  var list = state.history, sum = {sales:0, cost:0, net:0};
+  var h = '<h1>' + APP + ' · Historial</h1><div>' + list.length + ' días cerrados</div>' +
     '<h4>Resumen</h4><table><tr><th>Fecha</th><th>Ventas</th><th>Gastos</th><th>Entregar</th><th>Contado</th><th>Resultado</th></tr>';
   list.forEach(function(s) {
     sum.sales += Number(s.sales)||0; sum.cost += Number(s.cost)||0; sum.net += Number(s.net)||0;
@@ -1008,62 +1032,127 @@ $("history-pdf").addEventListener("click", function() {
   });
   h += '<tr><td><b>TOTAL</b></td><td><b>'+money(sum.sales)+'</b></td><td><b>'+money(sum.cost)+'</b></td><td><b>'+money(sum.net)+'</b></td><td></td><td></td></tr></table>';
   list.forEach(function(s){ if (s.products) h += reportDay(s); });
-  showReport(h, reportText(list), "historial-cuadra");
+  showReport(h, reportText(list), "historial-rey-pollo-sv");
 });
 $("history").addEventListener("click", function(e) {
-  var r = e.target.closest ? e.target.closest("[data-hist]") : null;
+  var r = closest(e.target, "[data-hist]");
   if (!r) return;
   var i = Number(r.getAttribute("data-hist")), s = state.history[i];
   if (!s) return;
-  showReport(reportDay(s), reportText([s]), "cuadre-" + s.date,
-    '<button class="danger" data-m="delhist">Borrar</button>',
+  showReport(reportDay(s), reportText([s]), "rey-pollo-sv-" + s.date,
+    '<button class="btn-danger" data-m="delhist">Borrar</button>',
     { delhist: function() {
-        ask("¿Borrar el cierre del " + niceDate(s.date) + " del historial?", "Borrar", function() {
-          state.history.splice(i, 1); save(); renderHistory(); toast("Cierre borrado");
-        });
+        ask("¿Borrar el día " + niceDate(s.date) + " del historial?", "Borrar", function() {
+          state.history.splice(i, 1); save(); renderHistory(); toast("Día borrado");
+        }, true);
       } });
 });
 
-/* ===================== comparar ===================== */
-var CUTS = [["Alas",2],["Piernas",2],["Muslos",2],["Pechugas",2]];
+/* ===================== pollos ===================== */
 var cutLeft = {};
-var cmp = {};
-var cmpExtras = [];
-
-function renderCuts() {
-  var birds = number($("birds").value);
-  if (birds === null || birds !== birds || birds < 0) {
-    $("cuts").innerHTML = '<p class="sub">Escribe cuántos pollos recibiste para ver las piezas.</p>';
-    return;
-  }
-  $("cuts").innerHTML = CUTS.map(function(c, i) {
-    return '<div class="cut"><b>' + c[0] + '</b> <span class="sub">(' + c[1] + ' por pollo)</span>' +
-      '<div class="cut-values"><div><small>CORRESPONDEN</small><b data-cut-total="'+i+'">0</b></div>' +
-      '<div><small>SOBRAN</small><b data-cut-left="'+i+'">0</b></div>' +
-      '<div><small>INGRESAR</small><b data-cut-in="'+i+'">0</b></div></div>' +
-      '<label>' + c[0] + ' sobrantes</label>' +
-      '<input type="number" min="0" inputmode="numeric" data-cut="'+i+'" placeholder="0" value="'+fmt(cutLeft[i])+'"></div>';
+var cutsEditing = false;
+function cuts() { return state.settings.cuts; }
+function birdsVal() { var b = number($("birds").value); return b === null || b !== b || b < 0 ? 0 : Math.floor(b); }
+function renderBirdChips() {
+  var b = birdsVal();
+  $("birds-chips").innerHTML = [25,50,75,100].map(function(n) {
+    return '<button class="chip' + (b === n ? ' on' : '') + '" data-birds="'+n+'">'+n+'</button>';
   }).join("");
+}
+function renderCuts() {
+  $("cuts").innerHTML = cuts().map(function(c, i) {
+    return '<div class="cut-row">' +
+      '<div class="cut-name"><b>' + safe(c[0]) + '</b><small>Corresponden <span data-cut-total="'+i+'">0</span></small></div>' +
+      '<input type="number" min="0" inputmode="numeric" enterkeyhint="next" data-cut="'+i+'" placeholder="0" value="'+fmt(cutLeft[i])+'" aria-label="'+safe(c[0])+' sobrantes">' +
+      '<div class="cut-in"><b data-cut-in="'+i+'">0</b></div></div>';
+  }).join("");
+  renderBirdChips();
   updateCuts();
 }
 function updateCuts() {
-  var birds = number($("birds").value) || 0;
-  CUTS.forEach(function(c, i) {
-    var tot = Math.round(birds * c[1]), left = Number(cutLeft[i]) || 0;
+  var b = birdsVal();
+  cuts().forEach(function(c, i) {
+    var tot = Math.round(b * c[1]), left = Number(cutLeft[i]) || 0;
     var t = document.querySelector('[data-cut-total="'+i+'"]');
     if (!t) return;
     t.textContent = tot;
-    document.querySelector('[data-cut-left="'+i+'"]').textContent = left;
-    document.querySelector('[data-cut-in="'+i+'"]').textContent = tot - left;
+    var inEl = document.querySelector('[data-cut-in="'+i+'"]');
+    inEl.textContent = tot - left;
+    inEl.style.color = tot - left < 0 ? "var(--red)" : "";
   });
 }
-$("birds").addEventListener("input", renderCuts);
+function setBirds(n) {
+  $("birds").value = n > 0 ? n : "";
+  renderBirdChips(); updateCuts();
+}
+$("birds").addEventListener("input", function(){ renderBirdChips(); updateCuts(); });
+$("birds-minus").addEventListener("click", function(){ setBirds(Math.max(0, birdsVal() - 1)); });
+$("birds-plus").addEventListener("click", function(){ setBirds(birdsVal() + 1); });
+$("birds-chips").addEventListener("click", function(e) {
+  var b = closest(e.target, "[data-birds]");
+  if (b) setBirds(Number(b.getAttribute("data-birds")));
+});
 $("cuts").addEventListener("input", function(e) {
   var i = e.target.getAttribute("data-cut");
   if (i === null) return;
   cutLeft[i] = number(e.target.value);
   updateCuts();
 });
+$("cuts-clear").addEventListener("click", function() {
+  cutLeft = {}; $("birds").value = ""; renderCuts(); toast("Calculadora limpia");
+});
+function renderCutsEditor() {
+  var ed = $("cuts-editor");
+  ed.classList.toggle("hidden", !cutsEditing);
+  $("cuts-edit").textContent = cutsEditing ? "✓ Listo" : "Cambiar piezas";
+  if (!cutsEditing) { ed.innerHTML = ""; return; }
+  ed.innerHTML = '<p class="hint">Nombre de la pieza y cuántas trae cada pollo.</p>' +
+    cuts().map(function(c, i) {
+      return '<div class="cut-edit" style="margin-bottom:6px"><input data-cname="'+i+'" value="'+safe(c[0])+'">' +
+        '<input type="number" min="0" step="1" inputmode="numeric" data-cper="'+i+'" value="'+c[1]+'">' +
+        '<button class="btn-danger btn-sm" data-cdel="'+i+'" aria-label="Quitar pieza">×</button></div>';
+    }).join("") +
+    '<div class="row-btns"><button class="btn-sm" data-cadd="1">+ Pieza</button><button class="btn-sm btn-ghost" data-creset="1">Volver a las 4 piezas</button></div>';
+}
+$("cuts-edit").addEventListener("click", function() {
+  cutsEditing = !cutsEditing;
+  renderCutsEditor(); renderCuts();
+});
+$("cuts-editor").addEventListener("input", function(e) {
+  var x = e.target;
+  if (x.hasAttribute("data-cname")) cuts()[+x.getAttribute("data-cname")][0] = x.value;
+  else if (x.hasAttribute("data-cper")) cuts()[+x.getAttribute("data-cper")][1] = Math.max(0, number(x.value) || 0);
+  else return;
+  save(); renderCuts();
+});
+$("cuts-editor").addEventListener("click", function(e) {
+  var x = e.target;
+  if (x.hasAttribute("data-cdel")) { cuts().splice(+x.getAttribute("data-cdel"), 1); cutLeft = {}; }
+  else if (x.hasAttribute("data-cadd")) cuts().push(["Pieza", 1]);
+  else if (x.hasAttribute("data-creset")) { state.settings.cuts = DEFAULT_CUTS.map(function(c){ return c.slice(); }); cutLeft = {}; }
+  else return;
+  save(); renderCutsEditor(); renderCuts();
+});
+
+/* ===================== libro vs sistema ===================== */
+var cmp = {};
+var cmpExtras = [];
+function actionFor(libro, sistema) {
+  var l = number(libro), s = number(sistema);
+  if (l === null || s === null || l !== l || s !== s) return null;
+  var d = Math.round((s - l) * 100) / 100;
+  if (d > 0) return {text:"VENDER " + d, cls:"tag-sell", kind:"sell", n:d};
+  if (d < 0) return {text:"AGREGAR " + (-d), cls:"tag-add", kind:"add", n:-d};
+  return {text:"✓ IGUAL", cls:"tag-ok", kind:"ok", n:0};
+}
+function updateQuick() {
+  var a = actionFor($("q-libro").value, $("q-sistema").value), el = $("q-result");
+  if (!a) { el.className = "big-result"; el.innerHTML = "—<small>Escribe los dos números</small>"; return; }
+  el.className = "big-result " + a.cls;
+  el.innerHTML = a.text + "<small>" + (a.kind === "sell" ? "El sistema tiene más que el libro" : a.kind === "add" ? "El libro tiene más que el sistema" : "No hay diferencia") + "</small>";
+}
+$("q-libro").addEventListener("input", updateQuick);
+$("q-sistema").addEventListener("input", updateQuick);
 
 function compareRows() {
   return state.products.map(function(p){ return {id:p.id, name:p.name, fixed:true}; }).concat(cmpExtras);
@@ -1071,33 +1160,41 @@ function compareRows() {
 function renderCompare() {
   $("comparison").innerHTML = compareRows().map(function(r) {
     var v = cmp[r.id] || {};
-    return '<tr><td>' + (r.fixed ? safe(r.name)
-        : '<input data-cname="'+r.id+'" value="'+safe(r.name)+'" placeholder="Producto">') + '</td>' +
-      '<td><input type="number" inputmode="numeric" data-cmp="'+r.id+'" data-f="libro" value="'+fmt(v.libro)+'"></td>' +
-      '<td><input type="number" inputmode="numeric" data-cmp="'+r.id+'" data-f="sistema" value="'+fmt(v.sistema)+'"></td>' +
-      '<td><span class="sold" data-act="'+r.id+'">—</span></td></tr>';
+    return '<div class="cmp-row">' + (r.fixed ? '<b>' + safe(r.name) + '</b>'
+        : '<input data-xname="'+r.id+'" value="'+safe(r.name)+'" placeholder="Producto" style="text-align:left;padding:9px 8px">') +
+      '<input type="number" inputmode="numeric" enterkeyhint="next" data-cmp="'+r.id+'" data-f="libro" value="'+fmt(v.libro)+'" aria-label="Libro">' +
+      '<input type="number" inputmode="numeric" enterkeyhint="next" data-cmp="'+r.id+'" data-f="sistema" value="'+fmt(v.sistema)+'" aria-label="Sistema">' +
+      '<div class="cmp-act" data-act="'+r.id+'">—</div></div>';
   }).join("");
   compareRows().forEach(function(r){ updateCompareRow(r.id); });
-  if (!$("cuts").innerHTML) renderCuts();
+  updateCounts();
 }
 function updateCompareRow(rid) {
   var el = document.querySelector('[data-act="'+rid+'"]');
   if (!el) return;
-  var v = cmp[rid] || {}, l = number(v.libro), s = number(v.sistema);
-  if (l === null || s === null || l !== l || s !== s) { el.textContent = "—"; el.className = "sold"; return; }
-  var d = Math.round((s - l) * 100) / 100;
-  if (d > 0) { el.textContent = "VENDER " + d; el.className = "sold sell"; }
-  else if (d < 0) { el.textContent = "AGREGAR " + (-d); el.className = "sold add"; }
-  else { el.textContent = "✓ OK"; el.className = "sold ok"; }
+  var v = cmp[rid] || {}, a = actionFor(v.libro, v.sistema);
+  el.textContent = a ? a.text : "—";
+  el.className = "cmp-act" + (a ? " " + a.cls : "");
+}
+function updateCounts() {
+  var sell = 0, add = 0, ok = 0;
+  compareRows().forEach(function(r) {
+    var v = cmp[r.id] || {}, a = actionFor(v.libro, v.sistema);
+    if (!a) return;
+    if (a.kind === "sell") sell++; else if (a.kind === "add") add++; else ok++;
+  });
+  $("cmp-counts").innerHTML = (sell ? '<span class="pill tag-sell">' + sell + ' vender</span>' : '') +
+    (add ? '<span class="pill tag-add">' + add + ' agregar</span>' : '') +
+    (ok ? '<span class="pill tag-ok">' + ok + ' iguales</span>' : '');
 }
 $("comparison").addEventListener("input", function(e) {
   var x = e.target, rid = x.getAttribute("data-cmp");
   if (rid) {
     if (!cmp[rid]) cmp[rid] = {};
     cmp[rid][x.getAttribute("data-f")] = number(x.value);
-    updateCompareRow(rid);
-  } else if (x.hasAttribute("data-cname")) {
-    var ex = findBy(cmpExtras, "id", x.getAttribute("data-cname"));
+    updateCompareRow(rid); updateCounts();
+  } else if (x.hasAttribute("data-xname")) {
+    var ex = findBy(cmpExtras, "id", x.getAttribute("data-xname"));
     if (ex) ex.name = x.value;
   }
 });
@@ -1105,15 +1202,14 @@ $("extra").addEventListener("click", function() {
   var r = {id:id(), name:"", fixed:false};
   cmpExtras.push(r);
   renderCompare();
-  var inp = document.querySelector('[data-cname="'+r.id+'"]');
+  var inp = document.querySelector('[data-xname="'+r.id+'"]');
   if (inp) inp.focus();
 });
 $("clear-comparison").addEventListener("click", function() {
-  cmp = {}; cmpExtras = []; cutLeft = {};
-  $("birds").value = "";
-  renderCuts();
-  renderCompare();
-  toast("Calculadoras limpias");
+  cmp = {}; cmpExtras = [];
+  $("q-libro").value = ""; $("q-sistema").value = "";
+  updateQuick(); renderCompare();
+  toast("Libro vs. Sistema limpio");
 });
 
 /* ===================== sonido ===================== */
@@ -1161,11 +1257,11 @@ function playAlarm(seconds) {
     }
   }
   if (!audioCtx()) { toast("Este teléfono no permite sonidos"); return; }
-  var t = 0;
+  var t = 0, k = 0;
   while (t < seconds) {
     if (tone === "classic") { beep(880, t, 0.9, "sine", v); beep(1320, t, 0.6, "sine", v*0.4); t += 1; }
     else if (tone === "digital") { for (var i=0;i<4;i++) beep(1000, t+i*0.15, 0.08, "square", v*0.5); t += 1; }
-    else if (tone === "urgent") { beep(t*10 % 2 < 1 ? 900 : 1250, t, 0.12, "sawtooth", v*0.5); t += 0.16; }
+    else if (tone === "urgent") { beep(k++ % 2 ? 1250 : 900, t, 0.12, "sawtooth", v*0.5); t += 0.16; }
     else { beep(523, t, 0.5, "sine", v*0.8); beep(659, t+0.5, 0.5, "sine", v*0.8); t += 1.2; }
   }
 }
@@ -1180,7 +1276,6 @@ $("audio-file").addEventListener("change", function() {
   $("tone").value = "custom";
   $("audio-name").textContent = "♫ " + f.name;
   state.settings.tone = "custom"; save();
-  // Guardar el sonido si es pequeño, para que siga después de cerrar la app
   if (f.size < 1500000 && window.FileReader) {
     var rd = new FileReader();
     rd.onload = function() {
@@ -1196,19 +1291,33 @@ try {
 } catch(e) {}
 
 /* ===================== temporizador ===================== */
+var RING = 653.45;
 var timer = {running:false, start:0, acc:0, alertFired:false, doneFired:false};
 var tickId = null, wakeLock = null;
 function pad(n) { return ("0" + n).slice(-2); }
-function mmss(ms) { var s = Math.max(0, Math.round(ms / 1000)); return pad(Math.floor(s/60)) + ":" + pad(s % 60); }
+function mmss(ms) { var s = Math.max(0, Math.ceil(ms / 1000)); return pad(Math.floor(s/60)) + ":" + pad(s % 60); }
 function totalMs() { return Math.max(1, Number($("minutes").value) || 15) * 60000; }
 function alertMs() { var a = number($("alert").value); return a === null || a !== a || a <= 0 ? null : a * 60000; }
 function elapsedMs() { return timer.acc + (timer.running ? Date.now() - timer.start : 0); }
+function placeAlertMark() {
+  var al = alertMs(), tot = totalMs(), m = $("alert-mark");
+  if (al === null || al >= tot) { m.style.display = "none"; return; }
+  m.style.display = "";
+  var ang = al / tot * Math.PI * 2;
+  m.setAttribute("cx", 120 + 104 * Math.cos(ang));
+  m.setAttribute("cy", 120 + 104 * Math.sin(ang));
+}
+function renderPresets() {
+  var cur = Number($("minutes").value);
+  $("presets").innerHTML = [10,12,15,20].map(function(n) {
+    return '<button class="chip' + (cur === n ? ' on' : '') + '" data-min="'+n+'">'+n+' min</button>';
+  }).join("");
+}
 function tick() {
-  var el = elapsedMs(), tot = totalMs(), al = alertMs();
-  var clock = $("clock");
+  var el = elapsedMs(), tot = totalMs(), al = alertMs(), clock = $("clock");
   clock.textContent = mmss(tot - el);
-  $("elapsed").textContent = "Transcurrido: " + mmss(el);
-  $("progress").style.width = Math.min(100, el / tot * 100) + "%";
+  $("elapsed").textContent = "Transcurrido " + mmss(el);
+  $("ring").setAttribute("stroke-dashoffset", RING * (1 - Math.min(1, el / tot)));
   if (timer.running && al !== null && al < tot && !timer.alertFired && el >= al) {
     timer.alertFired = true;
     clock.className = "clock alerting";
@@ -1232,12 +1341,13 @@ function keepAwake() {
 }
 function releaseWake() { try { if (wakeLock) wakeLock.release(); } catch(e) {} wakeLock = null; }
 function updTimerButtons() {
-  $("start").textContent = timer.running ? "● En marcha" : (timer.acc > 0 && !timer.doneFired ? "▶ Continuar" : "▶ Iniciar");
+  $("start").textContent = timer.running ? "En marcha" : (timer.acc > 0 && !timer.doneFired ? "▶ Continuar" : "▶ Iniciar");
   $("start").disabled = timer.running;
   $("pause").disabled = !timer.running;
+  $("minutes").disabled = $("alert").disabled = timer.running;
 }
 $("start").addEventListener("click", function() {
-  audioCtx(); // el sonido debe activarse con un toque
+  audioCtx();
   if (timer.doneFired) resetTimer();
   if (timer.running) return;
   timer.running = true; timer.start = Date.now();
@@ -1262,20 +1372,29 @@ function resetTimer() {
   tick(); updTimerButtons();
 }
 $("reset").addEventListener("click", resetTimer);
+$("presets").addEventListener("click", function(e) {
+  var b = closest(e.target, "[data-min]");
+  if (!b || timer.running) return;
+  $("minutes").value = b.getAttribute("data-min");
+  if (Number($("alert").value) >= Number($("minutes").value)) $("alert").value = Math.round(Number($("minutes").value) / 2);
+  state.settings.minutes = $("minutes").value; state.settings.alert = $("alert").value; save();
+  resetTimer(); renderPresets(); placeAlertMark();
+});
 ["minutes","alert","sound-length","volume","tone"].forEach(function(k) {
+  if (state.settings[k] != null) $(k).value = state.settings[k];
   $(k).addEventListener("change", function() {
     state.settings[k] = this.value; save();
-    if ((k === "minutes" || k === "alert") && !timer.running) tick();
+    if (k === "minutes" || k === "alert") { if (!timer.running) tick(); renderPresets(); placeAlertMark(); }
   });
-  if (state.settings[k] != null) $(k).value = state.settings[k];
 });
-$("minutes").addEventListener("input", function(){ if (!timer.running) tick(); });
+$("minutes").addEventListener("input", function(){ if (!timer.running) tick(); renderPresets(); placeAlertMark(); });
+$("alert").addEventListener("input", placeAlertMark);
 document.addEventListener("visibilitychange", function() {
-  if (!document.hidden) { if (timer.running) { tick(); keepAwake(); } }
+  if (!document.hidden && timer.running) { tick(); keepAwake(); }
 });
 
 /* ===================== calculadora ===================== */
-var expr = "";
+var expr = "", justSolved = false;
 function evaluate(s) {
   var i = 0;
   function peek() { return s.charAt(i); }
@@ -1292,42 +1411,45 @@ function evaluate(s) {
   function parseFactor() {
     if (peek() === "-") { i++; return -parseFactor(); }
     if (peek() === "+") { i++; return parseFactor(); }
-    if (peek() === "(") { i++; var v = parseExpr(); if (peek() === ")") i++; return v; }
     var st = i;
     while (/[0-9.]/.test(peek())) i++;
     if (st === i) throw new Error("x");
     var n = Number(s.slice(st, i));
     if (isNaN(n)) throw new Error("x");
+    if (peek() === "%") { i++; n = n / 100; }
     return n;
   }
   var res = parseExpr();
-  if (i < s.length) throw new Error("x");
-  if (!isFinite(res)) throw new Error("x");
+  if (i < s.length || !isFinite(res)) throw new Error("x");
   return Math.round(res * 1e10) / 1e10;
 }
+function pretty(s) { return s.replace(/\*/g, "×").replace(/\//g, "÷").replace(/-/g, "−"); }
 function showCalc(final) {
-  var pretty = expr.replace(/\*/g, "×").replace(/\//g, "÷").replace(/-/g, "−");
-  $("expression").textContent = pretty || "0";
+  $("expression").textContent = expr ? pretty(expr) : " ";
   var ans = $("answer");
   if (!expr) { ans.textContent = "0"; return; }
   try {
-    var open = (expr.match(/\(/g)||[]).length - (expr.match(/\)/g)||[]).length;
-    var r = evaluate(expr + new Array(Math.max(0, open) + 1).join(")"));
-    ans.textContent = r;
-    if (final) { expr = String(r); $("expression").textContent = pretty + " ="; }
+    var r = evaluate(expr.replace(/[+\-*/]$/, ""));
+    ans.textContent = r.toLocaleString("en-US", {maximumFractionDigits:10});
+    if (final) { $("expression").textContent = pretty(expr) + " ="; expr = String(r); justSolved = true; }
   } catch(e) { if (final) ans.textContent = "Error"; }
 }
 $("keys").addEventListener("click", function(e) {
-  var b = e.target.closest ? e.target.closest("[data-key]") : null;
+  var b = closest(e.target, "[data-key]");
   if (!b) return;
   var k = b.getAttribute("data-key");
-  if (k === "C") expr = "";
-  else if (k === "DEL") expr = expr.slice(0, -1);
+  if (k === "C") { expr = ""; justSolved = false; }
+  else if (k === "DEL") { expr = justSolved ? "" : expr.slice(0, -1); justSolved = false; }
   else if (k === "=") { showCalc(true); return; }
   else {
+    var isOp = /[+\-*/]/.test(k);
+    if (justSolved && !isOp && k !== "%") expr = "";
+    justSolved = false;
     var last = expr.slice(-1);
-    if (/[+\-*/]/.test(k) && /[+*/]/.test(last)) expr = expr.slice(0, -1); // cambiar operador
-    if (k === "." ) { var seg = expr.split(/[+\-*/()]/).pop(); if (seg.indexOf(".") >= 0) return; if (!seg) expr += "0"; }
+    if (isOp && /[+\-*/]/.test(last)) expr = expr.slice(0, -1);
+    if (isOp && !expr && k !== "-") return;
+    if (k === "%" && !/[0-9]/.test(last)) return;
+    if (k === ".") { var seg = expr.split(/[+\-*/]/).pop(); if (seg.indexOf(".") >= 0) return; if (!seg) expr += "0"; }
     expr += k;
   }
   showCalc(false);
@@ -1337,7 +1459,12 @@ $("keys").addEventListener("click", function(e) {
 renderProducts();
 renderExpenses();
 renderCuts();
+renderCompare();
+updateQuick();
+renderPresets();
+placeAlertMark();
 tick(); updTimerButtons();
+setTab(state.settings.tab || "cuadre");
 $("js-status").classList.add("hidden");
 window.addEventListener("error", function(e) { toast("Error: " + (e.message || "desconocido")); });
 

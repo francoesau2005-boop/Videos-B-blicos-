@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Arma CUADRA.apk sin Android Studio.
+"""Arma ReyPolloSV.apk sin Android Studio.
 
 Genera el AndroidManifest binario y resources.arsc a mano, compila la
 Activity con javac, la convierte a dex con dx y firma con apksig (v1+v2).
@@ -11,7 +11,7 @@ import os, struct, subprocess, sys, zipfile, zlib, shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORK = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
 PKG = "com.reypollo.cuadra"
-VERSION_CODE, VERSION_NAME = 2, "1.1"
+VERSION_CODE, VERSION_NAME = 3, "1.2"
 ICON_ID = 0x7F010000
 
 # ---------------------------------------------------------------- string pool
@@ -63,7 +63,7 @@ MANIFEST = ("manifest", [
     ("uses-permission", [(True, "name", S("android.permission.VIBRATE"))], []),
     ("uses-permission", [(True, "name", S("android.permission.WAKE_LOCK"))], []),
     ("application", [
-            (True, "label", S("CUADRA")), (True, "icon", R(ICON_ID)),
+            (True, "label", S("Rey Pollo SV")), (True, "icon", R(ICON_ID)),
             (True, "roundIcon", R(ICON_ID)), (True, "allowBackup", B(True)),
             (True, "hardwareAccelerated", B(True))], [
         ("activity", [
@@ -176,10 +176,17 @@ def make_icons(dst):
         g = ImageDraw.Draw(im)
         g.ellipse((0, 0, S4 - 1, S4 - 1), fill=(38, 62, 73, 255))
         g.ellipse((S4 * .08, S4 * .08, S4 * .92, S4 * .92), outline=(255, 211, 143, 255), width=int(S4 * .035))
-        fnt = ImageFont.truetype(font, int(S4 * .25)) if font else ImageFont.load_default()
-        for txt, y, col in (("CUA", .36, (238, 246, 247, 255)), ("DRA", .64, (255, 211, 143, 255))):
-            w = g.textlength(txt, font=fnt)
-            g.text(((S4 - w) / 2, S4 * y), txt, font=fnt, fill=col, anchor="lm")
+        gold = (255, 207, 125, 255)
+        # corona (el «Rey» de Rey Pollo)
+        c = [(.27, .50), (.24, .25), (.37, .36), (.50, .19), (.63, .36), (.76, .25), (.73, .50)]
+        g.polygon([(S4 * x, S4 * y) for x, y in c], fill=gold)
+        g.rounded_rectangle((S4 * .27, S4 * .53, S4 * .73, S4 * .59), radius=S4 * .02, fill=gold)
+        for x, y in ((.24, .25), (.50, .19), (.76, .25)):
+            r = S4 * .035
+            g.ellipse((S4 * x - r, S4 * y - r, S4 * x + r, S4 * y + r), fill=gold)
+        fnt = ImageFont.truetype(font, int(S4 * .17)) if font else ImageFont.load_default()
+        w = g.textlength("SV", font=fnt)
+        g.text(((S4 - w) / 2, S4 * .72), "SV", font=fnt, fill=(238, 246, 247, 255), anchor="lm")
         im = im.resize((px, px), Image.LANCZOS)
         p = os.path.join(dst, "icon-%s.png" % d)
         im.save(p, optimize=True)
@@ -219,10 +226,10 @@ def main():
     if not os.path.exists(ks):
         run(["keytool", "-genkeypair", "-keystore", ks, "-storepass", "cuadra123", "-keypass",
              "cuadra123", "-alias", "cuadra", "-keyalg", "RSA", "-keysize", "2048",
-             "-validity", "10000", "-dname", "CN=CUADRA Rey Pollo"])
+             "-validity", "10000", "-dname", "CN=Rey Pollo SV"])
     signer = os.path.join(HERE, "Sign.java")
     run(["javac", "-nowarn", "-cp", os.path.join(WORK, "apksig.jar"), "-d", b, signer])
-    out = os.path.join(WORK, "CUADRA.apk")
+    out = os.path.join(WORK, "ReyPolloSV.apk")
     run(["java", "--add-exports", "java.base/sun.security.x509=ALL-UNNAMED", "--add-exports", "java.base/sun.security.pkcs=ALL-UNNAMED", "-cp", b + os.pathsep + os.path.join(WORK, "apksig.jar"), "Sign",
          ks, "cuadra123", "cuadra", unsigned, out])
     print("OK ->", out, os.path.getsize(out), "bytes")
