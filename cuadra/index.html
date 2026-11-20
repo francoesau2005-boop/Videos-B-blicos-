@@ -929,22 +929,32 @@ function reportText(list) {
     return t;
   }).join("\n------------------------\n\n");
 }
+var NATIVE = !!(window.Android && window.Android.printHtml);
+function printablePage(html, filename, autoPrint) {
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+safe(filename)+'</title>' +
+    '<style>body{font-family:Arial;font-size:12px;color:#111;background:#fff;padding:14px}table{width:100%;border-collapse:collapse}th{background:#eee;font-size:10px;padding:6px}td{border-bottom:1px solid #ccc;padding:5px}h1{font-size:18px;margin:0 0 2px}h4{border-bottom:2px solid #111;margin:14px 0 6px}.big{font-size:16px;font-weight:900}.rep-day{page-break-inside:avoid;margin-bottom:18px}</style>' +
+    '</head><body>' + html + (autoPrint ? '<script>window.onload=function(){try{window.print()}catch(e){}}<\/script>' : '') + '</body></html>';
+}
+window.cuadraBack = function() {
+  if (!$("modal").classList.contains("hidden")) { closeModal(); return true; }
+  return false;
+};
 function showReport(html, text, filename, extraButtons, extraHandlers) {
   var handlers = {
     print: function() {
+      if (NATIVE) { window.Android.printHtml(printablePage(html, filename, false), filename); return; }
       try { window.print(); }
       catch(e) { toast("Este teléfono no permite imprimir. Usa Compartir o Descargar."); }
     },
     share: function() {
+      if (window.Android && window.Android.shareText) { window.Android.shareText(text); return; }
       if (navigator.share) {
         navigator.share({title:"Cuadre Rey Pollo", text:text}).catch(function(){});
       } else copyText(text);
     },
     download: function() {
       try {
-        var page = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+safe(filename)+'</title>' +
-          '<style>body{font-family:Arial;font-size:12px;color:#111;padding:14px}table{width:100%;border-collapse:collapse}th{background:#eee;font-size:10px;padding:6px}td{border-bottom:1px solid #ccc;padding:5px}h4{border-bottom:2px solid #111;margin:14px 0 6px}.big{font-size:16px;font-weight:900}.rep-day{page-break-inside:avoid;margin-bottom:18px}</style>' +
-          '</head><body>' + html + '<script>window.onload=function(){try{window.print()}catch(e){}}<\/script></body></html>';
+        var page = printablePage(html, filename, true);
         var blob = new Blob([page], {type:"text/html"});
         var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -959,9 +969,11 @@ function showReport(html, text, filename, extraButtons, extraHandlers) {
     '<div id="print-area">' + html + '</div>' +
     '<div class="actions"><button class="gold" data-m="print">🖨 Imprimir / PDF</button>' +
     '<button data-m="share">↗ Compartir</button></div>' +
-    '<div class="actions"><button data-m="download">⬇ Descargar</button>' +
+    '<div class="actions">' + (NATIVE ? '' : '<button data-m="download">⬇ Descargar</button>') +
     (extraButtons||"") + '<button data-m="close">Cerrar</button></div>' +
-    '<p class="sub">Para PDF: toca «Imprimir / PDF» y elige «Guardar como PDF». Si tu app no lo permite, usa «Descargar» o «Compartir» (WhatsApp).</p>',
+    '<p class="sub">' + (NATIVE
+      ? 'Para PDF: toca «Imprimir / PDF» y en la impresora elige «Guardar como PDF». «Compartir» lo envía como texto (WhatsApp).'
+      : 'Para PDF: toca «Imprimir / PDF» y elige «Guardar como PDF». Si tu app no lo permite, usa «Descargar» o «Compartir» (WhatsApp).') + '</p>',
     handlers
   );
 }
