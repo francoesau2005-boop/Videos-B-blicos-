@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CUADRA - Rey Pollo</title>
+<style>
+:root {
+  --bg:#0c1720;
+  --panel:#192d38;
+  --line:#405c67;
+  --gold:#ffd38f;
+  --green:#a9f0cd;
+  --red:#ffb8bc;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;background:var(--bg);color:#eef6f7;
+  font-family:Arial,sans-serif;font-size:13px;
+}
+header {
+  padding:21px 15px;
+  background:linear-gradient(125deg,#263e49,#3b352b);
+}
+.logo {font-size:28px;font-weight:900;letter-spacing:-1px}
+.logo span {color:var(--gold)}
+.sub {color:#b5cbd1;font-size:11px;margin:6px 0}
+main {padding:10px;max-width:850px;margin:auto}
+h2 {font-size:19px;margin:4px 0 12px}
+h3 {font-size:15px;margin:8px 0}
+.panel {
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:13px;padding:13px 10px;margin-bottom:12px;
+}
+button {
+  cursor:pointer;background:#2c4652;color:white;
+  border:1px solid #58727b;border-radius:9px;
+  padding:11px;font-weight:700;font-size:12px;
+  touch-action:manipulation;
+}
+button:active {filter:brightness(1.3)}
+button:disabled {opacity:.5}
+.gold {
+  background:var(--gold);border-color:var(--gold);
+  color:#302515;
+}
+.danger {background:#57383e;color:#ffd1d3}
+input,select {
+  background:#102631;border:1px solid #526b77;
+  color:white;border-radius:7px;padding:10px;
+  font-size:13px;min-width:0;width:100%;
+}
+input:focus {outline:1px solid var(--gold)}
+input.bad {border-color:#ff7b84;background:#3a1f25}
+label {font-size:11px;color:#c2d3d8}
+.actions {display:flex;gap:7px;margin:10px 0}
+.actions button {flex:1}
+.nav {
+  display:flex;gap:7px;overflow-x:auto;
+  margin:12px 0;padding-bottom:5px;
+}
+.nav button {white-space:nowrap;border-radius:22px}
+.nav .active {background:var(--gold);color:#302515}
+.stats {
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:6px;margin:12px 0;
+}
+.stat {
+  background:#243c47;border:1px solid var(--line);
+  padding:12px 6px;border-radius:11px;min-width:0;
+}
+.stat small {font-size:9px;color:#c1d2d6}
+.stat b {
+  display:block;font-size:clamp(14px,4vw,22px);
+  margin-top:6px;white-space:nowrap;
+}
+.stat:last-child {background:#493d2e}
+.stat:last-child b {color:var(--gold)}
+.scroll {overflow-x:auto;border-radius:9px}
+table {width:100%;border-collapse:collapse;table-layout:fixed}
+th {background:#304753;font-size:9px;padding:11px 2px}
+td {
+  padding:8px 3px;text-align:center;
+  border-bottom:1px solid #38525e;
+}
+td:first-child {text-align:left;font-weight:bold;font-size:11px}
+td input {padding:9px 2px;text-align:center;font-weight:bold}
+td:first-child input {text-align:left;padding:8px 6px;margin-bottom:4px}
+td:first-child button {width:100%;padding:7px}
+.price {display:block;color:var(--gold);font-size:10px}
+.sold {
+  color:var(--green);background:#254b40;
+  border-radius:6px;padding:9px 2px;display:block;
+}
+.sold.err {color:#ffd6d9;background:#513538}
+.amount {color:var(--gold);font-weight:900}
+tfoot td {background:#4c3d2e;color:var(--gold);font-weight:bold}
+.row {
+  display:flex;justify-content:space-between;
+  align-items:center;gap:10px;
+  padding:13px 0;border-bottom:1px solid #3e5763;
+}
+.row b {font-size:16px}
+.total-box {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 12px;border:1px solid #a17d49;
+  background:#4b3b2a;border-radius:10px;margin:13px 0;
+}
+.total-box b {font-size:24px;color:var(--gold)}
+.note {
+  font-size:11px;line-height:1.6;
+  background:#1c3934;color:#d5f5e4;
+  border:1px solid #456b5b;border-radius:9px;
+  padding:11px;margin:12px 0;
+}
+.warning {
+  background:#513538;border:1px solid #95636b;
+  color:#ffd6d9;padding:11px;border-radius:9px;margin:10px 0;
+}
+.result {
+  background:#29414b;padding:12px;
+  border:1px solid #55717c;border-radius:9px;
+  font-weight:bold;margin-top:10px;
+}
+.sell {background:#513e2d;color:#ffe0ad}
+.add {background:#1e503d;color:#b7f8d6}
+.ok {background:#254b40;color:var(--green)}
+.two {display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cut {
+  padding:12px;margin:11px 0;border-radius:11px;
+  border:1px solid #415c68;background:#132a35;
+}
+.cut-values {
+  display:grid;grid-template-columns:repeat(3,1fr);
+  background:#0b222c;padding:13px 5px;
+  border-radius:9px;text-align:center;margin:11px 0;
+}
+.cut-values small {display:block;font-size:10px;color:#b9cbd1}
+.cut-values b {font-size:22px}
+.cut-values div:last-child b {color:var(--gold)}
+.expense {
+  display:grid;grid-template-columns:1fr 85px 40px;
+  gap:6px;margin:7px 0;
+}
+.hidden {display:none!important}
+.clock {
+  font-size:54px;text-align:center;font-weight:900;
+  letter-spacing:-2px;margin:17px 0;font-variant-numeric:tabular-nums;
+}
+.clock.alerting {color:var(--gold)}
+.clock.done {color:var(--green)}
+.track {
+  height:9px;border-radius:20px;background:#324b57;
+  overflow:hidden;margin:12px 0;
+}
+.track div {
+  height:100%;width:0;
+  background:linear-gradient(90deg,#83eac0,#ffd38f);
+}
+.keys {display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.keys button {font-size:19px;min-height:48px}
+.keys .operator {background:#685136;color:#ffe3b3}
+.keys .equals {background:var(--gold);color:#332517}
+.screen {
+  background:#0b212c;padding:15px;
+  border-radius:10px;text-align:right;margin:12px 0;
+}
+.screen b {font-size:30px;word-break:break-all}
+.notice-status {
+  margin-bottom:11px;padding:12px;
+  border-radius:9px;background:#56373b;
+  color:#ffdade;border:1px solid #a46a71;
+}
+.hist-row {cursor:pointer}
+.hist-row small {display:block;color:#b5cbd1;font-size:10px;margin-top:3px}
+footer {text-align:center;color:#9ab0b8;padding:20px;font-size:11px}
+
+/* Ventanas propias (los confirm() del sistema no funcionan en muchos APK) */
+#modal {
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;
+  display:flex;align-items:center;justify-content:center;padding:14px;
+}
+#modal .card {
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  width:100%;max-width:620px;max-height:92vh;overflow:auto;padding:14px;
+}
+#modal .card p {line-height:1.5}
+#toast {
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+  background:var(--gold);color:#302515;font-weight:700;
+  padding:10px 16px;border-radius:20px;z-index:60;
+  opacity:0;transition:opacity .2s;pointer-events:none;
+  max-width:90vw;text-align:center;
+}
+#toast.show {opacity:1}
+
+/* Reporte (se ve como hoja y es lo único que se imprime) */
+#print-area {background:#fff;color:#111;border-radius:8px;padding:14px;font-size:12px}
+#print-area h1 {font-size:18px;margin:0 0 2px}
+#print-area h4 {font-size:13px;margin:14px 0 6px;border-bottom:2px solid #111;padding-bottom:3px}
+#print-area table {table-layout:auto}
+#print-area th {background:#eee;color:#111;font-size:10px;padding:6px 4px}
+#print-area td {border-bottom:1px solid #ccc;padding:5px 4px;font-size:11px;color:#111}
+#print-area td:first-child {font-size:11px}
+#print-area .big {font-size:16px;font-weight:900}
+#print-area .rep-day {page-break-inside:avoid;margin-bottom:18px}
+@media print {
+  body * {visibility:hidden}
+  #print-area, #print-area * {visibility:visible}
+  #print-area {position:absolute;left:0;top:0;width:100%;border-radius:0}
+  #modal {position:static;background:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">CUA<span>DRA</span></div>
+  <div class="sub">CONTROL DE INVENTARIO Y CAJA · REY POLLO</div>
+  <h2 style="margin-top:24px">Cuadre del día</h2>
+  <label>FECHA</label>
+  <input id="date" type="date" style="max-width:180px;margin-top:5px">
+</header>
+
+<main>
+<div class="notice-status" id="js-status">
+  ⚠ Esperando JavaScript. Si este aviso permanece,
+  activa JavaScript en tu generador de APK.
+</div>
+
+<div class="stats">
+  <div class="stat"><small>VENTAS</small><b id="sale">$0.00</b></div>
+  <div class="stat"><small>GASTOS</small><b id="cost">$0.00</b></div>
+  <div class="stat"><small>A ENTREGAR</small><b id="net">$0.00</b></div>
+</div>
+
+<nav class="nav">
+  <button class="active" data-tab="cuadre">Cuadre y caja</button>
+  <button data-tab="compare">Comparar</button>
+  <button data-tab="tools">Alarma y calculadora</button>
+</nav>
+
+<section id="cuadre">
+
+<div class="panel">
+  <h2>01 · Productos y ventas</h2>
+  <div class="actions">
+    <button class="gold" id="new-day">↻ Nuevo cuadre</button>
+    <button id="edit">Editar precios</button>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <colgroup>
+        <col style="width:29%">
+        <col style="width:16%">
+        <col style="width:15%">
+        <col style="width:16%">
+        <col style="width:24%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>PRODUCTO</th><th>ENTRA</th>
+          <th>VENTA</th><th>EXISTE</th><th>TOTAL</th>
+        </tr>
+      </thead>
+      <tbody id="products"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">TOTAL VENDIDO</td>
+          <td id="table-total">$0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="actions">
+    <button id="add-product">+ Producto</button>
+    <button id="add-direct">+ Venta directa</button>
+  </div>
+  <p class="sub">Venta = ENTRA menos EXISTE. Los precios permanecen guardados.</p>
+</div>
+
+<div class="panel">
+  <h2>02 · Caja final</h2>
+  <div class="row">
+    <h3>Gastos y salidas</h3>
+    <button id="add-expense">+ Gasto</button>
+  </div>
+  <div id="expenses"></div>
+
+  <div class="row">
+    <span>Ventas del día</span><b id="cash-sale">$0.00</b>
+  </div>
+  <div class="row">
+    <span>Menos gastos</span><b id="cash-cost">$0.00</b>
+  </div>
+
+  <div class="total-box">
+    <strong>TOTAL A ENTREGAR</strong>
+    <b id="cash-net">$0.00</b>
+  </div>
+
+  <div class="row">
+    <label>Dinero contado</label>
+    <input id="delivered" type="number" step=".01" inputmode="decimal"
+      placeholder="$ 0.00" style="max-width:140px">
+  </div>
+
+  <div class="result" id="difference">Pendiente de contar</div>
+
+  <div class="actions">
+    <button class="gold" id="pdf">Guardar PDF</button>
+    <button id="history-pdf">PDF historial</button>
+  </div>
+  <p class="sub">
+    Los reportes incluyen inventario, ventas, gastos,
+    caja final y fecha.
+  </p>
+</div>
+
+<div class="panel">
+  <h3>Historial de cuadres</h3>
+  <p class="sub">Toca un cierre para ver su reporte.</p>
+  <div id="history" class="sub">Sin cierres anteriores.</div>
+</div>
+</section>
+
+<section id="compare" class="hidden">
+<div class="panel">
+  <h2>Calculadora de pollos</h2>
+  <p class="sub">Los cálculos no se guardan.</p>
+  <label>¿Cuántos pollos recibiste?</label>
+  <input id="birds" type="number" min="0" inputmode="numeric" placeholder="Ejemplo: 50">
+
+  <div class="note">
+    Si recibes 50 pollos, corresponden 100 alas.
+    Con 10 alas sobrantes debes ingresar 90.
+  </div>
+  <div id="cuts"></div>
+</div>
+
+<div class="panel">
+  <h2>Libro vs. Sistema</h2>
+  <div class="note">
+    Libro 50 / Sistema 70 = <b>VENDER 20</b><br>
+    Libro 70 / Sistema 50 = <b>AGREGAR 20</b>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <colgroup>
+        <col style="width:32%">
+        <col style="width:20%">
+        <col style="width:20%">
+        <col style="width:28%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>PRODUCTO</th><th>LIBRO</th>
+          <th>SISTEMA</th><th>ACCIÓN</th>
+        </tr>
+      </thead>
+      <tbody id="comparison"></tbody>
+    </table>
+  </div>
+  <div class="actions">
+    <button id="extra">+ Producto</button>
+    <button id="clear-comparison">Limpiar calculadoras</button>
+  </div>
+</div>
+</section>
+
+<section id="tools" class="hidden">
+<div class="panel">
+  <h2>⏱ Temporizador de pollo</h2>
+
+  <div class="two">
+    <div>
+      <label>Tiempo total (minutos)</label>
+      <input id="minutes" type="number" value="15" min="1" inputmode="decimal">
+    </div>
+    <div>
+      <label>Avisar al minuto</label>
+      <input id="alert" type="number" value="8" min="0" inputmode="decimal">
+    </div>
+  </div>
+
+  <div class="clock" id="clock">15:00</div>
+  <p class="sub" id="elapsed" style="text-align:center">Transcurrido: 00:00</p>
+  <div class="track"><div id="progress"></div></div>
+  <p id="timer-status" class="sub" style="text-align:center">Listo para iniciar</p>
+
+  <div class="actions">
+    <button class="gold" id="start">▶ Iniciar</button>
+    <button id="pause">Ⅱ Pausar</button>
+    <button id="reset">↻ Reiniciar</button>
+  </div>
+
+  <h3 style="margin-top:24px">Sonido de alarma</h3>
+  <select id="tone">
+    <option value="classic">Campana clásica</option>
+    <option value="digital">Pitidos digitales</option>
+    <option value="urgent">Alerta rápida</option>
+    <option value="soft">Tono suave</option>
+    <option value="custom">Mi sonido personalizado</option>
+  </select>
+
+  <div style="margin-top:12px">
+    <label>Elegir audio del teléfono (MP3, WAV, OGG)</label>
+    <input id="audio-file" type="file" accept="audio/*">
+    <p class="sub" id="audio-name">Ningún sonido seleccionado</p>
+  </div>
+
+  <div class="two" style="margin-top:12px">
+    <div>
+      <label>Duración de alarma (segundos)</label>
+      <input id="sound-length" type="number" value="2" min="1" max="30">
+    </div>
+    <div>
+      <label>Volumen</label>
+      <input id="volume" type="range" value="80" min="0" max="100">
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="gold" id="test-sound">♫ Probar sonido</button>
+    <button id="stop-sound">■ Detener</button>
+  </div>
+
+  <div class="warning">
+    El reloj calcula el tiempo real, pero una página HTML
+    no puede garantizar que la alarma suene con el móvil
+    bloqueado. Mientras el temporizador corre, la app intenta
+    mantener la pantalla encendida.
+  </div>
+</div>
+
+<div class="panel">
+  <h2>▦ Calculadora</h2>
+  <div class="screen">
+    <div id="expression" class="sub">0</div>
+    <b id="answer">0</b>
+  </div>
+  <div class="keys" id="keys">
+    <button class="operator" data-key="C">C</button>
+    <button data-key="DEL">⌫</button>
+    <button data-key="(">(</button>
+    <button data-key=")">)</button>
+    <button data-key="7">7</button>
+    <button data-key="8">8</button>
+    <button data-key="9">9</button>
+    <button class="operator" data-key="/">÷</button>
+    <button data-key="4">4</button>
+    <button data-key="5">5</button>
+    <button data-key="6">6</button>
+    <button class="operator" data-key="*">×</button>
+    <button data-key="1">1</button>
+    <button data-key="2">2</button>
+    <button data-key="3">3</button>
+    <button class="operator" data-key="-">−</button>
+    <button data-key="0">0</button>
+    <button data-key=".">.</button>
+    <button class="equals" data-key="=">=</button>
+    <button class="operator" data-key="+">+</button>
+  </div>
+</div>
+</section>
+
+<footer id="storage-status">CUADRA · Rey Pollo</footer>
+</main>
+
+<div id="modal" class="hidden"><div class="card" id="modal-card"></div></div>
+<div id="toast"></div>
+
+<script>
+(function () {
+"use strict";
+
+var $ = function(id) { return document.getElementById(id); };
+var KEY = "CUADRA_LOCAL_V6";
+var SOUND_KEY = "CUADRA_SOUND_V1";
+var date = localDate();
+var editing = false;
+var storageOK = false;
+
+/* ===================== utilidades ===================== */
+function localDate() {
+  var d = new Date();
+  return d.getFullYear() + "-" +
+    ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+    ("0"+d.getDate()).slice(-2);
+}
+function number(v) {
+  if (v === "" || v === null || v === undefined) return null;
+  var n = Number(String(v).replace(",", "."));
+  return isNaN(n) ? NaN : n;
+}
+function isInt(n) { return typeof n === "number" && isFinite(n) && Math.floor(n) === n; }
+function fmt(v) { return v == null || (typeof v === "number" && isNaN(v)) ? "" : v; }
+function money(v) {
+  return "$" + (Math.round((Number(v)||0)*100)/100).toFixed(2);
+}
+function safe(v) {
+  return String(v == null ? "" : v).replace(/[&<>"']/g,function(c) {
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",
+      '"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function id() {
+  return "p"+Date.now()+Math.floor(Math.random()*10000);
+}
+function findBy(list, key, val) {
+  for (var i = 0; i < list.length; i++) if (list[i][key] === val) return list[i];
+  return null;
+}
+function niceDate(d) {
+  if (!d) return "";
+  var p = String(d).split("-");
+  return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : d;
+}
+
+var toastTimer;
+function toast(msg) {
+  var t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+}
+
+/* Ventana propia: en muchos generadores de APK confirm()/alert() no hacen nada */
+var modalHandlers = {};
+function openModal(html, handlers) {
+  $("modal-card").innerHTML = html;
+  modalHandlers = handlers || {};
+  $("modal").classList.remove("hidden");
+}
+function closeModal() {
+  $("modal").classList.add("hidden");
+  $("modal-card").innerHTML = "";
+  modalHandlers = {};
+}
+$("modal").addEventListener("click", function(e) {
+  if (e.target === this) { closeModal(); return; }
+  var b = e.target.closest ? e.target.closest("[data-m]") : null;
+  if (!b) return;
+  var fn = modalHandlers[b.getAttribute("data-m")];
+  if (b.getAttribute("data-m") === "close") closeModal();
+  else if (fn) fn();
+});
+function ask(question, yesText, onYes) {
+  openModal(
+    "<h3>" + question + "</h3>" +
+    '<div class="actions"><button data-m="close">Cancelar</button>' +
+    '<button class="gold" data-m="yes">' + yesText + "</button></div>",
+    { yes: function(){ closeModal(); onYes(); } }
+  );
+}
+
+/* ===================== datos ===================== */
+function defaultState() {
+  var names = [
+    ["Pollo",null],["Pan",null],["Papas",1],
+    ["Ensalada",1],["Soda",1],["Frutado",1],
+    ["Petit",1],["AMP",null],["Gatorade",null],
+    ["Soda 1.5 L",1.50],["Agua",.75],
+    ["Promo",5],["Burguer",1.75]
+  ];
+  return {
+    products:names.map(function(p,i) {
+      return {id:"p"+i,name:p[0],price:p[1],
+        direct:p[0]==="Promo"};
+    }),
+    days:{},history:[],settings:{}
+  };
+}
+var state = defaultState();
+try {
+  var stored = localStorage.getItem(KEY);
+  if(stored) {
+    var parsed = JSON.parse(stored);
+    if(parsed && parsed.products && parsed.days) state=parsed;
+  }
+  localStorage.setItem("_test","1");
+  localStorage.removeItem("_test");
+  storageOK=true;
+} catch(e) {}
+if (!state.history) state.history = [];
+if (!state.settings) state.settings = {};
+
+function save() {
+  try {
+    if(storageOK) localStorage.setItem(KEY,JSON.stringify(state));
+  } catch(e) { storageOK=false; }
+  $("storage-status").textContent=storageOK
+    ? "● Datos almacenados en este dispositivo"
+    : "● Almacenamiento desactivado. Exporta tu PDF.";
+}
+function day() {
+  if(!state.days[date])
+    state.days[date]={rows:{},expenses:[],delivered:null};
+  return state.days[date];
+}
+function row(p) {
+  if(!day().rows[p.id])
+    day().rows[p.id]={entra:null,existe:null,direct:null};
+  return day().rows[p.id];
+}
+function quantity(p) {
+  var r=row(p),a,b;
+  if(p.direct) {
+    a=number(r.direct);
+    return a===null ? null :
+      isInt(a)&&a>=0 ? a : NaN;
+  }
+  a=number(r.entra);
+  b=number(r.existe);
+  if(a===null && b===null) return null;
+  if(a===null || b===null || !isInt(a) ||
+     !isInt(b) || a<0 || b<0 || b>a)
+    return NaN;
+  return a-b;
+}
+function priceOK(p) { return p.price !== null && isFinite(p.price) && p.price >= 0; }
+function totals() {
+  var sales=0,cost=0,errors=0;
+  state.products.forEach(function(p) {
+    var q=quantity(p);
+    if(q!==q) {errors++;return;} // NaN
+    if(q!==null && q>0 && !priceOK(p)) {
+      errors++;return;
+    }
+    if(q!==null && priceOK(p))
+      sales+=Math.round(q*p.price*100);
+  });
+  day().expenses.forEach(function(e) {
+    var v=number(e.value);
+    if(v!==null && v>=0) cost+=Math.round(v*100);
+    else if(v!==null) errors++;
+  });
+  return {sales:sales/100,cost:cost/100,
+    net:(sales-cost)/100,errors:errors};
+}
+function dayHasData() {
+  var d = day();
+  if (d.expenses.length || d.delivered !== null) return true;
+  for (var k in d.rows) {
+    var r = d.rows[k];
+    if (r.entra !== null || r.existe !== null || r.direct !== null) return true;
+  }
+  return false;
+}
+
+/* ===================== productos ===================== */
+function renderProducts() {
+  var html="";
+  state.products.forEach(function(p) {
+    var r=row(p);
+    html+='<tr data-row="'+p.id+'"><td>';
+    if(editing) {
+      html+='<input data-name="'+p.id+'" value="'+safe(p.name)+'" placeholder="Nombre">';
+      html+='<input data-price="'+p.id+'" type="number" step=".01" min="0" inputmode="decimal" placeholder="Precio" value="'+fmt(p.price)+'">';
+      html+='<button class="danger" data-remove="'+p.id+'">Eliminar</button>';
+    } else {
+      html+=safe(p.name)+'<span class="price">'+
+        (p.price===null?"Sin precio":money(p.price))+
+        (p.direct?" · directa":"")+'</span>';
+    }
+    html+='</td><td>';
+    if(!p.direct)
+      html+='<input type="number" min="0" step="1" inputmode="numeric" data-id="'+p.id+'" data-field="entra" value="'+fmt(r.entra)+'">';
+    else html+='—';
+    html+='</td><td>';
+    if(p.direct)
+      html+='<input type="number" min="0" step="1" inputmode="numeric" data-id="'+p.id+'" data-field="direct" value="'+fmt(r.direct)+'">';
+    else html+='<span class="sold" data-sold="'+p.id+'">—</span>';
+    html+='</td><td>';
+    if(!p.direct)
+      html+='<input type="number" min="0" step="1" inputmode="numeric" data-id="'+p.id+'" data-field="existe" value="'+fmt(r.existe)+'">';
+    else html+='—';
+    html+='</td><td class="amount" data-total="'+p.id+'">—</td></tr>';
+  });
+  $("products").innerHTML=html;
+  $("edit").textContent=editing?"✓ Guardar precios":"Editar precios";
+  $("edit").className=editing?"gold":"";
+  update();
+}
+function renderExpenses() {
+  var html="";
+  day().expenses.forEach(function(e) {
+    html+='<div class="expense">'+
+      '<input placeholder="Descripción" data-exp="'+e.id+
+      '" data-field="name" value="'+safe(e.name)+'">'+
+      '<input type="number" min="0" step=".01" inputmode="decimal" placeholder="$" data-exp="'+e.id+
+      '" data-field="value" value="'+fmt(e.value)+'">'+
+      '<button class="danger" data-del-exp="'+e.id+'">×</button></div>';
+  });
+  $("expenses").innerHTML=html || '<p class="sub">Sin gastos.</p>';
+  $("delivered").value=fmt(day().delivered);
+  renderHistory();
+  update();
+}
+function renderHistory() {
+  $("history").innerHTML=state.history.length ?
+    state.history.slice(0,30).map(function(h,i) {
+      var extra = h.sales != null
+        ? "Ventas " + money(h.sales) + " · Gastos " + money(h.cost) +
+          (h.diffText ? " · " + safe(h.diffText) : "")
+        : "";
+      return '<div class="row hist-row" data-hist="'+i+'"><span>'+safe(niceDate(h.date))+
+        (extra ? '<small>'+extra+'</small>' : '') +
+        '</span><b>'+money(h.net)+'</b></div>';
+    }).join("") : "Sin cierres anteriores.";
+}
+function diffInfo(t, paid) {
+  if (t.errors) return {text:"⚠ Revisa las cantidades o precios", cls:"warning"};
+  if (paid === null || paid !== paid) return {text:"Pendiente de contar", cls:""};
+  var dif=Math.round((paid-t.net)*100)/100;
+  if (dif===0) return {text:"✓ Caja cuadrada", cls:"add"};
+  if (dif>0) return {text:"SOBRA "+money(dif), cls:"sell"};
+  return {text:"FALTA "+money(-dif), cls:"warning"};
+}
+function update() {
+  var t=totals();
+  $("sale").textContent=money(t.sales);
+  $("cost").textContent=money(t.cost);
+  $("net").textContent=money(t.net);
+  $("table-total").textContent=money(t.sales);
+  $("cash-sale").textContent=money(t.sales);
+  $("cash-cost").textContent="− "+money(t.cost);
+  $("cash-net").textContent=money(t.net);
+
+  state.products.forEach(function(p) {
+    var q=quantity(p);
+    var s=document.querySelector('[data-sold="'+p.id+'"]');
+    var a=document.querySelector('[data-total="'+p.id+'"]');
+    var bad = q!==q;
+    if(s) {
+      s.textContent=q===null?"—":bad?"!":q;
+      s.className = "sold" + (bad ? " err" : "");
+    }
+    var ins = document.querySelectorAll('[data-id="'+p.id+'"]');
+    for (var i=0;i<ins.length;i++) ins[i].classList.toggle("bad", bad);
+    if(a) a.textContent=q===null || bad ||
+       !priceOK(p) ? (q>0 && !priceOK(p) ? "Sin precio" : "—") : money(q*p.price);
+  });
+
+  var info = diffInfo(t, number(day().delivered));
+  var d=$("difference");
+  d.className="result" + (info.cls ? " " + info.cls : "");
+  d.textContent=info.text;
+  save();
+}
+
+$("date").value=date;
+$("date").addEventListener("change",function() {
+  if(!this.value)return;
+  date=this.value;
+  renderProducts();
+  renderExpenses();
+});
+
+/* pestañas */
+var tabButtons = document.querySelectorAll("[data-tab]");
+for (var tb = 0; tb < tabButtons.length; tb++) {
+  tabButtons[tb].addEventListener("click", function() {
+    var b = this;
+    for (var j = 0; j < tabButtons.length; j++)
+      tabButtons[j].classList.toggle("active", tabButtons[j] === b);
+    ["cuadre","compare","tools"].forEach(function(n) {
+      $(n).classList.toggle("hidden", n !== b.getAttribute("data-tab"));
+    });
+    if (b.getAttribute("data-tab")==="compare") renderCompare();
+    window.scrollTo(0, 0);
+  });
+}
+
+$("products").addEventListener("input",function(e) {
+  var x=e.target;
+  var pid=x.getAttribute("data-id") || x.getAttribute("data-price") || x.getAttribute("data-name");
+  var p=findBy(state.products,"id",pid);
+  if(!p)return;
+  if(x.hasAttribute("data-id")) row(p)[x.getAttribute("data-field")]=number(x.value);
+  else if(x.hasAttribute("data-price")) p.price=number(x.value);
+  else p.name=x.value;
+  update();
+});
+$("products").addEventListener("click",function(e) {
+  var pid=e.target.getAttribute && e.target.getAttribute("data-remove");
+  if(!pid)return;
+  var p=findBy(state.products,"id",pid);
+  ask("¿Eliminar «" + safe(p ? p.name : "producto") + "»?", "Eliminar", function() {
+    state.products = state.products.filter(function(z){ return z.id !== pid; });
+    for (var d in state.days) if (state.days[d].rows) delete state.days[d].rows[pid];
+    renderProducts();
+    toast("Producto eliminado");
+  });
+});
+$("edit").addEventListener("click", function() {
+  if (editing) {
+    var missing = state.products.filter(function(p){ return !String(p.name).trim(); });
+    missing.forEach(function(p){ p.name = "Sin nombre"; });
+    toast("Precios guardados");
+  }
+  editing = !editing;
+  renderProducts();
+});
+function addProduct(direct) {
+  var p = {id:id(), name: direct ? "Venta directa" : "Nuevo producto", price:null, direct:direct};
+  state.products.push(p);
+  editing = true;
+  renderProducts();
+  var inp = document.querySelector('[data-name="'+p.id+'"]');
+  if (inp) { inp.focus(); inp.select(); inp.scrollIntoView({block:"center"}); }
+}
+$("add-product").addEventListener("click", function(){ addProduct(false); });
+$("add-direct").addEventListener("click", function(){ addProduct(true); });
+
+/* gastos */
+$("add-expense").addEventListener("click", function() {
+  var e = {id:id(), name:"", value:null};
+  day().expenses.push(e);
+  renderExpenses();
+  var inp = document.querySelector('[data-exp="'+e.id+'"][data-field="name"]');
+  if (inp) inp.focus();
+});
+$("expenses").addEventListener("input", function(e) {
+  var x = e.target, eid = x.getAttribute("data-exp");
+  if (!eid) return;
+  var ex = findBy(day().expenses, "id", eid);
+  if (!ex) return;
+  var f = x.getAttribute("data-field");
+  ex[f] = f === "value" ? number(x.value) : x.value;
+  update();
+});
+$("expenses").addEventListener("click", function(e) {
+  var eid = e.target.getAttribute && e.target.getAttribute("data-del-exp");
+  if (!eid) return;
+  day().expenses = day().expenses.filter(function(z){ return z.id !== eid; });
+  renderExpenses();
+});
+$("delivered").addEventListener("input", function() {
+  day().delivered = number(this.value);
+  update();
+});
+
+/* ===================== cierres e historial ===================== */
+function snapshot() {
+  var t = totals(), d = day(), paid = number(d.delivered);
+  var info = diffInfo(t, paid);
+  return {
+    date: date,
+    closedAt: new Date().toLocaleString(),
+    products: state.products.map(function(p) {
+      var r = row(p), q = quantity(p);
+      return {
+        name: p.name, price: p.price, direct: !!p.direct,
+        entra: r.entra, existe: r.existe,
+        qty: q !== q ? null : q,
+        total: q && priceOK(p) ? Math.round(q*p.price*100)/100 : 0
+      };
+    }),
+    expenses: d.expenses.map(function(e){ return {name:e.name, value:e.value}; }),
+    sales: t.sales, cost: t.cost, net: t.net,
+    delivered: paid, diffText: info.text, errors: t.errors
+  };
+}
+$("new-day").addEventListener("click", function() {
+  if (!dayHasData()) { toast("El cuadre ya está limpio"); return; }
+  ask("¿Cerrar el cuadre del " + niceDate(date) + "?<br><small class='sub'>Se guardará en el historial y se limpiarán las cantidades y gastos. Los precios se conservan.</small>",
+    "Cerrar y empezar nuevo", function() {
+      var s = snapshot();
+      state.history = state.history.filter(function(h){ return h.date !== s.date; });
+      state.history.unshift(s);
+      state.history.sort(function(a,b){ return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+      state.days[date] = {rows:{},expenses:[],delivered:null};
+      renderProducts();
+      renderExpenses();
+      toast("Cuadre guardado en el historial");
+    });
+});
+
+function reportDay(s) {
+  var h = '<div class="rep-day"><h1>CUADRA · Rey Pollo</h1>' +
+    '<div>Cuadre del <b>' + safe(niceDate(s.date)) + '</b>' +
+    (s.closedAt ? ' · cerrado ' + safe(s.closedAt) : '') + '</div>';
+  if (s.products) {
+    h += '<h4>Inventario y ventas</h4><table><tr><th>Producto</th><th>Precio</th><th>Entra</th><th>Existe</th><th>Venta</th><th>Total</th></tr>';
+    s.products.forEach(function(p) {
+      if (p.direct)
+        h += '<tr><td>'+safe(p.name)+'</td><td>'+(p.price==null?"—":money(p.price))+'</td><td>—</td><td>—</td><td>'+fmt(p.qty)+'</td><td>'+(p.qty?money(p.total):"—")+'</td></tr>';
+      else
+        h += '<tr><td>'+safe(p.name)+'</td><td>'+(p.price==null?"—":money(p.price))+'</td><td>'+fmt(p.entra)+'</td><td>'+fmt(p.existe)+'</td><td>'+fmt(p.qty)+'</td><td>'+(p.qty?money(p.total):"—")+'</td></tr>';
+    });
+    h += '<tr><td colspan="5"><b>TOTAL VENDIDO</b></td><td><b>'+money(s.sales)+'</b></td></tr></table>';
+  }
+  if (s.expenses) {
+    h += '<h4>Gastos y salidas</h4>';
+    if (s.expenses.length) {
+      h += '<table>';
+      s.expenses.forEach(function(e){ h += '<tr><td>'+safe(e.name||"Gasto")+'</td><td style="text-align:right">'+money(e.value)+'</td></tr>'; });
+      h += '<tr><td><b>TOTAL GASTOS</b></td><td style="text-align:right"><b>'+money(s.cost)+'</b></td></tr></table>';
+    } else h += '<div>Sin gastos.</div>';
+  }
+  h += '<h4>Caja final</h4><table>' +
+    '<tr><td>Ventas del día</td><td style="text-align:right">'+money(s.sales)+'</td></tr>' +
+    '<tr><td>Menos gastos</td><td style="text-align:right">− '+money(s.cost)+'</td></tr>' +
+    '<tr><td class="big">TOTAL A ENTREGAR</td><td class="big" style="text-align:right">'+money(s.net)+'</td></tr>' +
+    '<tr><td>Dinero contado</td><td style="text-align:right">'+(s.delivered==null?"—":money(s.delivered))+'</td></tr>' +
+    '<tr><td><b>Resultado</b></td><td style="text-align:right"><b>'+safe(s.diffText||"")+'</b></td></tr></table></div>';
+  return h;
+}
+function reportText(list) {
+  return list.map(function(s) {
+    var t = "CUADRA · Rey Pollo\nCuadre del " + niceDate(s.date) + "\n";
+    if (s.products) {
+      t += "\nVENTAS\n";
+      s.products.forEach(function(p){ if (p.qty) t += "- " + p.name + ": " + p.qty + " × " + money(p.price) + " = " + money(p.total) + "\n"; });
+    }
+    if (s.expenses && s.expenses.length) {
+      t += "\nGASTOS\n";
+      s.expenses.forEach(function(e){ t += "- " + (e.name||"Gasto") + ": " + money(e.value) + "\n"; });
+    }
+    t += "\nVentas: " + money(s.sales) + "\nGastos: " + money(s.cost) +
+      "\nTOTAL A ENTREGAR: " + money(s.net) +
+      "\nContado: " + (s.delivered==null?"—":money(s.delivered)) +
+      "\n" + (s.diffText||"") + "\n";
+    return t;
+  }).join("\n------------------------\n\n");
+}
+function showReport(html, text, filename, extraButtons, extraHandlers) {
+  var handlers = {
+    print: function() {
+      try { window.print(); }
+      catch(e) { toast("Este teléfono no permite imprimir. Usa Compartir o Descargar."); }
+    },
+    share: function() {
+      if (navigator.share) {
+        navigator.share({title:"Cuadre Rey Pollo", text:text}).catch(function(){});
+      } else copyText(text);
+    },
+    download: function() {
+      try {
+        var page = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+safe(filename)+'</title>' +
+          '<style>body{font-family:Arial;font-size:12px;color:#111;padding:14px}table{width:100%;border-collapse:collapse}th{background:#eee;font-size:10px;padding:6px}td{border-bottom:1px solid #ccc;padding:5px}h4{border-bottom:2px solid #111;margin:14px 0 6px}.big{font-size:16px;font-weight:900}.rep-day{page-break-inside:avoid;margin-bottom:18px}</style>' +
+          '</head><body>' + html + '<script>window.onload=function(){try{window.print()}catch(e){}}<\/script></body></html>';
+        var blob = new Blob([page], {type:"text/html"});
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = filename + ".html";
+        document.body.appendChild(a); a.click(); a.remove();
+        toast("Archivo descargado. Ábrelo y elige «Guardar como PDF».");
+      } catch(e) { toast("No se pudo descargar. Usa Compartir."); }
+    }
+  };
+  for (var k in (extraHandlers||{})) handlers[k] = extraHandlers[k];
+  openModal(
+    '<div id="print-area">' + html + '</div>' +
+    '<div class="actions"><button class="gold" data-m="print">🖨 Imprimir / PDF</button>' +
+    '<button data-m="share">↗ Compartir</button></div>' +
+    '<div class="actions"><button data-m="download">⬇ Descargar</button>' +
+    (extraButtons||"") + '<button data-m="close">Cerrar</button></div>' +
+    '<p class="sub">Para PDF: toca «Imprimir / PDF» y elige «Guardar como PDF». Si tu app no lo permite, usa «Descargar» o «Compartir» (WhatsApp).</p>',
+    handlers
+  );
+}
+function copyText(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function(){ toast("Reporte copiado"); },
+        function(){ fallbackCopy(text); });
+    } else fallbackCopy(text);
+  } catch(e) { fallbackCopy(text); }
+}
+function fallbackCopy(text) {
+  var ta = document.createElement("textarea");
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); toast("Reporte copiado"); }
+  catch(e) { toast("No se pudo copiar"); }
+  ta.remove();
+}
+$("pdf").addEventListener("click", function() {
+  var s = snapshot();
+  showReport(reportDay(s), reportText([s]), "cuadre-" + s.date);
+});
+$("history-pdf").addEventListener("click", function() {
+  if (!state.history.length) { toast("Aún no hay cierres. Usa «Nuevo cuadre» para cerrar un día."); return; }
+  var list = state.history;
+  var sum = {sales:0,cost:0,net:0};
+  var h = '<h1>CUADRA · Historial de cuadres</h1><div>' + list.length + ' cierres</div>' +
+    '<h4>Resumen</h4><table><tr><th>Fecha</th><th>Ventas</th><th>Gastos</th><th>Entregar</th><th>Contado</th><th>Resultado</th></tr>';
+  list.forEach(function(s) {
+    sum.sales += Number(s.sales)||0; sum.cost += Number(s.cost)||0; sum.net += Number(s.net)||0;
+    h += '<tr><td>'+safe(niceDate(s.date))+'</td><td>'+(s.sales==null?"—":money(s.sales))+'</td><td>'+(s.cost==null?"—":money(s.cost))+'</td><td><b>'+money(s.net)+'</b></td><td>'+(s.delivered==null?"—":money(s.delivered))+'</td><td>'+safe(s.diffText||"")+'</td></tr>';
+  });
+  h += '<tr><td><b>TOTAL</b></td><td><b>'+money(sum.sales)+'</b></td><td><b>'+money(sum.cost)+'</b></td><td><b>'+money(sum.net)+'</b></td><td></td><td></td></tr></table>';
+  list.forEach(function(s){ if (s.products) h += reportDay(s); });
+  showReport(h, reportText(list), "historial-cuadra");
+});
+$("history").addEventListener("click", function(e) {
+  var r = e.target.closest ? e.target.closest("[data-hist]") : null;
+  if (!r) return;
+  var i = Number(r.getAttribute("data-hist")), s = state.history[i];
+  if (!s) return;
+  showReport(reportDay(s), reportText([s]), "cuadre-" + s.date,
+    '<button class="danger" data-m="delhist">Borrar</button>',
+    { delhist: function() {
+        ask("¿Borrar el cierre del " + niceDate(s.date) + " del historial?", "Borrar", function() {
+          state.history.splice(i, 1); save(); renderHistory(); toast("Cierre borrado");
+        });
+      } });
+});
+
+/* ===================== comparar ===================== */
+var CUTS = [["Alas",2],["Piernas",2],["Muslos",2],["Pechugas",2]];
+var cutLeft = {};
+var cmp = {};
+var cmpExtras = [];
+
+function renderCuts() {
+  var birds = number($("birds").value);
+  if (birds === null || birds !== birds || birds < 0) {
+    $("cuts").innerHTML = '<p class="sub">Escribe cuántos pollos recibiste para ver las piezas.</p>';
+    return;
+  }
+  $("cuts").innerHTML = CUTS.map(function(c, i) {
+    return '<div class="cut"><b>' + c[0] + '</b> <span class="sub">(' + c[1] + ' por pollo)</span>' +
+      '<div class="cut-values"><div><small>CORRESPONDEN</small><b data-cut-total="'+i+'">0</b></div>' +
+      '<div><small>SOBRAN</small><b data-cut-left="'+i+'">0</b></div>' +
+      '<div><small>INGRESAR</small><b data-cut-in="'+i+'">0</b></div></div>' +
+      '<label>' + c[0] + ' sobrantes</label>' +
+      '<input type="number" min="0" inputmode="numeric" data-cut="'+i+'" placeholder="0" value="'+fmt(cutLeft[i])+'"></div>';
+  }).join("");
+  updateCuts();
+}
+function updateCuts() {
+  var birds = number($("birds").value) || 0;
+  CUTS.forEach(function(c, i) {
+    var tot = Math.round(birds * c[1]), left = Number(cutLeft[i]) || 0;
+    var t = document.querySelector('[data-cut-total="'+i+'"]');
+    if (!t) return;
+    t.textContent = tot;
+    document.querySelector('[data-cut-left="'+i+'"]').textContent = left;
+    document.querySelector('[data-cut-in="'+i+'"]').textContent = tot - left;
+  });
+}
+$("birds").addEventListener("input", renderCuts);
+$("cuts").addEventListener("input", function(e) {
+  var i = e.target.getAttribute("data-cut");
+  if (i === null) return;
+  cutLeft[i] = number(e.target.value);
+  updateCuts();
+});
+
+function compareRows() {
+  return state.products.map(function(p){ return {id:p.id, name:p.name, fixed:true}; }).concat(cmpExtras);
+}
+function renderCompare() {
+  $("comparison").innerHTML = compareRows().map(function(r) {
+    var v = cmp[r.id] || {};
+    return '<tr><td>' + (r.fixed ? safe(r.name)
+        : '<input data-cname="'+r.id+'" value="'+safe(r.name)+'" placeholder="Producto">') + '</td>' +
+      '<td><input type="number" inputmode="numeric" data-cmp="'+r.id+'" data-f="libro" value="'+fmt(v.libro)+'"></td>' +
+      '<td><input type="number" inputmode="numeric" data-cmp="'+r.id+'" data-f="sistema" value="'+fmt(v.sistema)+'"></td>' +
+      '<td><span class="sold" data-act="'+r.id+'">—</span></td></tr>';
+  }).join("");
+  compareRows().forEach(function(r){ updateCompareRow(r.id); });
+  if (!$("cuts").innerHTML) renderCuts();
+}
+function updateCompareRow(rid) {
+  var el = document.querySelector('[data-act="'+rid+'"]');
+  if (!el) return;
+  var v = cmp[rid] || {}, l = number(v.libro), s = number(v.sistema);
+  if (l === null || s === null || l !== l || s !== s) { el.textContent = "—"; el.className = "sold"; return; }
+  var d = Math.round((s - l) * 100) / 100;
+  if (d > 0) { el.textContent = "VENDER " + d; el.className = "sold sell"; }
+  else if (d < 0) { el.textContent = "AGREGAR " + (-d); el.className = "sold add"; }
+  else { el.textContent = "✓ OK"; el.className = "sold ok"; }
+}
+$("comparison").addEventListener("input", function(e) {
+  var x = e.target, rid = x.getAttribute("data-cmp");
+  if (rid) {
+    if (!cmp[rid]) cmp[rid] = {};
+    cmp[rid][x.getAttribute("data-f")] = number(x.value);
+    updateCompareRow(rid);
+  } else if (x.hasAttribute("data-cname")) {
+    var ex = findBy(cmpExtras, "id", x.getAttribute("data-cname"));
+    if (ex) ex.name = x.value;
+  }
+});
+$("extra").addEventListener("click", function() {
+  var r = {id:id(), name:"", fixed:false};
+  cmpExtras.push(r);
+  renderCompare();
+  var inp = document.querySelector('[data-cname="'+r.id+'"]');
+  if (inp) inp.focus();
+});
+$("clear-comparison").addEventListener("click", function() {
+  cmp = {}; cmpExtras = []; cutLeft = {};
+  $("birds").value = "";
+  renderCuts();
+  renderCompare();
+  toast("Calculadoras limpias");
+});
+
+/* ===================== sonido ===================== */
+var AC = null, oscs = [], customAudio = null, customURL = null, stopTimer = null;
+function audioCtx() {
+  try {
+    if (!AC) { var A = window.AudioContext || window.webkitAudioContext; if (A) AC = new A(); }
+    if (AC && AC.state === "suspended") AC.resume();
+  } catch(e) {}
+  return AC;
+}
+function vol() { return Math.max(0, Math.min(1, Number($("volume").value) / 100)); }
+function beep(freq, start, dur, type, v) {
+  var ac = AC; if (!ac) return;
+  var o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.value = freq;
+  var t0 = ac.currentTime + start;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(Math.max(0.001, v), t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(ac.destination);
+  o.start(t0); o.stop(t0 + dur + 0.05);
+  oscs.push(o);
+}
+function stopSound() {
+  clearTimeout(stopTimer);
+  oscs.forEach(function(o){ try { o.stop(); } catch(e) {} });
+  oscs = [];
+  if (customAudio) { try { customAudio.pause(); customAudio.currentTime = 0; } catch(e) {} }
+  try { if (navigator.vibrate) navigator.vibrate(0); } catch(e) {}
+}
+function playAlarm(seconds) {
+  stopSound();
+  seconds = Math.max(1, Math.min(30, Number(seconds) || 2));
+  var v = vol(), tone = $("tone").value;
+  try { if (navigator.vibrate) navigator.vibrate([400,200,400,200,400]); } catch(e) {}
+  if (tone === "custom") {
+    if (!customURL) { toast("Elige primero un audio del teléfono"); tone = "classic"; }
+    else {
+      if (!customAudio) customAudio = new Audio();
+      customAudio.src = customURL; customAudio.loop = true; customAudio.volume = v;
+      var p = customAudio.play(); if (p && p.catch) p.catch(function(){ toast("No se pudo reproducir el audio"); });
+      stopTimer = setTimeout(stopSound, seconds * 1000);
+      return;
+    }
+  }
+  if (!audioCtx()) { toast("Este teléfono no permite sonidos"); return; }
+  var t = 0;
+  while (t < seconds) {
+    if (tone === "classic") { beep(880, t, 0.9, "sine", v); beep(1320, t, 0.6, "sine", v*0.4); t += 1; }
+    else if (tone === "digital") { for (var i=0;i<4;i++) beep(1000, t+i*0.15, 0.08, "square", v*0.5); t += 1; }
+    else if (tone === "urgent") { beep(t*10 % 2 < 1 ? 900 : 1250, t, 0.12, "sawtooth", v*0.5); t += 0.16; }
+    else { beep(523, t, 0.5, "sine", v*0.8); beep(659, t+0.5, 0.5, "sine", v*0.8); t += 1.2; }
+  }
+}
+$("test-sound").addEventListener("click", function(){ playAlarm($("sound-length").value); });
+$("stop-sound").addEventListener("click", stopSound);
+
+$("audio-file").addEventListener("change", function() {
+  var f = this.files && this.files[0];
+  if (!f) return;
+  if (customURL && customURL.indexOf("blob:") === 0) URL.revokeObjectURL(customURL);
+  customURL = URL.createObjectURL(f);
+  $("tone").value = "custom";
+  $("audio-name").textContent = "♫ " + f.name;
+  state.settings.tone = "custom"; save();
+  // Guardar el sonido si es pequeño, para que siga después de cerrar la app
+  if (f.size < 1500000 && window.FileReader) {
+    var rd = new FileReader();
+    rd.onload = function() {
+      try { localStorage.setItem(SOUND_KEY, JSON.stringify({name:f.name, data:rd.result})); customURL = rd.result; }
+      catch(e) { toast("Sonido listo (no se pudo guardar para la próxima vez)"); }
+    };
+    rd.readAsDataURL(f);
+  } else toast("Sonido listo. Es grande: tendrás que elegirlo de nuevo al reabrir.");
+});
+try {
+  var snd = JSON.parse(localStorage.getItem(SOUND_KEY) || "null");
+  if (snd && snd.data) { customURL = snd.data; $("audio-name").textContent = "♫ " + snd.name; }
+} catch(e) {}
+
+/* ===================== temporizador ===================== */
+var timer = {running:false, start:0, acc:0, alertFired:false, doneFired:false};
+var tickId = null, wakeLock = null;
+function pad(n) { return ("0" + n).slice(-2); }
+function mmss(ms) { var s = Math.max(0, Math.round(ms / 1000)); return pad(Math.floor(s/60)) + ":" + pad(s % 60); }
+function totalMs() { return Math.max(1, Number($("minutes").value) || 15) * 60000; }
+function alertMs() { var a = number($("alert").value); return a === null || a !== a || a <= 0 ? null : a * 60000; }
+function elapsedMs() { return timer.acc + (timer.running ? Date.now() - timer.start : 0); }
+function tick() {
+  var el = elapsedMs(), tot = totalMs(), al = alertMs();
+  var clock = $("clock");
+  clock.textContent = mmss(tot - el);
+  $("elapsed").textContent = "Transcurrido: " + mmss(el);
+  $("progress").style.width = Math.min(100, el / tot * 100) + "%";
+  if (timer.running && al !== null && al < tot && !timer.alertFired && el >= al) {
+    timer.alertFired = true;
+    clock.className = "clock alerting";
+    $("timer-status").textContent = "⚠ Minuto " + (al/60000) + ": revisa / voltea el pollo";
+    playAlarm($("sound-length").value);
+  }
+  if (timer.running && !timer.doneFired && el >= tot) {
+    timer.doneFired = true;
+    timer.acc = tot; timer.running = false;
+    clearInterval(tickId); tickId = null;
+    clock.className = "clock done";
+    clock.textContent = "00:00";
+    $("timer-status").textContent = "✓ ¡Pollo listo!";
+    playAlarm(Math.max(5, Number($("sound-length").value) || 2));
+    releaseWake();
+    updTimerButtons();
+  }
+}
+function keepAwake() {
+  try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function(w){ wakeLock = w; }).catch(function(){}); } catch(e) {}
+}
+function releaseWake() { try { if (wakeLock) wakeLock.release(); } catch(e) {} wakeLock = null; }
+function updTimerButtons() {
+  $("start").textContent = timer.running ? "● En marcha" : (timer.acc > 0 && !timer.doneFired ? "▶ Continuar" : "▶ Iniciar");
+  $("start").disabled = timer.running;
+  $("pause").disabled = !timer.running;
+}
+$("start").addEventListener("click", function() {
+  audioCtx(); // el sonido debe activarse con un toque
+  if (timer.doneFired) resetTimer();
+  if (timer.running) return;
+  timer.running = true; timer.start = Date.now();
+  $("timer-status").textContent = "Cocinando…";
+  if (!timer.alertFired) $("clock").className = "clock";
+  clearInterval(tickId); tickId = setInterval(tick, 250);
+  keepAwake(); tick(); updTimerButtons();
+});
+$("pause").addEventListener("click", function() {
+  if (!timer.running) return;
+  timer.acc = elapsedMs(); timer.running = false;
+  clearInterval(tickId); tickId = null;
+  $("timer-status").textContent = "En pausa";
+  releaseWake(); tick(); updTimerButtons();
+});
+function resetTimer() {
+  timer = {running:false, start:0, acc:0, alertFired:false, doneFired:false};
+  clearInterval(tickId); tickId = null;
+  stopSound(); releaseWake();
+  $("clock").className = "clock";
+  $("timer-status").textContent = "Listo para iniciar";
+  tick(); updTimerButtons();
+}
+$("reset").addEventListener("click", resetTimer);
+["minutes","alert","sound-length","volume","tone"].forEach(function(k) {
+  $(k).addEventListener("change", function() {
+    state.settings[k] = this.value; save();
+    if ((k === "minutes" || k === "alert") && !timer.running) tick();
+  });
+  if (state.settings[k] != null) $(k).value = state.settings[k];
+});
+$("minutes").addEventListener("input", function(){ if (!timer.running) tick(); });
+document.addEventListener("visibilitychange", function() {
+  if (!document.hidden) { if (timer.running) { tick(); keepAwake(); } }
+});
+
+/* ===================== calculadora ===================== */
+var expr = "";
+function evaluate(s) {
+  var i = 0;
+  function peek() { return s.charAt(i); }
+  function parseExpr() {
+    var v = parseTerm();
+    while (peek() === "+" || peek() === "-") { var op = s.charAt(i++); var r = parseTerm(); v = op === "+" ? v + r : v - r; }
+    return v;
+  }
+  function parseTerm() {
+    var v = parseFactor();
+    while (peek() === "*" || peek() === "/") { var op = s.charAt(i++); var r = parseFactor(); v = op === "*" ? v * r : v / r; }
+    return v;
+  }
+  function parseFactor() {
+    if (peek() === "-") { i++; return -parseFactor(); }
+    if (peek() === "+") { i++; return parseFactor(); }
+    if (peek() === "(") { i++; var v = parseExpr(); if (peek() === ")") i++; return v; }
+    var st = i;
+    while (/[0-9.]/.test(peek())) i++;
+    if (st === i) throw new Error("x");
+    var n = Number(s.slice(st, i));
+    if (isNaN(n)) throw new Error("x");
+    return n;
+  }
+  var res = parseExpr();
+  if (i < s.length) throw new Error("x");
+  if (!isFinite(res)) throw new Error("x");
+  return Math.round(res * 1e10) / 1e10;
+}
+function showCalc(final) {
+  var pretty = expr.replace(/\*/g, "×").replace(/\//g, "÷").replace(/-/g, "−");
+  $("expression").textContent = pretty || "0";
+  var ans = $("answer");
+  if (!expr) { ans.textContent = "0"; return; }
+  try {
+    var open = (expr.match(/\(/g)||[]).length - (expr.match(/\)/g)||[]).length;
+    var r = evaluate(expr + new Array(Math.max(0, open) + 1).join(")"));
+    ans.textContent = r;
+    if (final) { expr = String(r); $("expression").textContent = pretty + " ="; }
+  } catch(e) { if (final) ans.textContent = "Error"; }
+}
+$("keys").addEventListener("click", function(e) {
+  var b = e.target.closest ? e.target.closest("[data-key]") : null;
+  if (!b) return;
+  var k = b.getAttribute("data-key");
+  if (k === "C") expr = "";
+  else if (k === "DEL") expr = expr.slice(0, -1);
+  else if (k === "=") { showCalc(true); return; }
+  else {
+    var last = expr.slice(-1);
+    if (/[+\-*/]/.test(k) && /[+*/]/.test(last)) expr = expr.slice(0, -1); // cambiar operador
+    if (k === "." ) { var seg = expr.split(/[+\-*/()]/).pop(); if (seg.indexOf(".") >= 0) return; if (!seg) expr += "0"; }
+    expr += k;
+  }
+  showCalc(false);
+});
+
+/* ===================== inicio ===================== */
+renderProducts();
+renderExpenses();
+renderCuts();
+tick(); updTimerButtons();
+$("js-status").classList.add("hidden");
+window.addEventListener("error", function(e) { toast("Error: " + (e.message || "desconocido")); });
+
+})();
+</script>
+</body>
+</html>
