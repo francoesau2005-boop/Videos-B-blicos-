@@ -181,7 +181,7 @@ class _MarginVsMarkupHelp extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Margen y recargo no son lo mismo. Ej.: costo \$2.20 y precio \$5.00 → '
+              'Margen y recargo no son lo mismo. Ej.: costo \$2.20 y precio \$5.00: '
               'ganancia \$2.80; margen 56 % (sobre el precio) y recargo 127 % (sobre el costo).',
               style: context.tt.bodySmall,
             ),

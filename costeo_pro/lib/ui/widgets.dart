@@ -550,3 +550,59 @@ class CategoryField extends StatelessWidget {
     ]);
   }
 }
+
+/// Encabezado de paso numerado ("1  ¿Qué compraste?").
+class StepHeader extends StatelessWidget {
+  const StepHeader(this.number, this.title, {super.key, this.subtitle});
+  final int number;
+  final String title;
+  final String? subtitle;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(0, 22, 0, 10),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          CircleAvatar(
+            radius: 15,
+            backgroundColor: context.cs.primary,
+            child: Text('$number',
+                style: TextStyle(color: context.cs.onPrimary, fontWeight: FontWeight.w800)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: context.tt.titleMedium!.copyWith(fontWeight: FontWeight.w800)),
+              if (subtitle != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(subtitle!, style: context.tt.bodySmall!.copyWith(color: context.muted)),
+                ),
+            ]),
+          ),
+        ]),
+      );
+}
+
+/// Sección plegable para opciones que la mayoría no necesita.
+class MoreOptions extends StatelessWidget {
+  const MoreOptions({super.key, required this.title, required this.children, this.initiallyExpanded = false});
+  final String title;
+  final List<Widget> children;
+  final bool initiallyExpanded;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: 22),
+        child: Card(
+          child: ExpansionTile(
+            initiallyExpanded: initiallyExpanded,
+            shape: const Border(),
+            collapsedShape: const Border(),
+            leading: Icon(Icons.tune_rounded, color: context.muted),
+            title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+            subtitle: const Text('Opcional'),
+            childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 16),
+            expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+            children: children,
+          ),
+        ),
+      );
+}

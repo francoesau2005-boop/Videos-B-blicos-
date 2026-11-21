@@ -1,9 +1,9 @@
 /// Unidades de medida y conversiones.
 ///
 /// Todas las conversiones se hacen a una unidad base por dimensión:
-///   - masa    → gramos (g)
-///   - volumen → mililitros (ml)
-///   - conteo  → unidades (u)
+///   - masa   : gramos (g)
+///   - volumen: mililitros (ml)
+///   - conteo : unidades (u)
 ///
 /// Las onzas de peso (oz) y las onzas líquidas (fl oz) son unidades distintas
 /// y pertenecen a dimensiones distintas. Nunca se convierte masa ↔ volumen

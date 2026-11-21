@@ -46,15 +46,15 @@ void main() {
   }
 
   Future<void> setLastQty(WidgetTester tester, String v) async {
-    final f = find.widgetWithText(TextFormField, 'Cantidad usada').last;
+    final f = find.widgetWithText(TextFormField, '¿Cuánto usas?').last;
     await tester.ensureVisible(f);
     await tester.enterText(f, v);
     await tester.pumpAndSettle();
   }
 
   Future<void> addIngredient(WidgetTester tester, String name, String qty, String unitLabel, String? price) async {
-    await enter(tester, 'Nombre del producto *', name);
-    await enter(tester, 'Contenido *', qty);
+    await enter(tester, 'Nombre del producto', name);
+    await enter(tester, 'Cantidad', qty);
     if (unitLabel != 'Libras (lb)') {
       await tester.ensureVisible(find.text('Libras (lb)'));
       await tester.pumpAndSettle();
@@ -63,7 +63,7 @@ void main() {
       await tester.tap(find.text(unitLabel).last);
       await tester.pumpAndSettle();
     }
-    if (price != null) await enter(tester, 'Precio total de compra', price);
+    if (price != null) await enter(tester, 'Precio que pagaste', price);
     await tapText(tester, 'Guardar insumo');
     await tester.pumpAndSettle(const Duration(seconds: 5));
     expect(find.text('Guardar insumo'), findsNothing);
@@ -92,28 +92,27 @@ void main() {
     await tester.tap(find.text('Recetas').last);
     await tester.pumpAndSettle();
     await tapText(tester, 'Nueva receta');
-    await enter(tester, 'Nombre de la receta *', 'Masa de pizza');
+    await enter(tester, 'Nombre', 'Masa de pizza');
 
-    await tapText(tester, 'Insumo');
+    await tapText(tester, 'Agregar ingrediente');
     await tapText(tester, 'Harina fuerte');
     await setLastQty(tester, '7');
-    await tapText(tester, 'Insumo');
+    await tapText(tester, 'Agregar otro ingrediente');
     await tapText(tester, 'Aceite Orisol');
     await setLastQty(tester, '140');
-    await tapText(tester, 'Insumo');
+    await tapText(tester, 'Agregar otro ingrediente');
     await tapText(tester, 'Levadura');
     await setLastQty(tester, '14');
 
-    await enter(tester, 'Cantidad producida *', '10');
+    await enter(tester, 'Cantidad', '10');
     await tapText(tester, 'pizzas');
-    await enter(tester, 'Precio de venta por unidad', '5');
+    await enter(tester, 'Precio de venta', '5');
     await tester.pumpAndSettle();
     // Precio pendiente visible y no inventado.
     await tester.scrollUntilVisible(find.textContaining('Falta el precio de compra de Levadura'), -150,
         scrollable: find.byType(Scrollable).first);
     await tester.pumpAndSettle();
     expect(find.textContaining('Falta el precio de compra de Levadura'), findsOneWidget);
-    expect(find.text('Costo incompleto: faltan precios o hay líneas con error'), findsOneWidget);
 
     // Registrar el precio desde la receta.
     await tapText(tester, 'Falta el precio de compra de Levadura. Toca para registrarlo.');

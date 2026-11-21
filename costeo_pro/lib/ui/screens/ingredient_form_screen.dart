@@ -26,12 +26,32 @@ class IngredientFormScreen extends StatefulWidget {
 class _IngredientFormScreenState extends State<IngredientFormScreen> {
   final _form = GlobalKey<FormState>();
   late final Ingredient _ing;
-  late final TextEditingController _name, _category, _presentation, _qty, _price,
-      _brand, _supplier, _density, _stock, _minStock, _notes, _pieces;
+  late final TextEditingController _name,
+      _category,
+      _presentation,
+      _qty,
+      _price,
+      _brand,
+      _supplier,
+      _density,
+      _stock,
+      _minStock,
+      _notes,
+      _pieces;
   bool _saving = false;
 
   static const _presentations = [
-    'Saco', 'Bolsa', 'Bote', 'Paquete', 'Cartón', 'Botella', 'Caja', 'Sobre', 'Lata', 'Galón', 'Unidad'
+    'Saco',
+    'Bolsa',
+    'Bote',
+    'Paquete',
+    'Cartón',
+    'Botella',
+    'Caja',
+    'Sobre',
+    'Lata',
+    'Galón',
+    'Unidad',
   ];
 
   bool get _isNew => widget.ingredient == null;
@@ -39,8 +59,7 @@ class _IngredientFormScreenState extends State<IngredientFormScreen> {
   @override
   void initState() {
     super.initState();
-    _ing = widget.ingredient?.copy() ??
-        Ingredient(name: widget.initialName ?? '', quantity: 0, unit: Unit.lb);
+    _ing = widget.ingredient?.copy() ?? Ingredient(name: widget.initialName ?? '', quantity: 0, unit: Unit.lb);
     _name = TextEditingController(text: _ing.name);
     _category = TextEditingController(text: _ing.category);
     _presentation = TextEditingController(text: _ing.presentation);
@@ -57,8 +76,20 @@ class _IngredientFormScreenState extends State<IngredientFormScreen> {
 
   @override
   void dispose() {
-    for (final c in [_name, _category, _presentation, _qty, _price, _brand, _supplier,
-      _density, _stock, _minStock, _notes, _pieces]) {
+    for (final c in [
+      _name,
+      _category,
+      _presentation,
+      _qty,
+      _price,
+      _brand,
+      _supplier,
+      _density,
+      _stock,
+      _minStock,
+      _notes,
+      _pieces,
+    ]) {
       c.dispose();
     }
     super.dispose();
@@ -132,194 +163,206 @@ class _IngredientFormScreenState extends State<IngredientFormScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           children: [
-            Center(
-              child: GestureDetector(
-                onTap: () => _photoSheet(),
-                child: Stack(children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 96,
-                      height: 96,
-                      color: context.cs.surfaceContainerHigh,
-                      child: _ing.photoPath != null && File(_ing.photoPath!).existsSync()
-                          ? Image.file(File(_ing.photoPath!), fit: BoxFit.cover)
-                          : Icon(Icons.add_a_photo_rounded, size: 34, color: context.muted),
-                    ),
-                  ),
-                ]),
-              ),
-            ),
-            Center(
-              child: TextButton(
-                onPressed: _photoSheet,
-                child: Text(_ing.photoPath == null ? 'Agregar foto (opcional)' : 'Cambiar foto'),
-              ),
-            ),
+            const StepHeader(1, '¿Qué compraste?', subtitle: 'Ej.: Harina fuerte, Aceite, Tortas de carne'),
             TextFormField(
               controller: _name,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(labelText: 'Nombre del producto *', hintText: 'Ej.: Harina fuerte'),
+              decoration: const InputDecoration(labelText: 'Nombre del producto', hintText: 'Ej.: Harina fuerte'),
               validator: (v) => v == null || v.trim().isEmpty ? 'Escribe el nombre' : null,
             ),
-            const SizedBox(height: 14),
-            CategoryField(controller: _category, options: s.ingredientCategories),
-            const SizedBox(height: 18),
-            const SectionTitle('¿Cómo lo compras?', padding: EdgeInsets.fromLTRB(4, 4, 4, 8)),
-            TextFormField(
-              controller: _presentation,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(labelText: 'Presentación', hintText: 'Saco, bolsa, bote…'),
+            const StepHeader(2, '¿Cómo viene?', subtitle: 'Toca una opción'),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final pr in _presentations)
+                  ChoiceChip(
+                    label: Text(pr),
+                    selected: _presentation.text == pr,
+                    onSelected: (_) => setState(() => _presentation.text = pr),
+                  ),
+              ],
             ),
-            const SizedBox(height: 8),
-            Wrap(spacing: 6, runSpacing: 6, children: [
-              for (final pr in _presentations)
-                ChoiceChip(
-                  label: Text(pr),
-                  selected: _presentation.text == pr,
-                  onSelected: (_) => setState(() => _presentation.text = pr),
+            StepHeader(
+              3,
+              '¿Cuánto trae ${_presentation.text.isEmpty ? 'lo que compras' : 'el ${_presentation.text.toLowerCase()}'}?',
+              subtitle: 'Ej.: saco de 50 libras: 50 y Libras. Cartón de 30 huevos: 30 y Unidades.',
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: NumField(controller: _qty, label: 'Cantidad', hint: 'Ej.: 50', allowZero: false),
                 ),
-            ]),
-            const SizedBox(height: 14),
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Expanded(
-                flex: 5,
-                child: NumField(
-                  controller: _qty,
-                  label: 'Contenido *',
-                  hint: 'Ej.: 50',
-                  allowZero: false,
+                const SizedBox(width: 10),
+                Expanded(
+                  flex: 6,
+                  child: UnitDropdown(
+                    value: _ing.unit,
+                    units: Unit.values,
+                    onChanged: (u) => setState(() => _ing.unit = u),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                flex: 6,
-                child: UnitDropdown(
-                  value: _ing.unit,
-                  units: Unit.values,
-                  onChanged: (u) => setState(() => _ing.unit = u),
-                ),
-              ),
-            ]),
+              ],
+            ),
             if (_ing.unit != Unit.unit) ...[
               const SizedBox(height: 14),
               NumField(
                 controller: _pieces,
-                label: '¿Cuántas piezas trae? (opcional)',
+                label: '¿Y cuántas piezas son? (si se cuentan)',
                 suffix: 'piezas',
                 required: false,
-                helper: 'Ej.: paquete de 4 lb con 12 tortas → escribe 12. Así en tus recetas '
-                    'podrás usar "Unidades" (ej. 1 torta) en lugar de libras.',
+                helper: 'Ej.: paquete de 4 lb con 12 tortas: 12. Déjalo vacío si no se cuenta por piezas (harina, aceite…).',
               ),
             ],
-            const SizedBox(height: 14),
-            NumField(
-              controller: _price,
-              label: 'Precio total de compra',
-              prefix: r'$ ',
-              required: false,
-              helper: 'Lo que pagas por la presentación completa. Déjalo vacío si aún no '
-                  'lo sabes: quedará como "precio pendiente".',
+            const StepHeader(
+              4,
+              '¿Cuánto pagaste por todo?',
+              subtitle: 'El precio completo, no por libra. Si no lo sabes, déjalo vacío.',
             ),
+            NumField(controller: _price, label: 'Precio que pagaste', prefix: r'$ ', required: false),
             if (qty != null && qty > 0 && price != null) ...[
               const SizedBox(height: 12),
               _UnitCostPreview(qty: qty, unit: _ing.unit, price: price, density: Fmt.parse(_density.text)),
             ],
-            const SizedBox(height: 18),
-            const SectionTitle('Detalles opcionales', padding: EdgeInsets.fromLTRB(4, 4, 4, 8)),
-            TextFormField(
-              controller: _brand,
-              textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Marca'),
-            ),
-            const SizedBox(height: 14),
-            TextFormField(
-              controller: _supplier,
-              textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Proveedor'),
-            ),
-            const SizedBox(height: 14),
-            InkWell(
-              borderRadius: BorderRadius.circular(14),
-              onTap: () async {
-                final d = await showDatePicker(
-                  context: context,
-                  initialDate: _ing.purchaseDate ?? DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now().add(const Duration(days: 1)),
-                );
-                if (d != null) setState(() => _ing.purchaseDate = d);
-              },
-              child: InputDecorator(
-                decoration: InputDecoration(
-                  labelText: 'Fecha de compra',
-                  suffixIcon: _ing.purchaseDate == null
-                      ? const Icon(Icons.calendar_today_rounded)
-                      : IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () => setState(() => _ing.purchaseDate = null)),
-                ),
-                child: Text(_ing.purchaseDate == null ? 'Sin fecha' : Fmt.date(_ing.purchaseDate)),
-              ),
-            ),
-            const SizedBox(height: 14),
-            ExpansionTile(
-              tilePadding: const EdgeInsets.symmetric(horizontal: 4),
-              title: const Text('Densidad (avanzado)', style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: const Text('Solo si necesitas convertir peso ↔ volumen'),
+            MoreOptions(
+              title: 'Más detalles',
+              initiallyExpanded: !_isNew && (_ing.brand.isNotEmpty || _ing.supplier.isNotEmpty || _ing.trackStock),
               children: [
-                NumField(
-                  controller: _density,
-                  label: 'Densidad',
-                  suffix: 'g/ml',
-                  required: false,
-                  helper: 'Ej.: aceite ≈ 0.92 g/ml. Sin densidad, la app NO convierte '
-                      'gramos a mililitros.',
+                Center(
+                  child: GestureDetector(
+                    onTap: () => _photoSheet(),
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            width: 96,
+                            height: 96,
+                            color: context.cs.surfaceContainerHigh,
+                            child: _ing.photoPath != null && File(_ing.photoPath!).existsSync()
+                                ? Image.file(File(_ing.photoPath!), fit: BoxFit.cover)
+                                : Icon(Icons.add_a_photo_rounded, size: 34, color: context.muted),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 8),
-              ],
-            ),
-            const SizedBox(height: 6),
-            const SectionTitle('Inventario (opcional)', padding: EdgeInsets.fromLTRB(4, 4, 4, 0)),
-            SwitchListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-              value: _ing.trackStock,
-              title: const Text('Controlar existencias'),
-              subtitle: const Text('Descuenta solo al registrar producciones reales'),
-              onChanged: (v) => setState(() => _ing.trackStock = v),
-            ),
-            if (_ing.trackStock) ...[
-              const SizedBox(height: 8),
-              if (_isNew) ...[
-                NumField(
-                  controller: _stock,
-                  label: 'Existencia inicial',
-                  suffix: _ing.unit.symbol,
-                  required: false,
+                Center(
+                  child: TextButton(
+                    onPressed: _photoSheet,
+                    child: Text(_ing.photoPath == null ? 'Agregar foto (opcional)' : 'Cambiar foto'),
+                  ),
+                ),
+                TextFormField(
+                  controller: _presentation,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(labelText: 'Otra presentación', hintText: 'Ej.: Barril, Bandeja…'),
                 ),
                 const SizedBox(height: 14),
-              ] else
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12, left: 4),
-                  child: Text('Existencia actual: ${Fmt.qty(_ing.stock, _ing.unit)} '
-                      '(ajústala desde Inventario)',
-                      style: context.tt.bodySmall!.copyWith(color: context.muted)),
+                CategoryField(controller: _category, options: s.ingredientCategories),
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _brand,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(labelText: 'Marca'),
                 ),
-              NumField(
-                controller: _minStock,
-                label: 'Alerta de existencia baja',
-                suffix: _ing.unit.symbol,
-                required: false,
-                helper: 'Te avisaremos cuando la existencia sea igual o menor.',
-              ),
-            ],
-            const SizedBox(height: 14),
-            TextFormField(
-              controller: _notes,
-              maxLines: 3,
-              minLines: 1,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(labelText: 'Notas'),
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _supplier,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(labelText: 'Proveedor'),
+                ),
+                const SizedBox(height: 14),
+                InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () async {
+                    final d = await showDatePicker(
+                      context: context,
+                      initialDate: _ing.purchaseDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now().add(const Duration(days: 1)),
+                    );
+                    if (d != null) setState(() => _ing.purchaseDate = d);
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Fecha de compra',
+                      suffixIcon: _ing.purchaseDate == null
+                          ? const Icon(Icons.calendar_today_rounded)
+                          : IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () => setState(() => _ing.purchaseDate = null),
+                            ),
+                    ),
+                    child: Text(_ing.purchaseDate == null ? 'Sin fecha' : Fmt.date(_ing.purchaseDate)),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                ExpansionTile(
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 4),
+                  title: const Text('Densidad (avanzado)', style: TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: const Text('Solo si necesitas convertir peso ↔ volumen'),
+                  children: [
+                    NumField(
+                      controller: _density,
+                      label: 'Densidad',
+                      suffix: 'g/ml',
+                      required: false,
+                      helper:
+                          'Ej.: aceite ≈ 0.92 g/ml. Sin densidad, la app NO convierte '
+                          'gramos a mililitros.',
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                const SectionTitle('Inventario (opcional)', padding: EdgeInsets.fromLTRB(4, 4, 4, 0)),
+                SwitchListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                  value: _ing.trackStock,
+                  title: const Text('Controlar existencias'),
+                  subtitle: const Text('Descuenta solo al registrar producciones reales'),
+                  onChanged: (v) => setState(() => _ing.trackStock = v),
+                ),
+                if (_ing.trackStock) ...[
+                  const SizedBox(height: 8),
+                  if (_isNew) ...[
+                    NumField(
+                      controller: _stock,
+                      label: 'Existencia inicial',
+                      suffix: _ing.unit.symbol,
+                      required: false,
+                    ),
+                    const SizedBox(height: 14),
+                  ] else
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12, left: 4),
+                      child: Text(
+                        'Existencia actual: ${Fmt.qty(_ing.stock, _ing.unit)} '
+                        '(ajústala desde Inventario)',
+                        style: context.tt.bodySmall!.copyWith(color: context.muted),
+                      ),
+                    ),
+                  NumField(
+                    controller: _minStock,
+                    label: 'Alerta de existencia baja',
+                    suffix: _ing.unit.symbol,
+                    required: false,
+                    helper: 'Te avisaremos cuando la existencia sea igual o menor.',
+                  ),
+                ],
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _notes,
+                  maxLines: 3,
+                  minLines: 1,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(labelText: 'Notas'),
+                ),
+              ],
             ),
           ],
         ),
@@ -331,34 +374,37 @@ class _IngredientFormScreenState extends State<IngredientFormScreen> {
     showModalBottomSheet(
       context: context,
       builder: (c) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ListTile(
-            leading: const Icon(Icons.photo_camera_rounded),
-            title: const Text('Tomar foto'),
-            onTap: () {
-              Navigator.pop(c);
-              _pickPhoto(ImageSource.camera);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.photo_library_rounded),
-            title: const Text('Elegir de la galería'),
-            onTap: () {
-              Navigator.pop(c);
-              _pickPhoto(ImageSource.gallery);
-            },
-          ),
-          if (_ing.photoPath != null)
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
             ListTile(
-              leading: const Icon(Icons.delete_outline_rounded),
-              title: const Text('Quitar foto'),
+              leading: const Icon(Icons.photo_camera_rounded),
+              title: const Text('Tomar foto'),
               onTap: () {
                 Navigator.pop(c);
-                setState(() => _ing.photoPath = null);
+                _pickPhoto(ImageSource.camera);
               },
             ),
-          const SizedBox(height: 8),
-        ]),
+            ListTile(
+              leading: const Icon(Icons.photo_library_rounded),
+              title: const Text('Elegir de la galería'),
+              onTap: () {
+                Navigator.pop(c);
+                _pickPhoto(ImageSource.gallery);
+              },
+            ),
+            if (_ing.photoPath != null)
+              ListTile(
+                leading: const Icon(Icons.delete_outline_rounded),
+                title: const Text('Quitar foto'),
+                onTap: () {
+                  Navigator.pop(c);
+                  setState(() => _ing.photoPath = null);
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
@@ -381,15 +427,27 @@ class _UnitCostPreview extends StatelessWidget {
         color: context.cs.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Costo equivalente', style: TextStyle(fontWeight: FontWeight.w700, color: context.cs.primary)),
-        const SizedBox(height: 6),
-        Wrap(spacing: 14, runSpacing: 6, children: [
-          for (final u in units)
-            Text('${Fmt.moneySmart(price / convert(qty, unit, u))} / ${u.symbol}',
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-        ]),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Costo equivalente',
+            style: TextStyle(fontWeight: FontWeight.w700, color: context.cs.primary),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 14,
+            runSpacing: 6,
+            children: [
+              for (final u in units)
+                Text(
+                  '${Fmt.moneySmart(price / convert(qty, unit, u))} / ${u.symbol}',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

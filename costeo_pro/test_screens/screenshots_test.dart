@@ -14,6 +14,7 @@ import 'package:costeo_pro/state/app_state.dart';
 import 'package:costeo_pro/ui/screens/calculator_screen.dart';
 import 'package:costeo_pro/ui/screens/compare_screen.dart';
 import 'package:costeo_pro/ui/screens/home_shell.dart';
+import 'package:costeo_pro/ui/screens/ingredient_form_screen.dart';
 import 'package:costeo_pro/ui/screens/recipe_detail_screen.dart';
 import 'package:costeo_pro/ui/screens/recipe_editor_screen.dart';
 import 'package:costeo_pro/ui/screens/simulator_screen.dart';
@@ -180,8 +181,14 @@ void main() {
     final hamb2 = hamb.clone()..items[1].unit = Unit.unit;
     nav.push(MaterialPageRoute(builder: (_) => RecipeEditorScreen(recipe: hamb2)));
     await tester.pumpAndSettle();
-    await tester.drag(find.byType(Scrollable).last, const Offset(0, -330));
     await shot(tester, '15_hamburguesa_tortas_por_pieza');
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -900));
+    await shot(tester, '16_hamburguesa_resultado');
+    nav.pop();
+    await tester.pumpAndSettle();
+
+    nav.push(MaterialPageRoute(builder: (_) => const IngredientFormScreen()));
+    await shot(tester, '17_nuevo_insumo');
     nav.pop();
     await tester.pumpAndSettle();
 
