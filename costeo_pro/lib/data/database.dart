@@ -10,7 +10,7 @@ class AppDatabase {
 
   final Database db;
 
-  static const schemaVersion = 1;
+  static const schemaVersion = 2;
   static const backupFormat = 'costeo_pro_backup';
 
   /// Tablas en orden de dependencia (para respaldo/restauración).
@@ -35,6 +35,9 @@ class AppDatabase {
         version: schemaVersion,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
         onCreate: (db, v) => _create(db),
+        onUpgrade: (db, from, to) async {
+          if (from < 2) await db.execute('ALTER TABLE ingredients ADD COLUMN pieces REAL');
+        },
       ),
     );
     return AppDatabase._(db);
@@ -56,6 +59,7 @@ class AppDatabase {
       purchase_date INTEGER,
       photo_path TEXT,
       density REAL,
+      pieces REAL,
       track_stock INTEGER DEFAULT 0,
       stock REAL DEFAULT 0,
       min_stock REAL,

@@ -69,7 +69,8 @@ class IngredientDetailScreen extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(
                         '${ing.presentation.isEmpty ? 'Presentación' : ing.presentation} de '
-                        '${Fmt.qty(ing.quantity, ing.unit)}',
+                        '${Fmt.qty(ing.quantity, ing.unit)}'
+                        '${ing.hasPieces ? ' · ${Fmt.num(ing.pieces)} piezas' : ''}',
                         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                     const SizedBox(height: 4),
                     Pill(ing.category, color: context.muted),
@@ -89,6 +90,9 @@ class IngredientDetailScreen extends StatelessWidget {
                       '${Fmt.moneySmart(ing.price! / convert(ing.quantity, ing.unit, u, density: ing.density))} / ${u.symbol}',
                       style: TextStyle(color: context.muted, fontWeight: FontWeight.w600),
                     ),
+                  if (ing.hasPieces)
+                    Text('${Fmt.moneySmart(ing.price! / ing.pieces!)} / pieza',
+                        style: TextStyle(color: context.muted, fontWeight: FontWeight.w600)),
                 ]),
               ],
               const SizedBox(height: 10),

@@ -268,4 +268,26 @@ void main() {
       expect(Fmt.pct(56), '56 %');
     });
   });
+
+  group('Piezas por presentación', () {
+    test('paquete de 4 lb con 12 tortas: usar 12 tortas cuesta el paquete', () {
+      final tortas = Ingredient(id: 1, name: 'Tortas', quantity: 4, unit: Unit.lb, price: 1, pieces: 12);
+      expect(unitsForIngredient(tortas), contains(Unit.unit));
+      final r = Recipe(id: 1, name: 'Hamburguesas', yieldQty: 12, items: [
+        RecipeItem(ingredientId: 1, quantity: 12, unit: Unit.unit),
+      ]);
+      final e = CostingEngine(CostingContext(ingredients: {1: tortas}, recipes: {1: r}));
+      expect(e.cost(r).ingredientsCost, closeTo(1.0, 1e-12));
+      expect(e.requirements(r, 1)[1], closeTo(4, 1e-12)); // 4 lb
+      // Usar 12 lb son 3 paquetes.
+      r.items.first.unit = Unit.lb;
+      expect(e.cost(r).ingredientsCost, closeTo(3.0, 1e-12));
+    });
+
+    test('sin piezas registradas no se puede usar "unidades" con un insumo por peso', () {
+      final x = Ingredient(id: 1, name: 'X', quantity: 4, unit: Unit.lb, price: 1);
+      expect(unitsForIngredient(x), isNot(contains(Unit.unit)));
+      expect(() => toPurchaseUnit(x, 1, Unit.unit), throwsA(isA<UnitConversionException>()));
+    });
+  });
 }

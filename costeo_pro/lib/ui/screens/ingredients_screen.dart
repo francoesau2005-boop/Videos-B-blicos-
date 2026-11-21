@@ -110,7 +110,7 @@ class IngredientTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
             const SizedBox(height: 2),
-            Text('$pres${Fmt.qty(i.quantity, i.unit)}',
+            Text('$pres${Fmt.qty(i.quantity, i.unit)}${i.hasPieces ? ' · ${Fmt.num(i.pieces)} piezas' : ''}',
                 style: context.tt.bodySmall!.copyWith(color: context.muted)),
             const SizedBox(height: 4),
             Wrap(spacing: 6, runSpacing: 4, children: [

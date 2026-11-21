@@ -96,7 +96,7 @@ class UnitDropdown extends StatelessWidget {
         for (final u in list)
           DropdownMenuItem(
             value: u,
-            child: Text(compact ? u.symbol : '${u.label} (${u.symbol})',
+            child: Text(compact ? u.label : '${u.label} (${u.symbol})',
                 overflow: TextOverflow.ellipsis),
           )
       ],

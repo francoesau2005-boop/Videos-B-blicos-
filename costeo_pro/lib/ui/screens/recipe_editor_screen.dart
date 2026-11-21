@@ -254,12 +254,8 @@ class _RecipeEditorScreenState extends State<RecipeEditorScreen> {
               const SizedBox(height: 14),
               CategoryField(controller: _category, options: s.recipeCategories),
               SectionTitle('Ingredientes (${_items.length})'),
-              if (_items.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text('Agrega los insumos que usa esta receta y la cantidad de cada uno.',
-                      style: TextStyle(color: context.muted)),
-                ),
+              const _HowItWorks(),
+              const SizedBox(height: 12),
               for (var i = 0; i < _items.length; i++)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
@@ -462,12 +458,8 @@ class _RecipeEditorScreenState extends State<RecipeEditorScreen> {
         ),
         if (ing != null && ing.price != null)
           Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Text(
-              'De ${ing.presentation.isEmpty ? 'presentación' : ing.presentation.toLowerCase()} de '
-              '${Fmt.qty(ing.quantity, ing.unit)} a ${Fmt.money(ing.price)}',
-              style: context.tt.bodySmall!.copyWith(color: context.muted),
-            ),
+            padding: const EdgeInsets.only(top: 8, right: 8),
+            child: _UsageExplanation(ing: ing, qty: Fmt.parse(row.ctrl.text) ?? 0, unit: item.unit, cost: line?.cost),
           ),
         if (isSub && line?.subCostPerUnit != null)
           Padding(
@@ -593,11 +585,11 @@ class _SummaryBar extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Row(children: [
-              _mini(context, 'Costo total', Fmt.money(c.productionCost)),
-              _mini(context, 'Costo c/u', Fmt.money(c.costPerUnit)),
+              _mini(context, 'Cuesta toda la receta', Fmt.money(c.productionCost)),
+              _mini(context, 'Cuesta cada ${_one(c.recipe.yieldUnit)}', Fmt.money(c.costPerUnit)),
               _mini(
                 context,
-                'Ganancia c/u',
+                'Ganas por ${_one(c.recipe.yieldUnit)}',
                 c.hasSalePrice ? Fmt.money(c.grossProfitPerUnit) : '—',
                 color: (c.grossProfitPerUnit ?? 0) >= 0 ? context.positive : context.negative,
               ),
@@ -702,4 +694,81 @@ class _IngredientPickerState extends State<_IngredientPicker> {
       ]),
     );
   }
+}
+
+
+String _one(String u) {
+  final t = Fmt.units(1, u.trim().isEmpty ? 'unidades' : u.trim());
+  return t.substring(2);
+}
+
+/// Ayuda breve de cómo llenar la receta.
+class _HowItWorks extends StatelessWidget {
+  const _HowItWorks();
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.info.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Icon(Icons.lightbulb_outline_rounded, color: AppColors.info),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Escribe lo que gastas para preparar TODA la tanda (ej. 7 lb de harina). '
+              'Abajo indica cuántas unidades salen de esa tanda y a cuánto vendes CADA una.',
+              style: context.tt.bodySmall,
+            ),
+          ),
+        ]),
+      );
+}
+
+/// Explica en palabras simples cómo se calculó el costo de un ingrediente.
+class _UsageExplanation extends StatelessWidget {
+  const _UsageExplanation({required this.ing, required this.qty, required this.unit, required this.cost});
+  final Ingredient ing;
+  final double qty;
+  final Unit unit;
+  final double? cost;
+
+  @override
+  Widget build(BuildContext context) {
+    final pres = ing.presentation.isEmpty ? 'presentación' : ing.presentation.toLowerCase();
+    final presText = '$pres de ${Fmt.qty(ing.quantity, ing.unit)}'
+        '${ing.hasPieces ? ' (${Fmt.num(ing.pieces)} piezas)' : ''}';
+    double? packs;
+    try {
+      packs = qty <= 0 || ing.quantity <= 0 ? null : toPurchaseUnit(ing, qty, unit) / ing.quantity;
+    } catch (_) {}
+    final unitName = unit == Unit.unit ? Fmt.units(qty, 'unidades') : Fmt.qty(qty, unit);
+    final lines = <String>['Compras: $presText a ${Fmt.money(ing.price)}'];
+    if (packs != null && cost != null) {
+      lines.add('Usas $unitName = ${Fmt.num(packs, maxDecimals: 2)} '
+          '${_plural(packs, pres)}, cuesta ${Fmt.money(cost)}');
+    }
+    final many = packs != null && packs > 1.0001;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      for (final l in lines)
+        Text(l, style: context.tt.bodySmall!.copyWith(color: context.muted)),
+      if (many)
+        Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Text(
+            '¿Seguro? Eso equivale a ${Fmt.num(packs, maxDecimals: 2)} ${_plural(packs, pres)} completos. '
+            '${ing.unit.dimension != Dimension.count && !ing.hasPieces ? 'Si querías contar piezas (ej. 12 tortas), '
+                'edita el insumo y escribe cuántas piezas trae; luego elige "Unidades".' : 'Revisa la cantidad y la unidad.'}',
+            style: TextStyle(color: context.warning, fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+        ),
+    ]);
+  }
+}
+
+String _plural(double n, String w) {
+  if ((n - 1).abs() < 1e-9) return w;
+  if (w.endsWith('ón')) return '${w.substring(0, w.length - 2)}ones';
+  return RegExp(r'[aeiou]$').hasMatch(w) ? '${w}s' : '${w}es';
 }

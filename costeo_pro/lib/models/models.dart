@@ -20,6 +20,7 @@ class Ingredient {
     this.purchaseDate,
     this.photoPath,
     this.density,
+    this.pieces,
     this.trackStock = false,
     this.stock = 0,
     this.minStock,
@@ -49,6 +50,12 @@ class Ingredient {
 
   /// Densidad en g/ml, opcional. Solo con ella se convierte peso ↔ volumen.
   double? density;
+
+  /// Piezas que trae la presentación (ej. paquete de 4 lb con 12 tortas).
+  /// Permite usar "unidades" en recetas aunque se compre por peso o volumen.
+  double? pieces;
+
+  bool get hasPieces => pieces != null && pieces! > 0 && unit.dimension != Dimension.count;
 
   bool trackStock;
 
@@ -85,6 +92,7 @@ class Ingredient {
         'purchase_date': _ms(purchaseDate),
         'photo_path': photoPath,
         'density': density,
+        'pieces': pieces,
         'track_stock': trackStock ? 1 : 0,
         'stock': stock,
         'min_stock': minStock,
@@ -106,6 +114,7 @@ class Ingredient {
         purchaseDate: _dt(m['purchase_date']),
         photoPath: m['photo_path'] as String?,
         density: _d(m['density']),
+        pieces: _d(m['pieces']),
         trackStock: (m['track_stock'] as num? ?? 0) == 1,
         stock: _d(m['stock']) ?? 0,
         minStock: _d(m['min_stock']),

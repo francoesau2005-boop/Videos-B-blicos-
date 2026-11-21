@@ -302,6 +302,5 @@ class AppState extends ChangeNotifier {
   }
 
   /// Unidades en que puede expresarse un insumo en una receta.
-  List<Unit> unitsFor(Ingredient ing) =>
-      compatibleUnits(ing.unit, density: ing.density);
+  List<Unit> unitsFor(Ingredient ing) => unitsForIngredient(ing);
 }

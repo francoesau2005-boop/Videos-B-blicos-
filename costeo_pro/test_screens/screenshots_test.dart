@@ -161,6 +161,30 @@ void main() {
     nav.pop();
     await tester.pumpAndSettle();
 
+    // Caso real del usuario: hamburguesas con tortas compradas por peso.
+    final pan = Ingredient(name: 'Pan Hamburguesa', presentation: 'Paquete', quantity: 12, unit: Unit.unit, price: 3.8);
+    final tortas = Ingredient(name: 'Tortas de sello de oro', presentation: 'Paquete', quantity: 4, unit: Unit.lb, price: 1);
+    await s.saveIngredient(pan);
+    await s.saveIngredient(tortas);
+    final hamb = Recipe(name: 'Hamburguesas', yieldQty: 12, salePrice: 1.75, items: [
+      RecipeItem(ingredientId: pan.id, quantity: 12, unit: Unit.unit),
+      RecipeItem(ingredientId: tortas.id, quantity: 12, unit: Unit.lb),
+    ]);
+    nav.push(MaterialPageRoute(builder: (_) => RecipeEditorScreen(recipe: hamb)));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -330));
+    await shot(tester, '14_hamburguesa_tortas_en_libras');
+    nav.pop();
+    await tester.pumpAndSettle();
+    await s.saveIngredient(s.ingredient(tortas.id)!.copy()..pieces = 12);
+    final hamb2 = hamb.clone()..items[1].unit = Unit.unit;
+    nav.push(MaterialPageRoute(builder: (_) => RecipeEditorScreen(recipe: hamb2)));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -330));
+    await shot(tester, '15_hamburguesa_tortas_por_pieza');
+    nav.pop();
+    await tester.pumpAndSettle();
+
     await s.setSetting('theme', 'light');
     await tester.pumpAndSettle();
     await shot(tester, '12_inicio_claro');

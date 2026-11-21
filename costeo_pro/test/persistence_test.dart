@@ -206,4 +206,26 @@ void main() {
     expect(csvR, contains('Masa de pizza'));
     await s.db.close();
   });
+
+  test('actualiza una base de datos de la versión 1 sin perder datos', () async {
+    final old = await databaseFactoryFfi.openDatabase(path,
+        options: OpenDatabaseOptions(version: 1, onCreate: (db, v) async {
+      await db.execute('CREATE TABLE ingredients (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, '
+          'category TEXT, presentation TEXT, quantity REAL NOT NULL, unit TEXT NOT NULL, price REAL, brand TEXT, '
+          'supplier TEXT, purchase_date INTEGER, photo_path TEXT, density REAL, track_stock INTEGER DEFAULT 0, '
+          'stock REAL DEFAULT 0, min_stock REAL, notes TEXT, created_at INTEGER, updated_at INTEGER)');
+      await db.execute('CREATE TABLE price_history (id INTEGER PRIMARY KEY AUTOINCREMENT, ingredient_id INTEGER, '
+          'price REAL, quantity REAL, unit TEXT, date INTEGER, supplier TEXT, note TEXT)');
+      await db.insert('ingredients', {'name': 'Tortas', 'quantity': 4, 'unit': 'lb', 'price': 1.0});
+    }));
+    await old.close();
+    final db = await AppDatabase.open(path, factory: databaseFactoryFfi);
+    final list = await db.ingredients();
+    expect(list.single.name, 'Tortas');
+    expect(list.single.pieces, isNull);
+    list.single.pieces = 12;
+    await db.saveIngredient(list.single);
+    expect((await db.ingredients()).single.pieces, 12);
+    await db.close();
+  });
 }

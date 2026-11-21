@@ -279,7 +279,7 @@ class _IngredientsTable extends StatelessWidget {
           if (u != null && l.item.unit != u) {
             final ing = state.ingredient(l.item.ingredientId);
             try {
-              qq = convert(qq, l.item.unit, u, density: ing?.density);
+              qq = ing == null ? convert(qq, l.item.unit, u) : toPurchaseUnit(ing, qq, l.item.unit) * convert(1, ing.unit, u, density: ing.density);
             } catch (_) {}
           }
           q = (q ?? 0) + qq;

@@ -52,6 +52,23 @@ class ProfitMath {
   static double safeDiv(double a, double b) => b == 0 ? 0 : a / b;
 }
 
+/// Convierte la cantidad usada a la unidad de compra del insumo.
+/// Admite "unidades" (piezas) para insumos comprados por peso/volumen si
+/// el insumo indica cuántas piezas trae la presentación.
+double toPurchaseUnit(Ingredient ing, double qty, Unit unit) {
+  if (unit == Unit.unit && ing.hasPieces) {
+    return qty * ing.quantity / ing.pieces!;
+  }
+  return convert(qty, unit, ing.unit, density: ing.density);
+}
+
+/// Unidades en que puede expresarse un insumo en una receta.
+List<Unit> unitsForIngredient(Ingredient ing) {
+  final list = compatibleUnits(ing.unit, density: ing.density);
+  if (ing.hasPieces && !list.contains(Unit.unit)) list.add(Unit.unit);
+  return list;
+}
+
 /// Datos necesarios para costear: catálogo de insumos, recetas y gastos fijos.
 class CostingContext {
   CostingContext({
@@ -334,14 +351,10 @@ class CostingEngine {
       );
     }
     try {
-      final c = ProfitMath.usageCost(
-        usedQty: item.quantity,
-        usedUnit: item.unit,
-        purchaseQty: ing.quantity,
-        purchaseUnit: ing.unit,
-        purchasePrice: ing.price!,
-        density: ing.density,
-      );
+      if (ing.quantity <= 0) {
+        throw UnitConversionException('La cantidad comprada debe ser mayor que cero.');
+      }
+      final c = toPurchaseUnit(ing, item.quantity, item.unit) / ing.quantity * ing.price!;
       return LineCost(
         item: item,
         name: ing.name,
@@ -381,9 +394,7 @@ class CostingEngine {
         final ing = ctx.ingredients[item.ingredientId];
         if (ing == null) continue;
         try {
-          final q = convert(item.quantity, item.unit, ing.unit,
-                  density: ing.density) *
-              batches;
+          final q = toPurchaseUnit(ing, item.quantity, item.unit) * batches;
           out[ing.id!] = (out[ing.id!] ?? 0) + q;
         } on UnitConversionException {
           // Línea inválida: se omite (se avisa en el costeo).

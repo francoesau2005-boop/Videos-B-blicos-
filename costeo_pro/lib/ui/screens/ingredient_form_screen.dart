@@ -27,7 +27,7 @@ class _IngredientFormScreenState extends State<IngredientFormScreen> {
   final _form = GlobalKey<FormState>();
   late final Ingredient _ing;
   late final TextEditingController _name, _category, _presentation, _qty, _price,
-      _brand, _supplier, _density, _stock, _minStock, _notes;
+      _brand, _supplier, _density, _stock, _minStock, _notes, _pieces;
   bool _saving = false;
 
   static const _presentations = [
@@ -52,12 +52,13 @@ class _IngredientFormScreenState extends State<IngredientFormScreen> {
     _stock = TextEditingController(text: _isNew ? '' : Fmt.input(_ing.stock));
     _minStock = TextEditingController(text: Fmt.input(_ing.minStock));
     _notes = TextEditingController(text: _ing.notes);
+    _pieces = TextEditingController(text: Fmt.input(_ing.pieces));
   }
 
   @override
   void dispose() {
     for (final c in [_name, _category, _presentation, _qty, _price, _brand, _supplier,
-      _density, _stock, _minStock, _notes]) {
+      _density, _stock, _minStock, _notes, _pieces]) {
       c.dispose();
     }
     super.dispose();
@@ -91,6 +92,7 @@ class _IngredientFormScreenState extends State<IngredientFormScreen> {
       ..brand = _brand.text.trim()
       ..supplier = _supplier.text.trim()
       ..density = Fmt.parse(_density.text)
+      ..pieces = _ing.unit == Unit.unit ? null : Fmt.parse(_pieces.text)
       ..minStock = Fmt.parse(_minStock.text)
       ..notes = _notes.text.trim();
     if (_ing.density == 0) _ing.density = null;
@@ -199,6 +201,17 @@ class _IngredientFormScreenState extends State<IngredientFormScreen> {
                 ),
               ),
             ]),
+            if (_ing.unit != Unit.unit) ...[
+              const SizedBox(height: 14),
+              NumField(
+                controller: _pieces,
+                label: '¿Cuántas piezas trae? (opcional)',
+                suffix: 'piezas',
+                required: false,
+                helper: 'Ej.: paquete de 4 lb con 12 tortas → escribe 12. Así en tus recetas '
+                    'podrás usar "Unidades" (ej. 1 torta) en lugar de libras.',
+              ),
+            ],
             const SizedBox(height: 14),
             NumField(
               controller: _price,
