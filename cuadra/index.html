@@ -147,18 +147,33 @@ tfoot td {border-top:2px solid #7d6233;color:var(--gold);font-weight:800;padding
 .chips {display:flex;gap:6px;flex-wrap:wrap}
 .chip {padding:8px 13px;border-radius:999px;font-size:13px}
 .chip.on {background:var(--gold);color:#2b1f0b;border-color:var(--gold)}
-.cut-row {display:grid;grid-template-columns:1fr 84px 86px;gap:8px;align-items:center;padding:10px 0;border-top:1px solid #223a44}
-.cut-row:first-of-type {border-top:none}
-.cut-name b {display:block;font-size:15px}
-.cut-name small {color:var(--mu);font-size:12px}
-.cut-row input {text-align:center;font-weight:800;font-size:17px}
-.cut-in {text-align:center;border-radius:10px;background:var(--gold-d);padding:9px 2px;border:1px solid #6b5228}
-.cut-in small {display:block;font-size:9px;color:var(--gold);letter-spacing:.6px}
-.cut-in b {font-size:22px;color:var(--gold);font-variant-numeric:tabular-nums}
-.cut-head {display:grid;grid-template-columns:1fr 84px 86px;gap:8px;font-size:10px;color:var(--mu);letter-spacing:.6px;text-transform:uppercase;text-align:center}
-.cut-head span:first-child {text-align:left}
+.chip.off {text-decoration:line-through;opacity:.55}
+.steps {display:flex;gap:8px}
+.step {flex:1;display:flex;gap:8px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;font-size:12px;color:var(--mu)}
+.step b {flex:none;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#2b1f0b;display:flex;align-items:center;justify-content:center;font-size:12px}
+.left-row {display:grid;grid-template-columns:1fr 110px;gap:8px;align-items:center;padding:7px 0;border-top:1px solid #223a44}
+.left-row:first-child {border-top:none}
+.left-row b {font-size:15px}
+.left-row input {text-align:center;font-weight:800;font-size:18px}
+.left-total {display:flex;justify-content:space-between;color:var(--mu);font-size:12px;padding-top:4px}
+.del-head,.del-row {display:grid;grid-template-columns:1fr 58px 62px 84px;gap:6px;align-items:center;text-align:center}
+.del-head {font-size:10px;color:var(--mu);letter-spacing:.6px;text-transform:uppercase}
+.del-head span:first-child,.del-row span:first-child {text-align:left}
+.del-row {padding:9px 0;border-top:1px solid #223a44;font-variant-numeric:tabular-nums;font-size:15px}
+.del-row span:first-child {font-weight:800}
+.del-row .minus {color:var(--red)}
+.add-box {border-radius:10px;background:var(--gold-d);border:1px solid #6b5228;padding:7px 2px;font-size:21px;font-weight:900;color:var(--gold)}
+.add-box.neg {color:var(--red)}
+.formula {font-size:12px;color:var(--mu);text-align:center}
+.dl-row {display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 2px;border-top:1px solid #223a44;cursor:pointer}
+.dl-row:first-child {border-top:none}
+.dl-row small {display:block;color:var(--mu);font-size:11px;margin-top:2px}
+.dl-row .pill {flex:none}
 .cut-edit {display:grid;grid-template-columns:1fr 70px 44px;gap:6px}
-
+.det-table {width:100%;border-collapse:collapse;table-layout:auto}
+.det-table th,.det-table td {padding:8px 4px;text-align:center;border-top:1px solid #223a44;font-variant-numeric:tabular-nums}
+.det-table th {border-top:none}
+.det-table td:first-child,.det-table th:first-child {text-align:left}
 /* ---------- libro vs sistema ---------- */
 .quick {display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .big-result {
@@ -354,30 +369,55 @@ footer {text-align:center;color:#58737c;font-size:11px;padding:18px 0 4px}
 
 <!-- ================= POLLOS ================= -->
 <section id="pollos" class="screen hidden">
-  <div class="title"><h1>Calculadora de pollos</h1></div>
-  <p class="hint">Escribe cuántos pollos recibiste y cuántas piezas sobran. La app te dice cuánto ingresar.</p>
+  <div class="title"><h1>Pollos</h1></div>
+  <div class="steps">
+    <div class="step"><b>1</b><span>Cada día anota las piezas que <strong>sobraron</strong>.</span></div>
+    <div class="step"><b>2</b><span>Cuando llegue el pollo, agrega al sistema lo que te diga la app.</span></div>
+  </div>
 
   <div class="card">
+    <div class="card-head">
+      <h2>Sobrantes del <span id="left-date"></span></h2>
+      <span id="left-state"></span>
+    </div>
+    <p class="hint" id="left-note"></p>
+    <div id="left-rows"></div>
+  </div>
+
+  <div class="card">
+    <h2>Llegó el pollo</h2>
     <label for="birds">Pollos recibidos</label>
     <div class="stepper">
       <button id="birds-minus" aria-label="Menos">−</button>
-      <input id="birds" type="number" min="0" inputmode="numeric" placeholder="0" enterkeyhint="next">
+      <input id="birds" type="number" min="0" inputmode="numeric" placeholder="0" enterkeyhint="done">
       <button id="birds-plus" aria-label="Más">+</button>
     </div>
     <div class="chips" id="birds-chips"></div>
+    <div>
+      <label>Sobrantes que se descuentan</label>
+      <div class="chips" id="left-days" style="margin-top:6px"></div>
+    </div>
+    <div class="del-head"><span>Pieza</span><span>Llegan</span><span>Sobran</span><span>Agregar</span></div>
+    <div id="delivery-rows"></div>
+    <p class="formula">Agregar al sistema = piezas que llegan − sobrantes</p>
+    <button class="btn-gold" id="save-delivery">Guardar entrega</button>
   </div>
 
   <div class="card">
-    <div class="cut-head"><span>Pieza</span><span>Sobran</span><span>Ingresar</span></div>
-    <div id="cuts"></div>
-    <div class="row-btns">
-      <button id="cuts-clear" class="btn-sm btn-ghost">Limpiar</button>
-      <button id="cuts-edit" class="btn-sm btn-ghost">Cambiar piezas</button>
+    <h2>Entregas guardadas</h2>
+    <p class="hint">Para facturar después: toca una entrega y verás cuánto se agregó y qué días se descontaron.</p>
+    <div id="deliveries"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Piezas por pollo</h2>
+      <button id="cuts-edit" class="btn-sm">Cambiar</button>
     </div>
+    <p class="hint" id="cuts-summary"></p>
     <div id="cuts-editor" class="hidden"></div>
   </div>
 </section>
-
 <!-- ================= LIBRO VS SISTEMA ================= -->
 <section id="libro" class="screen hidden">
   <div class="title"><h1>Libro vs. Sistema</h1></div>
@@ -703,7 +743,7 @@ function setTab(name) {
     navs[j].classList.toggle("active", navs[j].getAttribute("data-tab") === name);
   TABS.forEach(function(n){ $(n).classList.toggle("hidden", n !== name); });
   if (name === "libro") renderCompare();
-  if (name === "pollos") renderCuts();
+  if (name === "pollos") renderPollos();
   window.scrollTo(0, 0);
   state.settings.tab = name; save();
 }
@@ -806,7 +846,7 @@ $("date").value = date;
 $("date").addEventListener("change", function() {
   if (!this.value) return;
   date = this.value;
-  renderProducts(); renderExpenses();
+  renderProducts(); renderExpenses(); renderPollos();
   toast("Mostrando " + niceDate(date));
 });
 
@@ -1048,63 +1088,171 @@ $("history").addEventListener("click", function(e) {
       } });
 });
 
-/* ===================== pollos ===================== */
-var cutLeft = {};
+/* ===================== pollos =====================
+   Cada día se anotan las piezas que sobraron (no se venden y quedan de
+   extra en el sistema). Al llegar el pollo se agrega al sistema:
+   pollos × piezas por pollo − sobrantes acumulados desde la última entrega. */
+if (!state.chicken) state.chicken = {left:{}, used:{}, deliveries:[]};
+var CH = state.chicken;
+var excludedDays = {};
 var cutsEditing = false;
 function cuts() { return state.settings.cuts; }
 function birdsVal() { var b = number($("birds").value); return b === null || b !== b || b < 0 ? 0 : Math.floor(b); }
+function shortDate(d) { var p = String(d).split("-"); return p.length === 3 ? p[2] + "/" + p[1] : d; }
+function leftOf(d, name) { var x = CH.left[d]; return x && x[name] != null ? (Number(x[name]) || 0) : 0; }
+function dayLeftTotal(d) { var t = 0; cuts().forEach(function(c){ t += leftOf(d, c[0]); }); return t; }
+function pendingDays() {
+  return Object.keys(CH.left).filter(function(d){ return !CH.used[d] && dayLeftTotal(d) > 0; }).sort();
+}
+function chosenDays() { return pendingDays().filter(function(d){ return !excludedDays[d]; }); }
+function deliveryById(did) { return findBy(CH.deliveries, "id", did); }
+
+function renderPollos() { renderLeft(); renderDelivery(); renderDeliveries(); renderCutsSummary(); renderCutsEditor(); }
+
+function renderLeft() {
+  $("left-date").textContent = niceDate(date);
+  var usedBy = CH.used[date] ? deliveryById(CH.used[date]) : null;
+  $("left-state").innerHTML = usedBy ? '<span class="pill tag-add">✓ Descontado</span>'
+    : dayLeftTotal(date) > 0 ? '<span class="pill tag-sell">Pendiente</span>' : '';
+  $("left-note").textContent = usedBy
+    ? "Estos sobrantes ya se descontaron en la entrega del " + niceDate(usedBy.date) + ". Para cambiarlos, borra esa entrega."
+    : "Lo que quedó sin vender ese día, según el libro. Para otro día, cambia la fecha de arriba.";
+  $("left-rows").innerHTML = cuts().map(function(c) {
+    var v = CH.left[date] && CH.left[date][c[0]] != null ? CH.left[date][c[0]] : "";
+    return '<div class="left-row"><b>' + safe(c[0]) + '</b>' +
+      '<input type="number" min="0" inputmode="numeric" enterkeyhint="next" placeholder="0" data-left="' + safe(c[0]) + '" value="' + fmt(v) + '"' + (usedBy ? ' disabled' : '') + '></div>';
+  }).join("");
+}
+$("left-rows").addEventListener("input", function(e) {
+  var name = e.target.getAttribute("data-left");
+  if (name === null || CH.used[date]) return;
+  var v = number(e.target.value);
+  if (!CH.left[date]) CH.left[date] = {};
+  if (v === null || v !== v || v < 0) delete CH.left[date][name]; else CH.left[date][name] = Math.floor(v);
+  if (!Object.keys(CH.left[date]).length) delete CH.left[date];
+  save();
+  var st = $("left-state");
+  st.innerHTML = dayLeftTotal(date) > 0 ? '<span class="pill tag-sell">Pendiente</span>' : '';
+  renderDelivery();
+});
+
 function renderBirdChips() {
   var b = birdsVal();
   $("birds-chips").innerHTML = [25,50,75,100].map(function(n) {
     return '<button class="chip' + (b === n ? ' on' : '') + '" data-birds="'+n+'">'+n+'</button>';
   }).join("");
 }
-function renderCuts() {
-  $("cuts").innerHTML = cuts().map(function(c, i) {
-    return '<div class="cut-row">' +
-      '<div class="cut-name"><b>' + safe(c[0]) + '</b><small>Corresponden <span data-cut-total="'+i+'">0</span></small></div>' +
-      '<input type="number" min="0" inputmode="numeric" enterkeyhint="next" data-cut="'+i+'" placeholder="0" value="'+fmt(cutLeft[i])+'" aria-label="'+safe(c[0])+' sobrantes">' +
-      '<div class="cut-in"><b data-cut-in="'+i+'">0</b></div></div>';
-  }).join("");
-  renderBirdChips();
-  updateCuts();
-}
-function updateCuts() {
-  var b = birdsVal();
-  cuts().forEach(function(c, i) {
-    var tot = Math.round(b * c[1]), left = Number(cutLeft[i]) || 0;
-    var t = document.querySelector('[data-cut-total="'+i+'"]');
-    if (!t) return;
-    t.textContent = tot;
-    var inEl = document.querySelector('[data-cut-in="'+i+'"]');
-    inEl.textContent = tot - left;
-    inEl.style.color = tot - left < 0 ? "var(--red)" : "";
+function computeDelivery() {
+  var b = birdsVal(), days = chosenDays();
+  return cuts().map(function(c) {
+    var recv = b * c[1], left = 0;
+    days.forEach(function(d){ left += leftOf(d, c[0]); });
+    return {name:c[0], per:c[1], recv:recv, left:left, add:recv - left};
   });
 }
-function setBirds(n) {
-  $("birds").value = n > 0 ? n : "";
-  renderBirdChips(); updateCuts();
+function renderDelivery() {
+  renderBirdChips();
+  var p = pendingDays();
+  $("left-days").innerHTML = p.length ? p.map(function(d) {
+    return '<button class="chip ' + (excludedDays[d] ? 'off' : 'on') + '" data-day="'+d+'">' + shortDate(d) + ' · ' + dayLeftTotal(d) + ' pzs</button>';
+  }).join("") : '<span class="hint">No hay sobrantes pendientes.</span>';
+  var b = birdsVal();
+  $("delivery-rows").innerHTML = computeDelivery().map(function(r) {
+    return '<div class="del-row"><span>' + safe(r.name) + '</span><span>' + (b ? r.recv : '—') + '</span>' +
+      '<span class="minus">' + (r.left ? '−' + r.left : '0') + '</span>' +
+      '<div class="add-box' + (b && r.add < 0 ? ' neg' : '') + '">' + (b ? r.add : '—') + '</div></div>';
+  }).join("");
+  $("save-delivery").textContent = "Guardar entrega del " + niceDate(date);
 }
-$("birds").addEventListener("input", function(){ renderBirdChips(); updateCuts(); });
+function setBirds(n) { $("birds").value = n > 0 ? n : ""; renderDelivery(); }
+$("birds").addEventListener("input", renderDelivery);
 $("birds-minus").addEventListener("click", function(){ setBirds(Math.max(0, birdsVal() - 1)); });
 $("birds-plus").addEventListener("click", function(){ setBirds(birdsVal() + 1); });
 $("birds-chips").addEventListener("click", function(e) {
   var b = closest(e.target, "[data-birds]");
   if (b) setBirds(Number(b.getAttribute("data-birds")));
 });
-$("cuts").addEventListener("input", function(e) {
-  var i = e.target.getAttribute("data-cut");
-  if (i === null) return;
-  cutLeft[i] = number(e.target.value);
-  updateCuts();
+$("left-days").addEventListener("click", function(e) {
+  var b = closest(e.target, "[data-day]");
+  if (!b) return;
+  var d = b.getAttribute("data-day");
+  excludedDays[d] = !excludedDays[d];
+  renderDelivery();
 });
-$("cuts-clear").addEventListener("click", function() {
-  cutLeft = {}; $("birds").value = ""; renderCuts(); toast("Calculadora limpia");
+
+function deliveryText(dl) {
+  var t = "*" + APP + "*\nEntrega del " + niceDate(dl.date) + ": " + dl.birds + " pollos\n\nAGREGAR AL SISTEMA\n";
+  dl.pieces.forEach(function(r){ t += "• " + r.name + ": " + r.recv + " − " + r.left + " = *" + r.add + "*\n"; });
+  t += "\nSobrantes descontados: " + (dl.days.length ? dl.days.map(niceDate).join(", ") : "ninguno") + "\n";
+  return t;
+}
+$("save-delivery").addEventListener("click", function() {
+  var b = birdsVal();
+  if (!b) { toast("Escribe cuántos pollos llegaron"); $("birds").focus(); return; }
+  var rows = computeDelivery(), days = chosenDays();
+  var list = rows.map(function(r){ return '<tr><td>' + safe(r.name) + '</td><td><b style="color:var(--gold);font-size:18px">' + r.add + '</b></td></tr>'; }).join("");
+  ask("¿Guardar entrega de " + b + " pollos?<table class='det-table' style='margin-top:10px'><tr><th>Pieza</th><th>Agregar</th></tr>" + list + "</table>" +
+      "<span class='hint'>" + (days.length ? "Se descuentan los sobrantes del " + days.map(shortDate).join(", ") + "." : "Sin sobrantes que descontar.") + "</span>",
+    "Guardar", function() {
+      var dl = {id:id(), date:date, birds:b, pieces:rows, days:days, savedAt:new Date().toLocaleString()};
+      CH.deliveries.unshift(dl);
+      CH.deliveries.sort(function(x,y){ return x.date < y.date ? 1 : x.date > y.date ? -1 : 0; });
+      days.forEach(function(d){ CH.used[d] = dl.id; });
+      excludedDays = {};
+      $("birds").value = "";
+      save(); renderPollos();
+      toast("Entrega guardada");
+      showDelivery(dl);
+    });
 });
+function renderDeliveries() {
+  $("deliveries").innerHTML = CH.deliveries.length ? CH.deliveries.slice(0, 40).map(function(dl) {
+    return '<div class="dl-row" data-dl="' + dl.id + '"><span><strong>' + safe(niceDate(dl.date)) + '</strong> · ' + dl.birds + ' pollos' +
+      '<small>' + dl.pieces.map(function(r){ return safe(r.name) + ' +' + r.add; }).join(" · ") + '</small></span>' +
+      '<span class="pill tag-ok">' + (dl.days.length ? '−' + dl.days.length + (dl.days.length > 1 ? ' días' : ' día') : 'sin desc.') + '</span></div>';
+  }).join("") : '<p class="hint">Aún no hay entregas guardadas.</p>';
+}
+function showDelivery(dl) {
+  var rows = dl.pieces.map(function(r) {
+    return '<tr><td>' + safe(r.name) + '</td><td>' + r.recv + '</td><td style="color:var(--red)">−' + r.left + '</td><td><b style="color:var(--gold);font-size:18px">' + r.add + '</b></td></tr>';
+  }).join("");
+  var daysHtml = dl.days.length ? dl.days.map(function(d) {
+    return '<div class="line"><span>' + niceDate(d) + '</span><span class="hint">' +
+      cuts().map(function(c){ var v = leftOf(d, c[0]); return v ? safe(c[0]) + ' ' + v : ''; }).filter(Boolean).join(" · ") + '</span></div>';
+  }).join("") : '<p class="hint">No se descontaron sobrantes.</p>';
+  openModal('<h3>Entrega del ' + niceDate(dl.date) + ' · ' + dl.birds + ' pollos</h3>' +
+    '<table class="det-table"><tr><th>Pieza</th><th>Llegan</th><th>Sobran</th><th>Agregar</th></tr>' + rows + '</table>' +
+    '<div><label>Sobrantes descontados</label>' + daysHtml + '</div>' +
+    '<div class="row-btns"><button class="btn-gold" data-m="share">Compartir</button><button data-m="close">Cerrar</button></div>' +
+    '<button class="btn-danger btn-sm" data-m="del">Borrar entrega</button>',
+    { share: function() {
+        var t = deliveryText(dl);
+        if (window.Android && window.Android.shareText) window.Android.shareText(t);
+        else if (navigator.share) navigator.share({title:APP, text:t}).catch(function(){});
+        else copyText(t);
+      },
+      del: function() {
+        ask("¿Borrar la entrega del " + niceDate(dl.date) + "?<br><span class='hint'>Sus sobrantes vuelven a quedar pendientes.</span>", "Borrar", function() {
+          CH.deliveries = CH.deliveries.filter(function(x){ return x.id !== dl.id; });
+          state.chicken.deliveries = CH.deliveries;
+          for (var d in CH.used) if (CH.used[d] === dl.id) delete CH.used[d];
+          save(); renderPollos(); toast("Entrega borrada");
+        }, true);
+      } });
+}
+$("deliveries").addEventListener("click", function(e) {
+  var r = closest(e.target, "[data-dl]");
+  if (r) { var dl = deliveryById(r.getAttribute("data-dl")); if (dl) showDelivery(dl); }
+});
+
+function renderCutsSummary() {
+  $("cuts-summary").textContent = cuts().map(function(c){ return c[0] + " × " + c[1]; }).join(" · ") + " por pollo";
+}
 function renderCutsEditor() {
   var ed = $("cuts-editor");
   ed.classList.toggle("hidden", !cutsEditing);
-  $("cuts-edit").textContent = cutsEditing ? "✓ Listo" : "Cambiar piezas";
+  $("cuts-edit").textContent = cutsEditing ? "✓ Listo" : "Cambiar";
+  $("cuts-edit").className = "btn-sm" + (cutsEditing ? " btn-gold" : "");
   if (!cutsEditing) { ed.innerHTML = ""; return; }
   ed.innerHTML = '<p class="hint">Nombre de la pieza y cuántas trae cada pollo.</p>' +
     cuts().map(function(c, i) {
@@ -1116,24 +1264,26 @@ function renderCutsEditor() {
 }
 $("cuts-edit").addEventListener("click", function() {
   cutsEditing = !cutsEditing;
-  renderCutsEditor(); renderCuts();
+  renderPollos();
 });
-$("cuts-editor").addEventListener("input", function(e) {
+$("cuts-editor").addEventListener("change", function(e) {
   var x = e.target;
-  if (x.hasAttribute("data-cname")) cuts()[+x.getAttribute("data-cname")][0] = x.value;
-  else if (x.hasAttribute("data-cper")) cuts()[+x.getAttribute("data-cper")][1] = Math.max(0, number(x.value) || 0);
+  if (x.hasAttribute("data-cname")) {
+    var i = +x.getAttribute("data-cname"), old = cuts()[i][0], nw = x.value.trim() || old;
+    cuts()[i][0] = nw;
+    for (var d in CH.left) if (CH.left[d][old] != null && old !== nw) { CH.left[d][nw] = CH.left[d][old]; delete CH.left[d][old]; }
+  } else if (x.hasAttribute("data-cper")) cuts()[+x.getAttribute("data-cper")][1] = Math.max(0, Math.floor(number(x.value) || 0));
   else return;
-  save(); renderCuts();
+  save(); renderLeft(); renderDelivery(); renderCutsSummary();
 });
 $("cuts-editor").addEventListener("click", function(e) {
   var x = e.target;
-  if (x.hasAttribute("data-cdel")) { cuts().splice(+x.getAttribute("data-cdel"), 1); cutLeft = {}; }
-  else if (x.hasAttribute("data-cadd")) cuts().push(["Pieza", 1]);
-  else if (x.hasAttribute("data-creset")) { state.settings.cuts = DEFAULT_CUTS.map(function(c){ return c.slice(); }); cutLeft = {}; }
+  if (x.hasAttribute("data-cdel")) cuts().splice(+x.getAttribute("data-cdel"), 1);
+  else if (x.hasAttribute("data-cadd")) cuts().push(["Pieza " + (cuts().length + 1), 2]);
+  else if (x.hasAttribute("data-creset")) state.settings.cuts = DEFAULT_CUTS.map(function(c){ return c.slice(); });
   else return;
-  save(); renderCutsEditor(); renderCuts();
+  save(); renderPollos();
 });
-
 /* ===================== libro vs sistema ===================== */
 var cmp = {};
 var cmpExtras = [];
@@ -1458,7 +1608,7 @@ $("keys").addEventListener("click", function(e) {
 /* ===================== inicio ===================== */
 renderProducts();
 renderExpenses();
-renderCuts();
+renderPollos();
 renderCompare();
 updateQuick();
 renderPresets();

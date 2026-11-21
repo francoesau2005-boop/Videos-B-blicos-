@@ -11,7 +11,7 @@ import os, struct, subprocess, sys, zipfile, zlib, shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORK = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
 PKG = "com.reypollo.cuadra"
-VERSION_CODE, VERSION_NAME = 3, "1.2"
+VERSION_CODE, VERSION_NAME = 4, "1.3"
 ICON_ID = 0x7F010000
 
 # ---------------------------------------------------------------- string pool
