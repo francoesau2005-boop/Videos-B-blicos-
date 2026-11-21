@@ -170,6 +170,25 @@ tfoot td {border-top:2px solid #7d6233;color:var(--gold);font-weight:800;padding
 .dl-row small {display:block;color:var(--mu);font-size:11px;margin-top:2px}
 .dl-row .pill {flex:none}
 .cut-edit {display:grid;grid-template-columns:1fr 70px 44px;gap:6px}
+.book-total {background:#0c1b23;border:1px solid #33515d;border-radius:10px;padding:9px 10px;min-height:44px;display:flex;flex-direction:column;justify-content:center}
+.book-total b {font-size:17px;color:var(--gold)}
+.book-total small {color:var(--mu);font-size:11px}
+.pc {border-top:1px solid #223a44;padding:12px 0 4px;display:flex;flex-direction:column;gap:8px}
+.pc:first-child {border-top:none;padding-top:2px}
+.pc-top {display:grid;grid-template-columns:1fr 120px;gap:8px;align-items:center}
+.pc-top b {font-size:16px}
+.pc-top label {display:block;font-size:10px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px}
+.pc-top input {text-align:center;font-weight:800;font-size:18px}
+.pc-res {display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.res {border-radius:10px;padding:7px 4px;text-align:center;border:1px solid var(--line);background:var(--card2)}
+.res small {display:block;font-size:9px;letter-spacing:.6px;text-transform:uppercase;opacity:.85}
+.res b {display:block;font-size:21px;font-weight:900;font-variant-numeric:tabular-nums}
+.res i {display:block;font-style:normal;font-size:10px;opacity:.8}
+.res.add {background:var(--green-d);color:var(--green);border-color:#2f6b55}
+.res.sell {background:var(--orange-d);color:var(--orange);border-color:#7d5a31}
+.res.final {background:#1d3340;color:#bfe3ef}
+.res.final.ok b::after {content:" ✓";font-size:14px}
+.order-note {display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--mu);align-items:center}
 .det-table {width:100%;border-collapse:collapse;table-layout:auto}
 .det-table th,.det-table td {padding:8px 4px;text-align:center;border-top:1px solid #223a44;font-variant-numeric:tabular-nums}
 .det-table th {border-top:none}
@@ -372,7 +391,7 @@ footer {text-align:center;color:#58737c;font-size:11px;padding:18px 0 4px}
   <div class="title"><h1>Pollos</h1></div>
   <div class="steps">
     <div class="step"><b>1</b><span>Cada día anota las piezas que <strong>sobraron</strong>.</span></div>
-    <div class="step"><b>2</b><span>Cuando llegue el pollo, agrega al sistema lo que te diga la app.</span></div>
+    <div class="step"><b>2</b><span>Cuando llegue el pollo, haz el cierre: la app te dice qué <strong>agregar</strong> y qué <strong>vender</strong>.</span></div>
   </div>
 
   <div class="card">
@@ -385,27 +404,35 @@ footer {text-align:center;color:#58737c;font-size:11px;padding:18px 0 4px}
   </div>
 
   <div class="card">
-    <h2>Llegó el pollo</h2>
-    <label for="birds">Pollos recibidos</label>
+    <h2>Cierre: llegó el pollo</h2>
+    <label for="birds">Pollos que llegaron</label>
     <div class="stepper">
       <button id="birds-minus" aria-label="Menos">−</button>
-      <input id="birds" type="number" min="0" inputmode="numeric" placeholder="0" enterkeyhint="done">
+      <input id="birds" type="number" min="0" inputmode="numeric" placeholder="0" enterkeyhint="next">
       <button id="birds-plus" aria-label="Más">+</button>
     </div>
     <div class="chips" id="birds-chips"></div>
+    <div class="two">
+      <div><label for="book-birds">Pollos que había en el libro</label>
+        <input id="book-birds" type="number" min="0" inputmode="numeric" placeholder="0" enterkeyhint="next"></div>
+      <div><label>El sistema debe quedar en</label><div class="book-total" id="book-total"><b>—</b></div></div>
+    </div>
     <div>
       <label>Sobrantes que se descuentan</label>
       <div class="chips" id="left-days" style="margin-top:6px"></div>
     </div>
-    <div class="del-head"><span>Pieza</span><span>Llegan</span><span>Sobran</span><span>Agregar</span></div>
-    <div id="delivery-rows"></div>
-    <p class="formula">Agregar al sistema = piezas que llegan − sobrantes</p>
-    <button class="btn-gold" id="save-delivery">Guardar entrega</button>
+    <div>
+      <label>Escribe lo que dice el sistema ahora de cada pieza</label>
+      <div id="delivery-rows" style="margin-top:4px"></div>
+    </div>
+    <div class="order-note"><span class="pill tag-add">1 · Agregar</span>→<span class="pill tag-sell">2 · Vender</span>→<span>el sistema queda igual que el libro</span></div>
+    <button class="btn-gold" id="save-delivery">Guardar cierre</button>
+    <button class="btn-sm btn-ghost" id="clear-delivery">Limpiar números</button>
   </div>
 
   <div class="card">
-    <h2>Entregas guardadas</h2>
-    <p class="hint">Para facturar después: toca una entrega y verás cuánto se agregó y qué días se descontaron.</p>
+    <h2>Cierres guardados</h2>
+    <p class="hint">Para facturar después: toca un cierre y verás cuánto agregar, cuánto vender y qué sobrantes se descontaron.</p>
     <div id="deliveries"></div>
   </div>
 
@@ -1142,30 +1169,87 @@ function renderBirdChips() {
     return '<button class="chip' + (b === n ? ' on' : '') + '" data-birds="'+n+'">'+n+'</button>';
   }).join("");
 }
+function draft() {
+  if (!CH.draft) CH.draft = {birds:null, book:null, sys:{}};
+  return CH.draft;
+}
+/* Cuentas de cada pieza:
+   agregar = llegan − sobrantes;  vender = sistema + agregar − meta;
+   meta = (pollos del libro + pollos que llegaron) × piezas por pollo.
+   Si "vender" sale negativo, falta en el sistema y se agrega esa diferencia. */
 function computeDelivery() {
-  var b = birdsVal(), days = chosenDays();
+  var b = birdsVal(), days = chosenDays(), dr = draft();
+  var book = number(dr.book); if (book === null || book !== book || book < 0) book = null;
   return cuts().map(function(c) {
     var recv = b * c[1], left = 0;
     days.forEach(function(d){ left += leftOf(d, c[0]); });
-    return {name:c[0], per:c[1], recv:recv, left:left, add:recv - left};
+    var base = recv - left, sys = number(dr.sys[c[0]]);
+    if (sys === null || sys !== sys) sys = null;
+    var target = book === null ? null : (book + b) * c[1];
+    var sell = null, add = base, extra = 0;
+    if (sys !== null && target !== null) {
+      sell = sys + base - target;
+      if (sell < 0) { extra = -sell; add = base + extra; sell = 0; }
+    }
+    return {name:c[0], per:c[1], recv:recv, left:left, base:base, add:add, extra:extra,
+            sys:sys, target:target, sell:sell, final: sys === null || sell === null ? null : sys + add - sell};
   });
+}
+function renderBookTotal() {
+  var dr = draft(), book = number(dr.book), b = birdsVal(), el = $("book-total");
+  if (book === null || book !== book) { el.innerHTML = "<b>—</b><small>Escribe los pollos del libro</small>"; return; }
+  var tot = book + b, per = cuts().length ? cuts()[0][1] : 2;
+  el.innerHTML = "<b>" + (tot * per) + " <span style=\"font-size:12px\">c/pieza</span></b><small>" + book + " + " + b + " = " + tot + " pollos</small>";
 }
 function renderDelivery() {
   renderBirdChips();
+  var dr = draft();
+  if (document.activeElement !== $("birds")) $("birds").value = fmt(dr.birds);
+  if (document.activeElement !== $("book-birds")) $("book-birds").value = fmt(dr.book);
   var p = pendingDays();
   $("left-days").innerHTML = p.length ? p.map(function(d) {
     return '<button class="chip ' + (excludedDays[d] ? 'off' : 'on') + '" data-day="'+d+'">' + shortDate(d) + ' · ' + dayLeftTotal(d) + ' pzs</button>';
   }).join("") : '<span class="hint">No hay sobrantes pendientes.</span>';
-  var b = birdsVal();
-  $("delivery-rows").innerHTML = computeDelivery().map(function(r) {
-    return '<div class="del-row"><span>' + safe(r.name) + '</span><span>' + (b ? r.recv : '—') + '</span>' +
-      '<span class="minus">' + (r.left ? '−' + r.left : '0') + '</span>' +
-      '<div class="add-box' + (b && r.add < 0 ? ' neg' : '') + '">' + (b ? r.add : '—') + '</div></div>';
+  $("delivery-rows").innerHTML = cuts().map(function(c) {
+    var k = safe(c[0]);
+    return '<div class="pc"><div class="pc-top"><b>' + k + '</b>' +
+      '<div><label>Sistema</label><input type="number" min="0" inputmode="numeric" enterkeyhint="next" placeholder="0" data-sys="' + k + '" value="' + fmt(dr.sys[c[0]]) + '"></div></div>' +
+      '<div class="pc-res">' +
+        '<div class="res add"><small>1 · Agregar</small><b data-r-add="' + k + '">—</b><i data-r-addf="' + k + '"></i></div>' +
+        '<div class="res sell"><small>2 · Vender</small><b data-r-sell="' + k + '">—</b><i data-r-sellf="' + k + '"></i></div>' +
+        '<div class="res final"><small>Queda</small><b data-r-fin="' + k + '">—</b><i data-r-finf="' + k + '"></i></div>' +
+      '</div></div>';
   }).join("");
-  $("save-delivery").textContent = "Guardar entrega del " + niceDate(date);
+  updateDeliveryNumbers();
+  $("save-delivery").textContent = "Guardar cierre del " + niceDate(date);
 }
-function setBirds(n) { $("birds").value = n > 0 ? n : ""; renderDelivery(); }
-$("birds").addEventListener("input", renderDelivery);
+function q(attr, name) { return document.querySelector('[' + attr + '="' + String(name).replace(/"/g, '\\"') + '"]'); }
+function updateDeliveryNumbers() {
+  renderBookTotal(); renderBirdChips();
+  var b = birdsVal();
+  computeDelivery().forEach(function(r) {
+    var a = q("data-r-add", r.name); if (!a) return;
+    a.textContent = b || r.extra ? r.add : "—";
+    q("data-r-addf", r.name).textContent = b ? r.recv + " − " + r.left + (r.extra ? " + " + r.extra : "") : "";
+    q("data-r-sell", r.name).textContent = r.sell === null ? "—" : r.sell;
+    q("data-r-sellf", r.name).textContent = r.sell === null ? (r.sys === null ? "falta sistema" : "falta libro") : (r.extra ? "faltaba " + r.extra : "");
+    var fin = q("data-r-fin", r.name);
+    fin.textContent = r.final === null ? (r.target === null ? "—" : r.target) : r.final;
+    fin.parentNode.classList.toggle("ok", r.final !== null && r.final === r.target);
+    q("data-r-finf", r.name).textContent = r.target === null ? "" : "libro " + r.target;
+  });
+}
+function saveDraft() { save(); updateDeliveryNumbers(); }
+$("birds").addEventListener("input", function(){ draft().birds = number(this.value); saveDraft(); });
+$("book-birds").addEventListener("input", function(){ draft().book = number(this.value); saveDraft(); });
+$("delivery-rows").addEventListener("input", function(e) {
+  var k = e.target.getAttribute("data-sys");
+  if (k === null) return;
+  var v = number(e.target.value);
+  if (v === null || v !== v) delete draft().sys[k]; else draft().sys[k] = v;
+  saveDraft();
+});
+function setBirds(n) { draft().birds = n > 0 ? n : null; $("birds").value = fmt(draft().birds); saveDraft(); }
 $("birds-minus").addEventListener("click", function(){ setBirds(Math.max(0, birdsVal() - 1)); });
 $("birds-plus").addEventListener("click", function(){ setBirds(birdsVal() + 1); });
 $("birds-chips").addEventListener("click", function(e) {
@@ -1179,52 +1263,74 @@ $("left-days").addEventListener("click", function(e) {
   excludedDays[d] = !excludedDays[d];
   renderDelivery();
 });
+$("clear-delivery").addEventListener("click", function() {
+  CH.draft = {birds:null, book:null, sys:{}}; excludedDays = {};
+  $("birds").value = ""; $("book-birds").value = "";
+  save(); renderDelivery(); toast("Números limpios");
+});
 
 function deliveryText(dl) {
-  var t = "*" + APP + "*\nEntrega del " + niceDate(dl.date) + ": " + dl.birds + " pollos\n\nAGREGAR AL SISTEMA\n";
-  dl.pieces.forEach(function(r){ t += "• " + r.name + ": " + r.recv + " − " + r.left + " = *" + r.add + "*\n"; });
+  var t = "*" + APP + "*\nCierre del " + niceDate(dl.date) + ": llegaron " + dl.birds + " pollos";
+  if (dl.book != null) t += " (libro " + dl.book + " + " + dl.birds + " = " + (dl.book + dl.birds) + " pollos)";
+  t += "\n\n*1 · AGREGAR al sistema*\n";
+  dl.pieces.forEach(function(r){ t += "• " + r.name + ": *" + r.add + "*  (" + r.recv + " − " + r.left + (r.extra ? " + " + r.extra : "") + ")\n"; });
+  if (dl.pieces.some(function(r){ return r.sell !== null && r.sell !== undefined; })) {
+    t += "\n*2 · VENDER (facturar)*\n";
+    dl.pieces.forEach(function(r){ t += "• " + r.name + ": *" + (r.sell == null ? "—" : r.sell) + "*\n"; });
+    t += "\nEl sistema queda en " + dl.pieces.map(function(r){ return r.name + " " + (r.target == null ? "—" : r.target); }).join(", ") + ", igual que el libro.\n";
+  }
   t += "\nSobrantes descontados: " + (dl.days.length ? dl.days.map(niceDate).join(", ") : "ninguno") + "\n";
   return t;
 }
 $("save-delivery").addEventListener("click", function() {
   var b = birdsVal();
   if (!b) { toast("Escribe cuántos pollos llegaron"); $("birds").focus(); return; }
-  var rows = computeDelivery(), days = chosenDays();
-  var list = rows.map(function(r){ return '<tr><td>' + safe(r.name) + '</td><td><b style="color:var(--gold);font-size:18px">' + r.add + '</b></td></tr>'; }).join("");
-  ask("¿Guardar entrega de " + b + " pollos?<table class='det-table' style='margin-top:10px'><tr><th>Pieza</th><th>Agregar</th></tr>" + list + "</table>" +
-      "<span class='hint'>" + (days.length ? "Se descuentan los sobrantes del " + days.map(shortDate).join(", ") + "." : "Sin sobrantes que descontar.") + "</span>",
+  var rows = computeDelivery(), days = chosenDays(), dr = draft();
+  var hasSell = rows.some(function(r){ return r.sell !== null; });
+  var list = rows.map(function(r){
+    return '<tr><td>' + safe(r.name) + '</td><td><b style="color:var(--green);font-size:18px">' + r.add + '</b></td>' +
+      (hasSell ? '<td><b style="color:var(--orange);font-size:18px">' + (r.sell === null ? "—" : r.sell) + '</b></td>' : '') + '</tr>';
+  }).join("");
+  ask("¿Guardar cierre con " + b + " pollos?<table class='det-table' style='margin-top:10px'><tr><th>Pieza</th><th>1 · Agregar</th>" + (hasSell ? "<th>2 · Vender</th>" : "") + "</tr>" + list + "</table>" +
+      "<span class='hint'>" + (days.length ? "Se descuentan los sobrantes del " + days.map(shortDate).join(", ") + "." : "Sin sobrantes que descontar.") +
+      (hasSell ? "" : " Sin los números del sistema y del libro solo se calcula lo que hay que agregar.") + "</span>",
     "Guardar", function() {
-      var dl = {id:id(), date:date, birds:b, pieces:rows, days:days, savedAt:new Date().toLocaleString()};
+      var bk = number(dr.book);
+      var dl = {id:id(), date:date, birds:b, book: bk === null || bk !== bk ? null : bk, pieces:rows, days:days, savedAt:new Date().toLocaleString()};
       CH.deliveries.unshift(dl);
       CH.deliveries.sort(function(x,y){ return x.date < y.date ? 1 : x.date > y.date ? -1 : 0; });
       days.forEach(function(d){ CH.used[d] = dl.id; });
       excludedDays = {};
-      $("birds").value = "";
+      CH.draft = {birds:null, book:null, sys:{}};
       save(); renderPollos();
-      toast("Entrega guardada");
+      toast("Cierre guardado");
       showDelivery(dl);
     });
 });
 function renderDeliveries() {
   $("deliveries").innerHTML = CH.deliveries.length ? CH.deliveries.slice(0, 40).map(function(dl) {
     return '<div class="dl-row" data-dl="' + dl.id + '"><span><strong>' + safe(niceDate(dl.date)) + '</strong> · ' + dl.birds + ' pollos' +
-      '<small>' + dl.pieces.map(function(r){ return safe(r.name) + ' +' + r.add; }).join(" · ") + '</small></span>' +
+      '<small>' + dl.pieces.map(function(r){ return safe(r.name) + ' +' + r.add + (r.sell ? ' −' + r.sell : ''); }).join(" · ") + '</small></span>' +
       '<span class="pill tag-ok">' + (dl.days.length ? '−' + dl.days.length + (dl.days.length > 1 ? ' días' : ' día') : 'sin desc.') + '</span></div>';
-  }).join("") : '<p class="hint">Aún no hay entregas guardadas.</p>';
+  }).join("") : '<p class="hint">Aún no hay cierres guardados.</p>';
 }
 function showDelivery(dl) {
+  var hasSell = dl.pieces.some(function(r){ return r.sell !== null && r.sell !== undefined; });
   var rows = dl.pieces.map(function(r) {
-    return '<tr><td>' + safe(r.name) + '</td><td>' + r.recv + '</td><td style="color:var(--red)">−' + r.left + '</td><td><b style="color:var(--gold);font-size:18px">' + r.add + '</b></td></tr>';
+    return '<tr><td>' + safe(r.name) + '</td>' + (hasSell ? '<td>' + (r.sys == null ? "—" : r.sys) + '</td>' : '') +
+      '<td><b style="color:var(--green);font-size:17px">' + r.add + '</b><br><small class="hint">' + r.recv + '−' + r.left + (r.extra ? '+' + r.extra : '') + '</small></td>' +
+      (hasSell ? '<td><b style="color:var(--orange);font-size:17px">' + (r.sell == null ? "—" : r.sell) + '</b></td><td>' + (r.target == null ? "—" : r.target) + '</td>' : '') + '</tr>';
   }).join("");
   var daysHtml = dl.days.length ? dl.days.map(function(d) {
     return '<div class="line"><span>' + niceDate(d) + '</span><span class="hint">' +
       cuts().map(function(c){ var v = leftOf(d, c[0]); return v ? safe(c[0]) + ' ' + v : ''; }).filter(Boolean).join(" · ") + '</span></div>';
   }).join("") : '<p class="hint">No se descontaron sobrantes.</p>';
-  openModal('<h3>Entrega del ' + niceDate(dl.date) + ' · ' + dl.birds + ' pollos</h3>' +
-    '<table class="det-table"><tr><th>Pieza</th><th>Llegan</th><th>Sobran</th><th>Agregar</th></tr>' + rows + '</table>' +
+  openModal('<h3>Cierre del ' + niceDate(dl.date) + ' · llegaron ' + dl.birds + ' pollos</h3>' +
+    (dl.book != null ? '<p class="hint" style="margin:0">Libro: ' + dl.book + ' + ' + dl.birds + ' = ' + (dl.book + dl.birds) + ' pollos</p>' : '') +
+    '<div class="scroll"><table class="det-table"><tr><th>Pieza</th>' + (hasSell ? '<th>Sistema</th>' : '') + '<th>1 · Agregar</th>' + (hasSell ? '<th>2 · Vender</th><th>Queda</th>' : '') + '</tr>' + rows + '</table></div>' +
     '<div><label>Sobrantes descontados</label>' + daysHtml + '</div>' +
     '<div class="row-btns"><button class="btn-gold" data-m="share">Compartir</button><button data-m="close">Cerrar</button></div>' +
-    '<button class="btn-danger btn-sm" data-m="del">Borrar entrega</button>',
+    '<button class="btn-danger btn-sm" data-m="del">Borrar cierre</button>',
     { share: function() {
         var t = deliveryText(dl);
         if (window.Android && window.Android.shareText) window.Android.shareText(t);
@@ -1232,11 +1338,11 @@ function showDelivery(dl) {
         else copyText(t);
       },
       del: function() {
-        ask("¿Borrar la entrega del " + niceDate(dl.date) + "?<br><span class='hint'>Sus sobrantes vuelven a quedar pendientes.</span>", "Borrar", function() {
+        ask("¿Borrar el cierre del " + niceDate(dl.date) + "?<br><span class='hint'>Sus sobrantes vuelven a quedar pendientes.</span>", "Borrar", function() {
           CH.deliveries = CH.deliveries.filter(function(x){ return x.id !== dl.id; });
           state.chicken.deliveries = CH.deliveries;
           for (var d in CH.used) if (CH.used[d] === dl.id) delete CH.used[d];
-          save(); renderPollos(); toast("Entrega borrada");
+          save(); renderPollos(); toast("Cierre borrado");
         }, true);
       } });
 }
