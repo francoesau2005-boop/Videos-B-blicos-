@@ -24,3 +24,7 @@ def icono(x, y):
     return (40, 52, 70, 255)
 for p in ("addon/BP/pack_icon.png", "addon/RP/pack_icon.png"):
     png(p, 64, 64, icono)
+
+# iconos de la app Android (mismo dibujo, escalado)
+for carpeta, tam in (("mdpi", 48), ("hdpi", 72), ("xhdpi", 96), ("xxhdpi", 144), ("xxxhdpi", 192)):
+    png(f"app_android/app/src/main/res/mipmap-{carpeta}/ic_launcher.png", tam, tam, lambda x, y, t=tam: icono(x * 64 // t, y * 64 // t))

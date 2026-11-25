@@ -10,7 +10,18 @@ Add-on y panel web para jugar survival con ayuda:
 - **Coordenadas en pantalla** con su equivalente en el Nether y hacia dónde miras.
 - **Puntos guardados** (casa, minas, aldeas) con indicaciones de distancia y giro.
 
-## Instalar
+## App Android
+
+`dist/AyudanteSurvival.apk` es una app para Android 8 o más reciente:
+
+- El panel completo (portales, maquetas por capas, puntos) sin necesidad de internet.
+- **Burbuja flotante** encima de Minecraft: tócala para abrir el panel sin salir del juego.
+  Puedes arrastrarla a cualquier lado. Se quita desde la notificación.
+- Botón para **instalar el add-on** directo en Minecraft y otro para abrir Minecraft.
+
+Para compilarla: `./compilar_app.sh` (requiere el SDK de Android en `ANDROID_HOME`).
+
+## Instalar el add-on a mano
 
 1. Descarga `dist/AyudanteSurvival.mcaddon` y ábrelo con Minecraft.
 2. Edita tu mundo → Paquetes de comportamiento → activa **Ayudante Survival**.

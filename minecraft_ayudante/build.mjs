@@ -27,6 +27,13 @@ execFileSync("zip", ["-qj", dist + "AyudanteSurvival.mcaddon", dist + "AyudanteS
 // 3. Panel web
 const plantilla = readFileSync(raiz + "panel/plantilla.html", "utf8");
 const datos = `const PALETA = ${JSON.stringify(PALETA)};\nconst CONSTRUCCIONES = ${JSON.stringify(CONSTRUCCIONES)};`;
-writeFileSync(raiz + "panel/index.html", plantilla.replace("/*DATOS*/", () => datos));
+const html = plantilla.replace("/*DATOS*/", () => datos);
+writeFileSync(raiz + "panel/index.html", html);
 
-console.log("Listo: dist/AyudanteSurvival.mcaddon y panel/index.html");
+// 4. Archivos para la app Android
+const assets = raiz + "app_android/app/src/main/assets/";
+mkdirSync(assets, { recursive: true });
+writeFileSync(assets + "panel.html", html);
+copyFileSync(dist + "AyudanteSurvival.mcaddon", assets + "AyudanteSurvival.mcaddon");
+
+console.log("Listo: dist/AyudanteSurvival.mcaddon, panel/index.html y assets de la app");

@@ -1,0 +1,506 @@
+<title>Ayudante Survival</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: hoja de plano azul; barra de pestañas arriba, una herramienta por pestaña */
+:root {
+  --bg: #eef3f8;
+  --paper: #ffffff;
+  --grid: #d6e2ee;
+  --ink: #15263a;
+  --muted: #5b6f86;
+  --line: #c5d3e2;
+  --accent: #1f6fd1;
+  --accent-ink: #ffffff;
+  --nether: #b4321f;
+  --ok: #2f8a3e;
+  --font-display: "Pixelify Sans", "Courier New", monospace;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1a2b; --paper: #12243a; --grid: #1a3250; --ink: #e3edf8; --muted: #93a9c2;
+    --line: #26415f; --accent: #5aa2ff; --accent-ink: #08131f; --nether: #ff7a5c; --ok: #6fd07e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1a2b; --paper: #12243a; --grid: #1a3250; --ink: #e3edf8; --muted: #93a9c2;
+  --line: #26415f; --accent: #5aa2ff; --accent-ink: #08131f; --nether: #ff7a5c; --ok: #6fd07e;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 20px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 6vw, 40px); margin: 0; line-height: 1; letter-spacing: 0.5px; }
+h1 small { display: block; font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0; margin-top: 6px; }
+h2 { font-family: var(--font-display); font-weight: 500; font-size: 22px; margin: 0 0 4px; text-wrap: balance; }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+p { margin: 0; }
+.tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 2px solid var(--ink); margin-bottom: 18px; }
+.tabs button { font-family: var(--font-display); font-size: 17px; background: transparent; color: var(--muted); border: 2px solid transparent; border-bottom: 0; padding: 8px 14px; cursor: pointer; white-space: nowrap; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tabs button:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.panel { background: var(--paper); border: 2px solid var(--ink); padding: 18px; display: grid; gap: 18px; }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.row > * { min-width: 0; }
+label { font-size: 13px; color: var(--muted); font-weight: 500; display: block; margin-bottom: 4px; }
+input, select { width: 100%; font: 600 18px var(--font-mono); padding: 8px 10px; border: 2px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 0; }
+.campos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.dim { border: 2px solid var(--line); padding: 14px; display: grid; gap: 10px; }
+.dim.mundo { border-left: 8px solid var(--ok); }
+.dim.nether { border-left: 8px solid var(--nether); }
+.resultado { font: 600 clamp(20px, 5vw, 28px) var(--font-mono); font-variant-numeric: tabular-nums; }
+.nota { color: var(--muted); font-size: 14px; max-width: 65ch; }
+.btn { font: 600 14px var(--font-body); background: var(--accent); color: var(--accent-ink); border: 2px solid var(--accent); padding: 8px 14px; cursor: pointer; }
+.btn.sec { background: transparent; color: var(--ink); border-color: var(--line); }
+.lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.tarjeta { text-align: left; background: var(--bg); color: var(--ink); border: 2px solid var(--line); padding: 10px 12px; cursor: pointer; font: inherit; display: grid; gap: 2px; }
+.tarjeta[aria-pressed="true"] { border-color: var(--accent); box-shadow: 4px 4px 0 var(--accent); }
+.tarjeta b { font-size: 15px; }
+.tarjeta span { font-size: 12px; color: var(--muted); }
+.visor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 280px); gap: 18px; align-items: start; }
+@media (max-width: 720px) { .visor { grid-template-columns: 1fr; } }
+.capa-ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.capa-ctrl .num { font: 600 16px var(--font-mono); min-width: 9ch; text-align: center; }
+.rejilla-scroll { overflow-x: auto; padding-bottom: 4px; }
+.rejilla { display: inline-grid; gap: 2px; background: var(--line); border: 2px solid var(--ink); padding: 2px; }
+.celda { width: 28px; height: 28px; display: grid; place-items: center; font: 600 12px var(--font-mono); color: rgba(0,0,0,.65); }
+.celda.vacia { background: var(--paper); }
+.celda.abajo { outline: 1px dashed var(--muted); outline-offset: -5px; }
+.frente { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.mat { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.mat li { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.mat .chip { width: 18px; height: 18px; border: 1px solid rgba(0,0,0,.35); flex: none; }
+.mat .n { margin-left: auto; font: 600 14px var(--font-mono); font-variant-numeric: tabular-nums; }
+canvas { max-width: 100%; display: block; }
+ul.notas { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+td.m { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tabla-scroll { overflow-x: auto; }
+ol.pasos { margin: 0; padding-left: 20px; display: grid; gap: 10px; max-width: 70ch; }
+code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; border: 1px solid var(--line); }
+.x { background: none; border: 0; color: var(--nether); cursor: pointer; font-weight: 600; }
+.solo-app { display: none; }
+.es-app .solo-app { display: flex; }
+.es-app .solo-web { display: none; }
+.es-app ol.solo-app { display: grid; }
+.appbar { flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.appbar .btn { flex: 1 1 160px; padding: 12px 14px; font-size: 15px; }
+.flotante .wrap { padding-block: 8px 24px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); }
+.flotante header, .flotante .appbar, .flotante #t-instalar { display: none; }
+.flotante .tabs button { font-size: 15px; padding: 6px 10px; }
+.flotante .panel { padding: 12px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Ayudante Survival<small>Panel para Minecraft Bedrock · portales, maquetas y coordenadas</small></h1>
+  </header>
+
+  <div class="appbar solo-app">
+    <button class="btn" id="a-burbuja" type="button">Burbuja flotante sobre el juego</button>
+    <button class="btn sec" id="a-minecraft" type="button">Abrir Minecraft</button>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button id="t-portales" role="tab" aria-selected="true" data-tab="portales">Portales</button>
+    <button id="t-construir" role="tab" aria-selected="false" data-tab="construir">Construcciones</button>
+    <button id="t-puntos" role="tab" aria-selected="false" data-tab="puntos">Mis puntos</button>
+    <button id="t-instalar" role="tab" aria-selected="false" data-tab="instalar">Add-on</button>
+  </nav>
+
+  <!-- PORTALES -->
+  <section class="panel" id="portales">
+    <div>
+      <h2>Enlazar portales al Nether</h2>
+      <p class="nota">Escribe dónde está (o estará) tu portal. Te digo las coordenadas exactas del otro lado. En el Nether todo mide 8 veces menos.</p>
+    </div>
+    <div class="row">
+      <div class="dim mundo">
+        <h3>Mundo normal</h3>
+        <div class="campos">
+          <div><label for="ow-x">X</label><input id="ow-x" inputmode="numeric" value="800"></div>
+          <div><label for="ow-y">Y</label><input id="ow-y" inputmode="numeric" value="70"></div>
+          <div><label for="ow-z">Z</label><input id="ow-z" inputmode="numeric" value="-240"></div>
+        </div>
+      </div>
+      <div class="dim nether">
+        <h3>Nether</h3>
+        <div class="campos">
+          <div><label for="ne-x">X</label><input id="ne-x" inputmode="numeric"></div>
+          <div><label for="ne-y">Y</label><input id="ne-y" inputmode="numeric"></div>
+          <div><label for="ne-z">Z</label><input id="ne-z" inputmode="numeric"></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Resultado</h3>
+      <p class="resultado" id="res-portal"></p>
+      <p class="nota" id="res-explica"></p>
+    </div>
+    <div>
+      <h3>Reglas para que no fallen</h3>
+      <ul class="notas">
+        <li>Nether X = Mundo X ÷ 8 (redondeado hacia abajo). Lo mismo con Z. La Y no se divide.</li>
+        <li>Al cruzar, el juego busca un portal cerca: hasta 128 bloques en el Mundo y 16 en el Nether. Si no encuentra, crea uno nuevo.</li>
+        <li>Dos portales en el Mundo deben estar a más de 128 bloques de distancia (más de 16 en el Nether) para no enlazarse con el portal equivocado.</li>
+        <li>En el Nether, entre Y 32 y Y 120 es zona segura para construir (debajo hay mar de lava, arriba el techo de bedrock).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONSTRUCCIONES -->
+  <section class="panel" id="construir" hidden>
+    <div>
+      <h2>Maquetas por capas</h2>
+      <p class="nota">Elige una construcción y sigue capa por capa. En el juego, el add-on muestra los mismos bloques en transparente donde van.</p>
+    </div>
+    <div class="lista" id="lista-c"></div>
+    <div class="visor">
+      <div>
+        <h3 id="c-nombre"></h3>
+        <p class="nota" id="c-desc" style="margin-bottom:12px"></p>
+        <div class="capa-ctrl">
+          <button class="btn sec" id="capa-menos" aria-label="Capa anterior">◀</button>
+          <span class="num" id="capa-num"></span>
+          <button class="btn sec" id="capa-mas" aria-label="Capa siguiente">▶</button>
+          <input type="range" id="capa-rango" min="1" value="1" style="flex:1;min-width:120px" aria-label="Capa">
+        </div>
+        <div class="rejilla-scroll"><div class="rejilla" id="rejilla"></div></div>
+        <p class="frente">▲ hacia donde miras &nbsp;·&nbsp; ▼ tú estás aquí (abajo). Contorno punteado = bloque de la capa de abajo.</p>
+        <h3 style="margin-top:18px">Vista 3D</h3>
+        <canvas id="iso" width="560" height="380"></canvas>
+      </div>
+      <div style="display:grid;gap:18px">
+        <div>
+          <h3>Esta capa</h3>
+          <ul class="mat" id="mat-capa"></ul>
+        </div>
+        <div>
+          <h3>Total de materiales</h3>
+          <ul class="mat" id="mat-total"></ul>
+        </div>
+        <div>
+          <h3>Consejos</h3>
+          <ul class="notas" id="c-notas"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUNTOS -->
+  <section class="panel" id="puntos" hidden>
+    <div>
+      <h2>Mis puntos</h2>
+      <p class="nota">Apunta tu casa, aldeas, fortalezas y portales. Se guardan en este navegador. En el juego, el add-on también guarda puntos y te guía hasta ellos.</p>
+    </div>
+    <form id="f-punto" class="row" style="align-items:end">
+      <div><label for="p-nombre">Nombre</label><input id="p-nombre" placeholder="Casa" style="font-family:var(--font-body)"></div>
+      <div class="campos">
+        <div><label for="p-x">X</label><input id="p-x" inputmode="numeric"></div>
+        <div><label for="p-y">Y</label><input id="p-y" inputmode="numeric"></div>
+        <div><label for="p-z">Z</label><input id="p-z" inputmode="numeric"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <select id="p-dim" aria-label="Dimensión"><option value="o">Mundo</option><option value="n">Nether</option><option value="e">End</option></select>
+        <button class="btn" type="submit">Guardar</button>
+      </div>
+    </form>
+    <div class="tabla-scroll">
+      <table>
+        <thead><tr><th>Lugar</th><th>Dónde</th><th>XYZ</th><th>Equivale a</th><th></th></tr></thead>
+        <tbody id="tabla-puntos"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- INSTALAR -->
+  <section class="panel" id="instalar" hidden>
+    <div>
+      <h2>Instalar el add-on en Bedrock</h2>
+      <p class="nota">El add-on es lo que pone los bloques transparentes en tu mundo. Funciona en celular, consola con Realms/servidor y PC.</p>
+    </div>
+    <div class="appbar solo-app">
+      <button class="btn" id="a-instalar" type="button">Instalar en Minecraft</button>
+      <button class="btn sec" id="a-guardar" type="button">Guardar en Descargas</button>
+    </div>
+    <ol class="pasos solo-app">
+      <li>Toca <b>Instalar en Minecraft</b>. Minecraft se abre y dice "Importación correcta" dos veces.</li>
+      <li>Si no se abre, toca <b>Guardar en Descargas</b> y abre el archivo <code>AyudanteSurvival.mcaddon</code> desde tu gestor de archivos.</li>
+      <li>Edita tu mundo → <b>Paquetes de comportamiento</b> → activa <b>Ayudante Survival</b>.</li>
+      <li>Entra al mundo. Recibes la <b>Guía de Construcción</b> (un libro brillante). Úsala para abrir el menú dentro del juego.</li>
+    </ol>
+    <ol class="pasos solo-web">
+      <li>Descarga <code>AyudanteSurvival.mcaddon</code> de la carpeta <code>minecraft_ayudante/dist</code> del repositorio.</li>
+      <li>Ábrelo con Minecraft (en celular: tócalo y elige Minecraft). Se importan dos paquetes: comportamiento y recursos.</li>
+      <li>Edita tu mundo → <b>Paquetes de comportamiento</b> → activa <b>Ayudante Survival</b>. El de recursos se activa solo.</li>
+      <li>Entra al mundo. Recibes la <b>Guía de Construcción</b> (un libro brillante). Úsala para abrir el menú.</li>
+      <li>¿La perdiste? Craftéala con <b>1 palo + 1 papel</b>, o escribe <code>/scriptevent ayudante:guia</code> (con trucos activados).</li>
+    </ol>
+    <div>
+      <h3>Qué hace en el juego</h3>
+      <ul class="notas">
+        <li>Bloques fantasma de colores donde va cada bloque, una capa a la vez. Pasa sola a la siguiente capa.</li>
+        <li>Marca en rojo parpadeante los bloques equivocados.</li>
+        <li>Lista de lo que te falta y porcentaje de avance.</li>
+        <li>Coordenadas en pantalla con su equivalente en el Nether y hacia dónde miras.</li>
+        <li>Calcula dónde construir el portal del otro lado y te guía hasta ahí.</li>
+        <li>Puntos guardados con indicaciones de distancia y giro.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+const PALETA = {"C":{"id":"minecraft:cobblestone","nombre":"Piedra labrada","color":[0.55,0.55,0.58]},"P":{"id":"minecraft:oak_planks","nombre":"Tablones de roble","acepta":["minecraft:planks"],"color":[0.78,0.6,0.36]},"L":{"id":"minecraft:oak_log","nombre":"Tronco de roble","acepta":["minecraft:log"],"color":[0.42,0.31,0.18]},"G":{"id":"minecraft:glass","nombre":"Vidrio","acepta":["minecraft:glass_pane"],"contiene":"stained_glass","color":[0.62,0.88,1]},"D":{"id":"minecraft:wooden_door","nombre":"Puerta de madera","contiene":"door","porItem":2,"color":[0.6,0.42,0.22]},"T":{"id":"minecraft:torch","nombre":"Antorcha","color":[1,0.85,0.2]},"B":{"id":"minecraft:bed","nombre":"Cama","porItem":2,"color":[0.85,0.15,0.15]},"M":{"id":"minecraft:crafting_table","nombre":"Mesa de crafteo","color":[0.66,0.45,0.25]},"H":{"id":"minecraft:furnace","nombre":"Horno","acepta":["minecraft:lit_furnace"],"color":[0.35,0.35,0.35]},"K":{"id":"minecraft:chest","nombre":"Cofre","acepta":["minecraft:trapped_chest"],"color":[0.85,0.6,0.2]},"O":{"id":"minecraft:obsidian","nombre":"Obsidiana","color":[0.3,0.12,0.5]},"W":{"id":"minecraft:water","nombre":"Agua (cubo)","acepta":["minecraft:flowing_water"],"color":[0.2,0.4,1]},"Y":{"id":"minecraft:lava","nombre":"Lava (cubo)","acepta":["minecraft:flowing_lava"],"color":[1,0.45,0]},"F":{"id":"minecraft:farmland","nombre":"Tierra arada (azada)","color":[0.45,0.3,0.15]},"N":{"id":"minecraft:oak_fence","nombre":"Valla de madera","contiene":"fence","color":[0.7,0.52,0.3]},"Q":{"id":"minecraft:fence_gate","nombre":"Puerta de valla","contiene":"fence_gate","color":[0.9,0.7,0.4]},"U":{"id":"minecraft:hopper","nombre":"Tolva","color":[0.3,0.3,0.33]},"S":{"id":"minecraft:oak_sign","nombre":"Cartel","contiene":"sign","color":[0.95,0.8,0.5]},"E":{"id":"minecraft:ladder","nombre":"Escalera de mano","color":[0.7,0.5,0.25]}};
+const CONSTRUCCIONES = [{"id":"casa_inicial","nombre":"Casa inicial 7x7","categoria":"Casas","descripcion":"Casa de madera con piso de piedra, ventanas, cama, cofre, horno y mesa de crafteo. Ideal para la primera noche.","offsetY":-1,"notas":["Pon la cama al final: haz clic en el bloque marcado más cercano a la puerta.","Las antorchas van pegadas a la pared interior."],"capas":[["CCCCCCC","CCCCCCC","CCCCCCC","CCCCCCC","CCCCCCC","CCCCCCC","CCCCCCC"],["LPPDPPL","P.....P","P.....P","P.....P","PK...BP","PMH..BP","LPPPPPL"],["LPPDPPL","P.....P","G.....G","G.....G","P.....P","P.....P","LPGGGPL"],["LPPPPPL","P.....P","P.....P","PT...TP","P.....P","P.....P","LPPPPPL"],["PPPPPPP","PPPPPPP","PPPPPPP","PPPPPPP","PPPPPPP","PPPPPPP","PPPPPPP"]]},{"id":"portal_nether","nombre":"Portal al Nether","categoria":"Portales","descripcion":"Marco de obsidiana 4x5 (10 bloques, sin esquinas). Enciéndelo con mechero o carga de fuego.","offsetY":0,"notas":["Usa el menú Portales para saber en qué coordenadas construirlo y que quede enlazado.","Las esquinas no son necesarias."],"capas":[[".OO."],["O..O"],["O..O"],["O..O"],[".OO."]]},{"id":"granja_trigo","nombre":"Granja de trigo 9x9","categoria":"Granjas","descripcion":"Un solo bloque de agua en el centro hidrata las 80 casillas de tierra. Cercada para que no entren mobs.","offsetY":-1,"notas":["Ara la tierra con una azada después de poner el agua.","Planta semillas, zanahorias o papas en la tierra arada."],"capas":[["LLLLLLLLLLL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFWFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LLLLLLLLLLL"],["NNNNNQNNNNN","N.........N","N.........N","N.........N","N.........N","N.........N","N.........N","N.........N","N.........N","N.........N","NNNNNNNNNNN"],["T.........T","...........","...........","...........","...........","...........","...........","...........","...........","...........","T.........T"]]},{"id":"generador_piedra","nombre":"Generador de piedra","categoria":"Granjas","descripcion":"Generador infinito de piedra labrada. La piedra aparece en el bloque entre la lava y el hoyo.","offsetY":-3,"notas":["Pon primero el AGUA (va a caer en el hoyo), luego la LAVA.","Pica la piedra que aparece en la 3ª casilla de la zanja; se regenera sola."],"capas":[[".......","....C..","......."],["....C..","CCCC.CC","....C.."],["CCCCCCC","CY...WC","CCCCCCC"]]},{"id":"torre_vigilancia","nombre":"Torre de vigilancia","categoria":"Casas","descripcion":"Torre de piedra de 10 bloques con escalera de mano y mirador con vallas.","offsetY":-1,"notas":["La escalera de mano va pegada a la pared del fondo."],"capas":[["CCCCC","CCCCC","CCCCC","CCCCC","CCCCC"],["CC.CC","C...C","C...C","C.E.C","CCCCC"],["CC.CC","C...C","C...C","C.E.C","CCCCC"],["CCCCC","C...C","C...C","C.E.C","CCCCC"],["CCGCC","G...G","C...C","C.E.C","CCCCC"],["CCCCC","C...C","C...C","C.E.C","CCCCC"],["CCGCC","G...G","C...C","C.E.C","CCGCC"],["CCCCC","C...C","C...C","C.E.C","CCCCC"],["CCCCC","CCCCC","CCCCC","CCECC","CCCCC"],["NNNNN","N...N","N...N","N...N","NNNNN"],["T...T",".....",".....",".....","T...T"]]},{"id":"granja_hierro","nombre":"Granja de hierro compacta","categoria":"Granjas","descripcion":"3 aldeanos asustados por un zombi hacen aparecer gólems. El agua los empuja a la cuchilla de lava y el hierro cae en las tolvas.","offsetY":-1,"notas":["Arriba van 3 aldeanos con 3 camas y un zombi (con etiqueta de nombre) detrás del vidrio.","Coloca las 3 tolvas haciendo clic en los cofres de abajo.","Los carteles de la capa de lava: usa carteles colgantes o pon un bloque temporal y quítalo.","Pon el agua al fondo del cuarto; debe llegar justo hasta las tolvas.","Si no aparecen gólems, agrega más aldeanos y camas: en Bedrock más aldea = más gólems."],"capas":[[".....",".KKK.",".....",".....",".....",".....",".....","....."],["CCCCC","CUUUC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC"],["GGGGG","G...G","G...G","G...G","G...G","G...G","GWWWG","GGGGG"],["GGGGG","GSSSG","G...G","G...G","G...G","G...G","G...G","GGGGG"],["GGGGG","GYYYG","GSSSG","G...G","G...G","G...G","G...G","GGGGG"],["GGGGG","GGGGG","G...G","G...G","G...G","G...G","G...G","GGGGG"],["CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC"],["CCCCC","C...C","CGGGC","C...C","C...C","CBBBC","CBBBC","CCCCC"],["CCCCC","G...G","CGGGC","G...G","G...G","G...G","G...G","CCCCC"],["CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC"]]}];
+
+const $ = (id) => document.getElementById(id);
+const APP = !!(window.Android && Android.esApp && Android.esApp());
+const FLOTANTE = APP && Android.esFlotante();
+if (APP) document.documentElement.classList.add("es-app");
+if (FLOTANTE) document.documentElement.classList.add("flotante");
+if (APP) {
+  $("a-burbuja").addEventListener("click", () => Android.activarBurbuja());
+  $("a-minecraft").addEventListener("click", () => Android.abrirMinecraft());
+  $("a-instalar").addEventListener("click", () => Android.instalarAddon());
+  $("a-guardar").addEventListener("click", () => Android.guardarAddon());
+}
+const leer = (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; } };
+const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+// ---------- pestañas ----------
+const tabs = [...document.querySelectorAll(".tabs button")];
+function abrir(nombre) {
+  for (const b of tabs) {
+    const on = b.dataset.tab === nombre;
+    b.setAttribute("aria-selected", on);
+    $(b.dataset.tab).hidden = !on;
+  }
+  escribir("ayu-tab", nombre);
+}
+tabs.forEach((b) => b.addEventListener("click", () => abrir(b.dataset.tab)));
+abrir(FLOTANTE && leer("ayu-tab", "portales") === "instalar" ? "portales" : leer("ayu-tab", "portales"));
+
+// ---------- portales ----------
+const num = (el) => { const n = parseInt(el.value, 10); return Number.isNaN(n) ? null : n; };
+function desdeMundo() {
+  const x = num($("ow-x")), y = num($("ow-y")), z = num($("ow-z"));
+  if (x === null || z === null) return;
+  $("ne-x").value = Math.floor(x / 8);
+  $("ne-z").value = Math.floor(z / 8);
+  $("ne-y").value = y === null ? "" : Math.min(Math.max(y, 32), 120);
+  pintarPortal("o");
+}
+function desdeNether() {
+  const x = num($("ne-x")), y = num($("ne-y")), z = num($("ne-z"));
+  if (x === null || z === null) return;
+  $("ow-x").value = x * 8;
+  $("ow-z").value = z * 8;
+  if (y !== null) $("ow-y").value = y;
+  pintarPortal("n");
+}
+function pintarPortal(origen) {
+  const o = [num($("ow-x")), num($("ow-y")), num($("ow-z"))];
+  const n = [num($("ne-x")), num($("ne-y")), num($("ne-z"))];
+  if (origen === "o") {
+    $("res-portal").textContent = `Construye en el Nether: ${n[0]}, ${n[1] ?? "?"}, ${n[2]}`;
+    $("res-explica").textContent = `Tu portal del Mundo está en ${o[0]}, ${o[2]}. Si la Y del Nether queda dentro de roca, cava un cuarto ahí o súbelo, sin cambiar X ni Z.`;
+  } else {
+    $("res-portal").textContent = `Construye en el Mundo: ${o[0]}, ${o[1] ?? "?"}, ${o[2]}`;
+    $("res-explica").textContent = `Tu portal del Nether está en ${n[0]}, ${n[2]}. En el Mundo puedes poner la Y a nivel del suelo, sin cambiar X ni Z.`;
+  }
+  escribir("ayu-portal", { o, n, origen });
+}
+["ow-x", "ow-y", "ow-z"].forEach((id) => $(id).addEventListener("input", desdeMundo));
+["ne-x", "ne-y", "ne-z"].forEach((id) => $(id).addEventListener("input", desdeNether));
+(() => {
+  const g = leer("ayu-portal", null);
+  if (g && g.o && g.o[0] !== null) { $("ow-x").value = g.o[0]; $("ow-y").value = g.o[1] ?? ""; $("ow-z").value = g.o[2]; }
+  desdeMundo();
+})();
+
+// ---------- construcciones ----------
+const css = (c) => `rgb(${c.map((v) => Math.round(v * 255)).join(",")})`;
+const entrada = (c, ch) => (c.paleta && c.paleta[ch]) || PALETA[ch];
+const vacio = (ch) => ch === "." || ch === " ";
+let actual = CONSTRUCCIONES[0];
+let capa = 0;
+
+function medidas(c) {
+  let ancho = 0;
+  for (const k of c.capas) for (const f of k) ancho = Math.max(ancho, f.length);
+  return { ancho, fondo: Math.max(...c.capas.map((k) => k.length)), alto: c.capas.length };
+}
+function contar(c, capas) {
+  const n = {};
+  for (const k of capas) for (const f of k) for (const ch of f) if (!vacio(ch)) n[ch] = (n[ch] || 0) + 1;
+  return Object.entries(n).sort((a, b) => b[1] - a[1]);
+}
+function pintarMateriales(ul, c, lista) {
+  ul.innerHTML = "";
+  if (!lista.length) { ul.innerHTML = '<li class="nota">Nada que poner en esta capa.</li>'; return; }
+  for (const [ch, n] of lista) {
+    const e = entrada(c, ch);
+    const items = Math.ceil(n / (e.porItem || 1));
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="chip" style="background:${css(e.color)}"></span><span></span><span class="n">${items}${items >= 64 ? ` <small style="color:var(--muted)">(${Math.floor(items / 64)}×64+${items % 64})</small>` : ""}</span>`;
+    li.children[1].textContent = e.nombre;
+    ul.append(li);
+  }
+}
+
+function listaConstrucciones() {
+  const cont = $("lista-c");
+  cont.innerHTML = "";
+  for (const c of CONSTRUCCIONES) {
+    const m = medidas(c);
+    const b = document.createElement("button");
+    b.className = "tarjeta";
+    b.setAttribute("aria-pressed", c === actual);
+    b.innerHTML = `<b></b><span>${c.categoria} · ${m.ancho}×${m.fondo}, ${m.alto} capas</span>`;
+    b.firstChild.textContent = c.nombre;
+    b.addEventListener("click", () => { actual = c; capa = 0; escribir("ayu-c", c.id); listaConstrucciones(); pintarConstruccion(); });
+    cont.append(b);
+  }
+}
+
+function pintarConstruccion() {
+  const c = actual;
+  const m = medidas(c);
+  capa = Math.max(0, Math.min(capa, m.alto - 1));
+  $("c-nombre").textContent = c.nombre;
+  $("c-desc").textContent = c.descripcion;
+  $("capa-num").textContent = `Capa ${capa + 1}/${m.alto}`;
+  $("capa-rango").max = m.alto;
+  $("capa-rango").value = capa + 1;
+  const rej = $("rejilla");
+  rej.style.gridTemplateColumns = `repeat(${m.ancho}, 28px)`;
+  rej.innerHTML = "";
+  const k = c.capas[capa];
+  const abajo = capa > 0 ? c.capas[capa - 1] : null;
+  // fila 0 = la más cercana a ti => se dibuja abajo
+  for (let z = m.fondo - 1; z >= 0; z--) {
+    for (let x = 0; x < m.ancho; x++) {
+      const ch = (k[z] || "")[x] || ".";
+      const d = document.createElement("div");
+      d.className = "celda";
+      if (vacio(ch)) {
+        d.classList.add("vacia");
+        const chA = abajo && (abajo[z] || "")[x];
+        if (chA && !vacio(chA)) d.classList.add("abajo");
+      } else {
+        const e = entrada(c, ch);
+        d.style.background = css(e.color);
+        d.textContent = ch;
+        d.title = e.nombre;
+        const lum = e.color[0] * 0.3 + e.color[1] * 0.59 + e.color[2] * 0.11;
+        d.style.color = lum < 0.45 ? "rgba(255,255,255,.85)" : "rgba(0,0,0,.65)";
+      }
+      rej.append(d);
+    }
+  }
+  pintarMateriales($("mat-capa"), c, contar(c, [k]));
+  pintarMateriales($("mat-total"), c, contar(c, c.capas));
+  const notas = $("c-notas");
+  notas.innerHTML = "";
+  for (const n of c.notas || []) { const li = document.createElement("li"); li.textContent = n; notas.append(li); }
+  dibujarIso();
+}
+
+function dibujarIso() {
+  const cv = $("iso");
+  const ctx = cv.getContext("2d");
+  const c = actual;
+  const m = medidas(c);
+  const s = Math.max(6, Math.min(22, Math.floor(420 / (m.ancho + m.fondo + m.alto * 1.2))));
+  const W = (m.ancho + m.fondo) * s * 0.87 + 20;
+  const H = (m.ancho + m.fondo) * s * 0.5 + m.alto * s + 20;
+  cv.width = Math.round(W * 2); cv.height = Math.round(H * 2);
+  cv.style.width = Math.round(W) + "px";
+  ctx.setTransform(2, 0, 0, 2, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const ox = m.fondo * s * 0.87 + 10, oy = m.alto * s + 10;
+  const p = (x, y, z) => [ox + (x - z) * s * 0.87, oy + (x + z) * s * 0.5 - y * s];
+  const sombra = (col, f) => `rgb(${col.map((v) => Math.round(v * 255 * f)).join(",")})`;
+  // se pinta de atrás hacia adelante
+  for (let y = 0; y < m.alto; y++) {
+    const k = c.capas[y];
+    const alfa = y === capa ? 1 : y < capa ? 0.9 : 0.12;
+    for (let z = m.fondo - 1; z >= 0; z--) {
+      for (let x = 0; x < m.ancho; x++) {
+        // el frente (z=0) queda abajo a la izquierda; tu izquierda (x=0) queda a la izquierda
+        const ch = (k[z] || "")[x];
+        if (!ch || vacio(ch)) continue;
+        const col = entrada(c, ch).color;
+        const X = x, Z = m.fondo - 1 - z;
+        ctx.globalAlpha = alfa;
+        const t = [p(X, y + 1, Z), p(X + 1, y + 1, Z), p(X + 1, y + 1, Z + 1), p(X, y + 1, Z + 1)];
+        const l = [p(X, y + 1, Z + 1), p(X + 1, y + 1, Z + 1), p(X + 1, y, Z + 1), p(X, y, Z + 1)];
+        const r = [p(X + 1, y + 1, Z), p(X + 1, y + 1, Z + 1), p(X + 1, y, Z + 1), p(X + 1, y, Z)];
+        for (const [cara, f] of [[t, 1], [l, 0.78], [r, 0.62]]) {
+          ctx.beginPath(); cara.forEach(([a, b], i) => (i ? ctx.lineTo(a, b) : ctx.moveTo(a, b))); ctx.closePath();
+          ctx.fillStyle = sombra(col, f); ctx.fill();
+          ctx.strokeStyle = y === capa ? "rgba(0,0,0,.45)" : "rgba(0,0,0,.18)"; ctx.lineWidth = 0.6; ctx.stroke();
+        }
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+$("capa-menos").addEventListener("click", () => { capa--; pintarConstruccion(); });
+$("capa-mas").addEventListener("click", () => { capa++; pintarConstruccion(); });
+$("capa-rango").addEventListener("input", (e) => { capa = +e.target.value - 1; pintarConstruccion(); });
+actual = CONSTRUCCIONES.find((c) => c.id === leer("ayu-c", "")) || CONSTRUCCIONES[0];
+listaConstrucciones();
+pintarConstruccion();
+
+// ---------- puntos ----------
+const DIM = { o: "Mundo", n: "Nether", e: "End" };
+const EJEMPLO = [{ nombre: "Ejemplo: casa", dim: "o", x: 120, y: 68, z: -45 }, { nombre: "Ejemplo: fortaleza", dim: "n", x: 210, y: 64, z: 30 }];
+let puntos = leer("ayu-puntos", null) || EJEMPLO;
+function equivale(p) {
+  if (p.dim === "o") return `Nether ${Math.floor(p.x / 8)}, ${Math.floor(p.z / 8)}`;
+  if (p.dim === "n") return `Mundo ${p.x * 8}, ${p.z * 8}`;
+  return "—";
+}
+function pintarPuntos() {
+  const tb = $("tabla-puntos");
+  tb.innerHTML = "";
+  if (!puntos.length) { tb.innerHTML = '<tr><td colspan="5" class="nota">Aún no hay puntos. Agrega el primero arriba.</td></tr>'; return; }
+  puntos.forEach((p, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td></td><td>${DIM[p.dim]}</td><td class="m">${p.x} ${p.y ?? "~"} ${p.z}</td><td class="m">${equivale(p)}</td><td><button class="x" aria-label="Borrar">Borrar</button></td>`;
+    tr.firstChild.textContent = p.nombre;
+    tr.querySelector("button").addEventListener("click", () => { puntos.splice(i, 1); escribir("ayu-puntos", puntos); pintarPuntos(); });
+    tb.append(tr);
+  });
+}
+$("f-punto").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const x = num($("p-x")), z = num($("p-z"));
+  if (x === null || z === null) { $("p-x").focus(); return; }
+  if (puntos === EJEMPLO) puntos = [];
+  puntos.push({ nombre: $("p-nombre").value.trim() || "Punto", dim: $("p-dim").value, x, y: num($("p-y")), z });
+  escribir("ayu-puntos", puntos);
+  $("f-punto").reset();
+  pintarPuntos();
+});
+pintarPuntos();
+</script>

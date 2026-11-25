@@ -94,6 +94,16 @@ td.m { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-
 ol.pasos { margin: 0; padding-left: 20px; display: grid; gap: 10px; max-width: 70ch; }
 code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; border: 1px solid var(--line); }
 .x { background: none; border: 0; color: var(--nether); cursor: pointer; font-weight: 600; }
+.solo-app { display: none; }
+.es-app .solo-app { display: flex; }
+.es-app .solo-web { display: none; }
+.es-app ol.solo-app { display: grid; }
+.appbar { flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.appbar .btn { flex: 1 1 160px; padding: 12px 14px; font-size: 15px; }
+.flotante .wrap { padding-block: 8px 24px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); }
+.flotante header, .flotante .appbar, .flotante #t-instalar { display: none; }
+.flotante .tabs button { font-size: 15px; padding: 6px 10px; }
+.flotante .panel { padding: 12px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
@@ -102,11 +112,16 @@ code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; b
     <h1>Ayudante Survival<small>Panel para Minecraft Bedrock · portales, maquetas y coordenadas</small></h1>
   </header>
 
+  <div class="appbar solo-app">
+    <button class="btn" id="a-burbuja" type="button">Burbuja flotante sobre el juego</button>
+    <button class="btn sec" id="a-minecraft" type="button">Abrir Minecraft</button>
+  </div>
+
   <nav class="tabs" role="tablist">
     <button id="t-portales" role="tab" aria-selected="true" data-tab="portales">Portales</button>
     <button id="t-construir" role="tab" aria-selected="false" data-tab="construir">Construcciones</button>
     <button id="t-puntos" role="tab" aria-selected="false" data-tab="puntos">Mis puntos</button>
-    <button id="t-instalar" role="tab" aria-selected="false" data-tab="instalar">Instalar add-on</button>
+    <button id="t-instalar" role="tab" aria-selected="false" data-tab="instalar">Add-on</button>
   </nav>
 
   <!-- PORTALES -->
@@ -209,7 +224,7 @@ code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; b
     <div class="tabla-scroll">
       <table>
         <thead><tr><th>Lugar</th><th>Dónde</th><th>XYZ</th><th>Equivale a</th><th></th></tr></thead>
-        <tbody id="t-puntos"></tbody>
+        <tbody id="tabla-puntos"></tbody>
       </table>
     </div>
   </section>
@@ -220,7 +235,17 @@ code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; b
       <h2>Instalar el add-on en Bedrock</h2>
       <p class="nota">El add-on es lo que pone los bloques transparentes en tu mundo. Funciona en celular, consola con Realms/servidor y PC.</p>
     </div>
-    <ol class="pasos">
+    <div class="appbar solo-app">
+      <button class="btn" id="a-instalar" type="button">Instalar en Minecraft</button>
+      <button class="btn sec" id="a-guardar" type="button">Guardar en Descargas</button>
+    </div>
+    <ol class="pasos solo-app">
+      <li>Toca <b>Instalar en Minecraft</b>. Minecraft se abre y dice "Importación correcta" dos veces.</li>
+      <li>Si no se abre, toca <b>Guardar en Descargas</b> y abre el archivo <code>AyudanteSurvival.mcaddon</code> desde tu gestor de archivos.</li>
+      <li>Edita tu mundo → <b>Paquetes de comportamiento</b> → activa <b>Ayudante Survival</b>.</li>
+      <li>Entra al mundo. Recibes la <b>Guía de Construcción</b> (un libro brillante). Úsala para abrir el menú dentro del juego.</li>
+    </ol>
+    <ol class="pasos solo-web">
       <li>Descarga <code>AyudanteSurvival.mcaddon</code> de la carpeta <code>minecraft_ayudante/dist</code> del repositorio.</li>
       <li>Ábrelo con Minecraft (en celular: tócalo y elige Minecraft). Se importan dos paquetes: comportamiento y recursos.</li>
       <li>Edita tu mundo → <b>Paquetes de comportamiento</b> → activa <b>Ayudante Survival</b>. El de recursos se activa solo.</li>
@@ -246,6 +271,16 @@ const PALETA = {"C":{"id":"minecraft:cobblestone","nombre":"Piedra labrada","col
 const CONSTRUCCIONES = [{"id":"casa_inicial","nombre":"Casa inicial 7x7","categoria":"Casas","descripcion":"Casa de madera con piso de piedra, ventanas, cama, cofre, horno y mesa de crafteo. Ideal para la primera noche.","offsetY":-1,"notas":["Pon la cama al final: haz clic en el bloque marcado más cercano a la puerta.","Las antorchas van pegadas a la pared interior."],"capas":[["CCCCCCC","CCCCCCC","CCCCCCC","CCCCCCC","CCCCCCC","CCCCCCC","CCCCCCC"],["LPPDPPL","P.....P","P.....P","P.....P","PK...BP","PMH..BP","LPPPPPL"],["LPPDPPL","P.....P","G.....G","G.....G","P.....P","P.....P","LPGGGPL"],["LPPPPPL","P.....P","P.....P","PT...TP","P.....P","P.....P","LPPPPPL"],["PPPPPPP","PPPPPPP","PPPPPPP","PPPPPPP","PPPPPPP","PPPPPPP","PPPPPPP"]]},{"id":"portal_nether","nombre":"Portal al Nether","categoria":"Portales","descripcion":"Marco de obsidiana 4x5 (10 bloques, sin esquinas). Enciéndelo con mechero o carga de fuego.","offsetY":0,"notas":["Usa el menú Portales para saber en qué coordenadas construirlo y que quede enlazado.","Las esquinas no son necesarias."],"capas":[[".OO."],["O..O"],["O..O"],["O..O"],[".OO."]]},{"id":"granja_trigo","nombre":"Granja de trigo 9x9","categoria":"Granjas","descripcion":"Un solo bloque de agua en el centro hidrata las 80 casillas de tierra. Cercada para que no entren mobs.","offsetY":-1,"notas":["Ara la tierra con una azada después de poner el agua.","Planta semillas, zanahorias o papas en la tierra arada."],"capas":[["LLLLLLLLLLL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFWFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LFFFFFFFFFL","LLLLLLLLLLL"],["NNNNNQNNNNN","N.........N","N.........N","N.........N","N.........N","N.........N","N.........N","N.........N","N.........N","N.........N","NNNNNNNNNNN"],["T.........T","...........","...........","...........","...........","...........","...........","...........","...........","...........","T.........T"]]},{"id":"generador_piedra","nombre":"Generador de piedra","categoria":"Granjas","descripcion":"Generador infinito de piedra labrada. La piedra aparece en el bloque entre la lava y el hoyo.","offsetY":-3,"notas":["Pon primero el AGUA (va a caer en el hoyo), luego la LAVA.","Pica la piedra que aparece en la 3ª casilla de la zanja; se regenera sola."],"capas":[[".......","....C..","......."],["....C..","CCCC.CC","....C.."],["CCCCCCC","CY...WC","CCCCCCC"]]},{"id":"torre_vigilancia","nombre":"Torre de vigilancia","categoria":"Casas","descripcion":"Torre de piedra de 10 bloques con escalera de mano y mirador con vallas.","offsetY":-1,"notas":["La escalera de mano va pegada a la pared del fondo."],"capas":[["CCCCC","CCCCC","CCCCC","CCCCC","CCCCC"],["CC.CC","C...C","C...C","C.E.C","CCCCC"],["CC.CC","C...C","C...C","C.E.C","CCCCC"],["CCCCC","C...C","C...C","C.E.C","CCCCC"],["CCGCC","G...G","C...C","C.E.C","CCCCC"],["CCCCC","C...C","C...C","C.E.C","CCCCC"],["CCGCC","G...G","C...C","C.E.C","CCGCC"],["CCCCC","C...C","C...C","C.E.C","CCCCC"],["CCCCC","CCCCC","CCCCC","CCECC","CCCCC"],["NNNNN","N...N","N...N","N...N","NNNNN"],["T...T",".....",".....",".....","T...T"]]},{"id":"granja_hierro","nombre":"Granja de hierro compacta","categoria":"Granjas","descripcion":"3 aldeanos asustados por un zombi hacen aparecer gólems. El agua los empuja a la cuchilla de lava y el hierro cae en las tolvas.","offsetY":-1,"notas":["Arriba van 3 aldeanos con 3 camas y un zombi (con etiqueta de nombre) detrás del vidrio.","Coloca las 3 tolvas haciendo clic en los cofres de abajo.","Los carteles de la capa de lava: usa carteles colgantes o pon un bloque temporal y quítalo.","Pon el agua al fondo del cuarto; debe llegar justo hasta las tolvas.","Si no aparecen gólems, agrega más aldeanos y camas: en Bedrock más aldea = más gólems."],"capas":[[".....",".KKK.",".....",".....",".....",".....",".....","....."],["CCCCC","CUUUC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC"],["GGGGG","G...G","G...G","G...G","G...G","G...G","GWWWG","GGGGG"],["GGGGG","GSSSG","G...G","G...G","G...G","G...G","G...G","GGGGG"],["GGGGG","GYYYG","GSSSG","G...G","G...G","G...G","G...G","GGGGG"],["GGGGG","GGGGG","G...G","G...G","G...G","G...G","G...G","GGGGG"],["CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC"],["CCCCC","C...C","CGGGC","C...C","C...C","CBBBC","CBBBC","CCCCC"],["CCCCC","G...G","CGGGC","G...G","G...G","G...G","G...G","CCCCC"],["CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC","CCCCC"]]}];
 
 const $ = (id) => document.getElementById(id);
+const APP = !!(window.Android && Android.esApp && Android.esApp());
+const FLOTANTE = APP && Android.esFlotante();
+if (APP) document.documentElement.classList.add("es-app");
+if (FLOTANTE) document.documentElement.classList.add("flotante");
+if (APP) {
+  $("a-burbuja").addEventListener("click", () => Android.activarBurbuja());
+  $("a-minecraft").addEventListener("click", () => Android.abrirMinecraft());
+  $("a-instalar").addEventListener("click", () => Android.instalarAddon());
+  $("a-guardar").addEventListener("click", () => Android.guardarAddon());
+}
 const leer = (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; } };
 const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
@@ -260,7 +295,7 @@ function abrir(nombre) {
   escribir("ayu-tab", nombre);
 }
 tabs.forEach((b) => b.addEventListener("click", () => abrir(b.dataset.tab)));
-abrir(leer("ayu-tab", "portales"));
+abrir(FLOTANTE && leer("ayu-tab", "portales") === "instalar" ? "portales" : leer("ayu-tab", "portales"));
 
 // ---------- portales ----------
 const num = (el) => { const n = parseInt(el.value, 10); return Number.isNaN(n) ? null : n; };
@@ -446,7 +481,7 @@ function equivale(p) {
   return "—";
 }
 function pintarPuntos() {
-  const tb = $("t-puntos");
+  const tb = $("tabla-puntos");
   tb.innerHTML = "";
   if (!puntos.length) { tb.innerHTML = '<tr><td colspan="5" class="nota">Aún no hay puntos. Agrega el primero arriba.</td></tr>'; return; }
   puntos.forEach((p, i) => {

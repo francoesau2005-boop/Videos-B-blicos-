@@ -94,6 +94,16 @@ td.m { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-
 ol.pasos { margin: 0; padding-left: 20px; display: grid; gap: 10px; max-width: 70ch; }
 code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; border: 1px solid var(--line); }
 .x { background: none; border: 0; color: var(--nether); cursor: pointer; font-weight: 600; }
+.solo-app { display: none; }
+.es-app .solo-app { display: flex; }
+.es-app .solo-web { display: none; }
+.es-app ol.solo-app { display: grid; }
+.appbar { flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.appbar .btn { flex: 1 1 160px; padding: 12px 14px; font-size: 15px; }
+.flotante .wrap { padding-block: 8px 24px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); }
+.flotante header, .flotante .appbar, .flotante #t-instalar { display: none; }
+.flotante .tabs button { font-size: 15px; padding: 6px 10px; }
+.flotante .panel { padding: 12px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
@@ -102,11 +112,16 @@ code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; b
     <h1>Ayudante Survival<small>Panel para Minecraft Bedrock · portales, maquetas y coordenadas</small></h1>
   </header>
 
+  <div class="appbar solo-app">
+    <button class="btn" id="a-burbuja" type="button">Burbuja flotante sobre el juego</button>
+    <button class="btn sec" id="a-minecraft" type="button">Abrir Minecraft</button>
+  </div>
+
   <nav class="tabs" role="tablist">
     <button id="t-portales" role="tab" aria-selected="true" data-tab="portales">Portales</button>
     <button id="t-construir" role="tab" aria-selected="false" data-tab="construir">Construcciones</button>
     <button id="t-puntos" role="tab" aria-selected="false" data-tab="puntos">Mis puntos</button>
-    <button id="t-instalar" role="tab" aria-selected="false" data-tab="instalar">Instalar add-on</button>
+    <button id="t-instalar" role="tab" aria-selected="false" data-tab="instalar">Add-on</button>
   </nav>
 
   <!-- PORTALES -->
@@ -209,7 +224,7 @@ code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; b
     <div class="tabla-scroll">
       <table>
         <thead><tr><th>Lugar</th><th>Dónde</th><th>XYZ</th><th>Equivale a</th><th></th></tr></thead>
-        <tbody id="t-puntos"></tbody>
+        <tbody id="tabla-puntos"></tbody>
       </table>
     </div>
   </section>
@@ -220,7 +235,17 @@ code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; b
       <h2>Instalar el add-on en Bedrock</h2>
       <p class="nota">El add-on es lo que pone los bloques transparentes en tu mundo. Funciona en celular, consola con Realms/servidor y PC.</p>
     </div>
-    <ol class="pasos">
+    <div class="appbar solo-app">
+      <button class="btn" id="a-instalar" type="button">Instalar en Minecraft</button>
+      <button class="btn sec" id="a-guardar" type="button">Guardar en Descargas</button>
+    </div>
+    <ol class="pasos solo-app">
+      <li>Toca <b>Instalar en Minecraft</b>. Minecraft se abre y dice "Importación correcta" dos veces.</li>
+      <li>Si no se abre, toca <b>Guardar en Descargas</b> y abre el archivo <code>AyudanteSurvival.mcaddon</code> desde tu gestor de archivos.</li>
+      <li>Edita tu mundo → <b>Paquetes de comportamiento</b> → activa <b>Ayudante Survival</b>.</li>
+      <li>Entra al mundo. Recibes la <b>Guía de Construcción</b> (un libro brillante). Úsala para abrir el menú dentro del juego.</li>
+    </ol>
+    <ol class="pasos solo-web">
       <li>Descarga <code>AyudanteSurvival.mcaddon</code> de la carpeta <code>minecraft_ayudante/dist</code> del repositorio.</li>
       <li>Ábrelo con Minecraft (en celular: tócalo y elige Minecraft). Se importan dos paquetes: comportamiento y recursos.</li>
       <li>Edita tu mundo → <b>Paquetes de comportamiento</b> → activa <b>Ayudante Survival</b>. El de recursos se activa solo.</li>
@@ -245,6 +270,16 @@ code { font-family: var(--font-mono); background: var(--bg); padding: 1px 5px; b
 /*DATOS*/
 
 const $ = (id) => document.getElementById(id);
+const APP = !!(window.Android && Android.esApp && Android.esApp());
+const FLOTANTE = APP && Android.esFlotante();
+if (APP) document.documentElement.classList.add("es-app");
+if (FLOTANTE) document.documentElement.classList.add("flotante");
+if (APP) {
+  $("a-burbuja").addEventListener("click", () => Android.activarBurbuja());
+  $("a-minecraft").addEventListener("click", () => Android.abrirMinecraft());
+  $("a-instalar").addEventListener("click", () => Android.instalarAddon());
+  $("a-guardar").addEventListener("click", () => Android.guardarAddon());
+}
 const leer = (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; } };
 const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
@@ -259,7 +294,7 @@ function abrir(nombre) {
   escribir("ayu-tab", nombre);
 }
 tabs.forEach((b) => b.addEventListener("click", () => abrir(b.dataset.tab)));
-abrir(leer("ayu-tab", "portales"));
+abrir(FLOTANTE && leer("ayu-tab", "portales") === "instalar" ? "portales" : leer("ayu-tab", "portales"));
 
 // ---------- portales ----------
 const num = (el) => { const n = parseInt(el.value, 10); return Number.isNaN(n) ? null : n; };
@@ -445,7 +480,7 @@ function equivale(p) {
   return "—";
 }
 function pintarPuntos() {
-  const tb = $("t-puntos");
+  const tb = $("tabla-puntos");
   tb.innerHTML = "";
   if (!puntos.length) { tb.innerHTML = '<tr><td colspan="5" class="nota">Aún no hay puntos. Agrega el primero arriba.</td></tr>'; return; }
   puntos.forEach((p, i) => {
