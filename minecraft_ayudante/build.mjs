@@ -22,7 +22,14 @@ copyFileSync(raiz + "construcciones.js", raiz + "addon/BP/scripts/construcciones
 for (const f of ["AyudanteSurvival_BP.mcpack", "AyudanteSurvival_RP.mcpack", "AyudanteSurvival.mcaddon"]) rmSync(dist + f, { force: true });
 execFileSync("zip", ["-qr", dist + "AyudanteSurvival_BP.mcpack", "."], { cwd: raiz + "addon/BP" });
 execFileSync("zip", ["-qr", dist + "AyudanteSurvival_RP.mcpack", "."], { cwd: raiz + "addon/RP" });
-execFileSync("zip", ["-qj", dist + "AyudanteSurvival.mcaddon", dist + "AyudanteSurvival_BP.mcpack", dist + "AyudanteSurvival_RP.mcpack"]);
+// el .mcaddon lleva las carpetas BP y RP directamente (igual que los add-ons populares)
+const tmp = dist + "_mcaddon/";
+rmSync(tmp, { recursive: true, force: true });
+mkdirSync(tmp);
+execFileSync("cp", ["-r", raiz + "addon/BP", tmp + "Ayudante Survival BP"]);
+execFileSync("cp", ["-r", raiz + "addon/RP", tmp + "Ayudante Survival RP"]);
+execFileSync("zip", ["-qr", dist + "AyudanteSurvival.mcaddon", "Ayudante Survival BP", "Ayudante Survival RP"], { cwd: tmp });
+rmSync(tmp, { recursive: true, force: true });
 
 // 3. Panel web
 const plantilla = readFileSync(raiz + "panel/plantilla.html", "utf8");

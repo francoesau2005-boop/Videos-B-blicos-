@@ -27,9 +27,9 @@ Para compilarla: `./compilar_app.sh` (requiere el SDK de Android en `ANDROID_HOM
 2. Edita tu mundo → Paquetes de comportamiento → activa **Ayudante Survival**.
 3. Al entrar recibes la **Guía de Construcción**. Úsala para abrir el menú.
    - Receta: 1 palo + 1 papel (sin forma).
-   - Comandos: `/scriptevent ayudante:menu` y `/scriptevent ayudante:guia`.
+   - Comandos (sin trucos): `/ayudante:menu` y `/ayudante:guia`.
 
-Requiere Minecraft Bedrock 1.21.50 o más reciente. No necesita experimentos.
+Requiere Minecraft Bedrock 1.21.90 o más reciente. No necesita experimentos.
 
 ## Construcciones incluidas
 

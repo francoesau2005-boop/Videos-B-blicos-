@@ -1,6 +1,6 @@
 // Ayudante Survival - add-on para Minecraft Bedrock
-// Abre el menú usando el objeto "Guía de Construcción" o con: /scriptevent ayudante:menu
-import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
+// Abre el menú usando el objeto "Guía de Construcción" o con el comando /ayudante:menu
+import { world, system, ItemStack, MolangVariableMap, CommandPermissionLevel } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { CONSTRUCCIONES, PALETA } from "./construcciones.js";
 
@@ -507,9 +507,9 @@ async function calculadoraPortal(p) {
   const l = piso(p.location);
   const f = new ModalFormData()
     .title("Calculadora de portales")
-    .dropdown("Las coordenadas que escribo son del:", ["Mundo normal", "Nether"], p.dimension.id === "minecraft:nether" ? 1 : 0)
-    .textField("X", "ej. 800", String(l.x))
-    .textField("Z", "ej. -240", String(l.z));
+    .dropdown("Las coordenadas que escribo son del:", ["Mundo normal", "Nether"], { defaultValueIndex: p.dimension.id === "minecraft:nether" ? 1 : 0 })
+    .textField("X", "ej. 800", { defaultValue: String(l.x) })
+    .textField("Z", "ej. -240", { defaultValue: String(l.z) });
   const r = await mostrar(p, f);
   if (r.canceled) return;
   const [origen, xs, zs] = r.formValues;
@@ -536,7 +536,7 @@ async function menuPuntos(p) {
 
 async function nuevoPunto(p) {
   const l = piso(p.location);
-  const f = new ModalFormData().title("Guardar punto").textField(`Nombre (${l.x} ${l.y} ${l.z})`, "Casa, mina, aldea...", "Casa");
+  const f = new ModalFormData().title("Guardar punto").textField(`Nombre (${l.x} ${l.y} ${l.z})`, "Casa, mina, aldea...", { defaultValue: "Casa" });
   const r = await mostrar(p, f);
   if (r.canceled) return;
   const nombre = String(r.formValues[0] || "Punto").slice(0, 32);
@@ -577,13 +577,30 @@ async function menuAyuda(p) {
         "§l4. Portales:§r el menú te dice dónde construir el otro portal para que se enlacen.",
         "§l5. Puntos:§r guarda lugares y sigue la flecha en la barra de abajo.",
         "",
-        "§7Si pierdes la Guía, craftéala con 1 palo + 1 papel, o escribe /scriptevent ayudante:menu",
+        "§7Si pierdes la Guía, craftéala con 1 palo + 1 papel, o escribe /ayudante:guia. El menú también se abre con /ayudante:menu",
       ].join("\n")
     )
     .button("« Volver");
   const r = await mostrar(p, f);
   if (!r.canceled) await menuPrincipal(p);
 }
+
+// ---------- Comandos (funcionan sin activar trucos) ----------
+system.beforeEvents.startup.subscribe((ev) => {
+  const registrar = (name, description, fn) => {
+    try {
+      ev.customCommandRegistry.registerCommand({ name, description, permissionLevel: CommandPermissionLevel.Any }, (origin) => {
+        const p = origin.sourceEntity;
+        if (!p || p.typeId !== "minecraft:player") return;
+        system.run(() => fn(p));
+      });
+    } catch (e) {
+      console.warn("No se pudo registrar " + name + ": " + e);
+    }
+  };
+  registrar("ayudante:menu", "Abre el menú del Ayudante Survival", (p) => menuPrincipal(p));
+  registrar("ayudante:guia", "Te da la Guía de Construcción", (p) => darGuia(p));
+});
 
 // ---------- Eventos ----------
 const ultimoUso = new Map();
