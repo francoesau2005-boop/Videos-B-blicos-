@@ -300,7 +300,7 @@ async function mostrar(p, form) {
   for (let i = 0; i < 20; i++) {
     const r = await form.show(p);
     if (r.canceled && r.cancelationReason === "UserBusy") {
-      await new Promise((res) => system.runTimeout(res, 10));
+      await new Promise((res) => system.runTimeout(() => res(undefined), 10));
       continue;
     }
     return r;
@@ -613,7 +613,6 @@ function abrirDesdeObjeto(p, item) {
 }
 
 world.afterEvents.itemUse.subscribe((ev) => abrirDesdeObjeto(ev.source, ev.itemStack));
-if (world.afterEvents.itemUseOn) world.afterEvents.itemUseOn.subscribe((ev) => abrirDesdeObjeto(ev.source, ev.itemStack));
 
 system.afterEvents.scriptEventReceive.subscribe((ev) => {
   const p = ev.sourceEntity;
