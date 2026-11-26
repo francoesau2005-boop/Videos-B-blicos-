@@ -13,3 +13,5 @@ App Android con ayudas legales para juegos de disparos tipo battle royale:
 - **Tips**: técnicas, armas y rutina de práctica. Sin hacks ni regedit.
 
 Compilar: `./compilar.sh` (requiere el SDK de Android). La app queda en `dist/Rotisimo.apk`.
+
+El diseño se edita en `web/app.html` (datos en `web/datos.js` y `web/respuestas.js`); `node web/build.mjs` genera `web/index.html` con la letra Outfit y los íconos Lucide incluidos, para que funcione sin internet.

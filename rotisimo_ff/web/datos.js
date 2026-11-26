@@ -1,0 +1,72 @@
+// ================= DATOS =================
+// tags: rusher, sniper, escudo, vida, velocidad, apoyo
+const ACTIVOS = [
+  { n: "Alok", h: "Crea un aura que cura vida y da más velocidad a ti y a tus aliados cercanos.", t: ["vida", "velocidad", "apoyo"] },
+  { n: "Tatsuya", h: "Da un impulso rápido hacia adelante. El enfriamiento se reinicia cuando derribas a un enemigo.", t: ["rusher", "velocidad"] },
+  { n: "Chrono", h: "Levanta un campo de fuerza que bloquea el daño y te da más velocidad un momento.", t: ["escudo", "rusher"] },
+  { n: "Skyler", h: "Lanza una onda sónica que rompe paredes gloo. Recupera vida cada vez que pones una pared gloo.", t: ["rusher", "vida"] },
+  { n: "Xayne", h: "Gana vida temporal y hace más daño a paredes gloo y escudos.", t: ["rusher", "escudo"] },
+  { n: "K", h: "Dos modos: Jiu-jitsu sube tu EP máximo y ayuda a tus aliados; Psicología convierte EP en vida.", t: ["vida", "apoyo"] },
+  { n: "Dimitri", h: "Crea una zona de curación. Dentro, los derribados se pueden levantar solos.", t: ["vida", "apoyo"] },
+  { n: "Wukong", h: "Se transforma en arbusto para esconderse.", t: ["escudo", "sniper"] },
+  { n: "Clu", h: "Localiza enemigos cercanos que no estén agachados o tumbados.", t: ["marcaje", "sniper", "apoyo"] },
+  { n: "Steffie", h: "Pinta un grafiti que restaura tu chaleco y reduce el daño de proyectiles.", t: ["escudo", "apoyo"] },
+  { n: "Homer", h: "Manda un dron que persigue al enemigo, lo ralentiza y lo daña.", t: ["rusher", "sniper"] },
+  { n: "Kenta", h: "Pone un escudo de espada que reduce el daño que recibes de frente.", t: ["escudo", "rusher"] },
+  { n: "Orion", h: "Absorbe vida de los enemigos cercanos y se vuelve inmune un momento.", t: ["rusher", "vida", "escudo"] },
+];
+const PASIVOS = [
+  { n: "Jota", h: "Recupera vida al hacer daño o derribar con escopetas y subfusiles.", t: ["rusher", "vida"] },
+  { n: "Dasha", h: "Menos retroceso al disparar y menos daño por caída. Ideal para controlar la mira.", t: ["rusher", "sniper"] },
+  { n: "Shirou", h: "Marca a quien te dispara; tu siguiente tiro contra él atraviesa más armadura.", t: ["marcaje", "rusher"] },
+  { n: "Hayato", h: "Más penetración de armadura mientras menos vida tienes.", t: ["rusher"] },
+  { n: "Kelly", h: "Corres más rápido.", t: ["velocidad", "rusher"] },
+  { n: "Moco", h: "Marca al enemigo que le disparas para que tu equipo lo vea.", t: ["marcaje", "apoyo", "sniper"] },
+  { n: "Laura", h: "Más precisión al disparar con mira.", t: ["sniper"] },
+  { n: "Maro", h: "Más daño mientras más lejos está el enemigo.", t: ["marcaje", "sniper"] },
+  { n: "Rafael", h: "Disparos silenciosos con francotirador y rifles de precisión.", t: ["sniper"] },
+  { n: "Maxim", h: "Come champiñones y usa botiquines más rápido.", t: ["vida"] },
+  { n: "Luqueta", h: "Tu vida máxima sube con cada eliminación (Battle Royale).", t: ["vida", "rusher"] },
+  { n: "Leon", h: "Recupera vida al salir del combate.", t: ["vida"] },
+  { n: "Andrew", h: "Tu chaleco se desgasta menos.", t: ["escudo"] },
+  { n: "Antonio", h: "Empiezas cada ronda con vida extra.", t: ["escudo", "vida"] },
+  { n: "Kapella", h: "Los objetos de curación curan más y tus aliados derribados pierden vida más lento.", t: ["vida", "apoyo"] },
+  { n: "Thiva", h: "Reanima más rápido a tus compañeros.", t: ["apoyo", "vida"] },
+  { n: "Olivia", h: "Tus compañeros reanimados vuelven con vida extra.", t: ["apoyo"] },
+  { n: "Miguel", h: "Ganas EP con cada eliminación.", t: ["vida", "rusher"] },
+  { n: "Ford", h: "Recibes menos daño fuera de la zona segura.", t: ["escudo"] },
+  { n: "D-bee", h: "Más velocidad y precisión mientras disparas en movimiento.", t: ["rusher", "velocidad"] },
+  { n: "Caroline", h: "Más velocidad con escopeta en la mano.", t: ["rusher", "velocidad"] },
+  { n: "Joseph", h: "Ganas velocidad al recibir daño.", t: ["velocidad", "escudo"] },
+  { n: "Wolfrahh", h: "Recibes menos daño de tiros a la cabeza.", t: ["escudo"] },
+  { n: "Paloma", h: "Las balas de rifle de asalto no ocupan espacio en la mochila.", t: ["sniper", "apoyo"] },
+];
+const MASCOTAS = [
+  { n: "Mr. Waggor", h: "Te fabrica granadas de pared gloo con el tiempo.", t: ["escudo", "rusher"] },
+  { n: "Rockie", h: "Reduce el enfriamiento de tu habilidad activa.", t: ["rusher", "velocidad", "apoyo"] },
+  { n: "Ottero", h: "Al curarte, recuperas también EP.", t: ["vida"] },
+  { n: "Detective Panda", h: "Recuperas vida con cada eliminación.", t: ["vida", "rusher"] },
+  { n: "Falco", h: "Planeas más rápido al caer del avión.", t: ["velocidad"] },
+  { n: "Dreki", h: "Detecta enemigos que usan botiquín cerca de ti.", t: ["marcaje", "sniper", "apoyo"] },
+  { n: "Beaston", h: "Lanzas granadas y paredes gloo más lejos.", t: ["escudo", "apoyo"] },
+  { n: "Agent Hop", h: "Ganas EP cuando se cierra la zona.", t: ["vida"] },
+];
+const ARMAS = {
+  rusher: ["M1887 + MP40", "M1014 + UMP", "M1887 + Desert Eagle", "MP40 + M590"],
+  sniper: ["AWM + M4A1", "Woodpecker + SCAR", "SVD + M4A1", "AWM + MP40"],
+  escudo: ["M4A1 + M1887", "SCAR + MP40", "AK + M1014"],
+  vida: ["SCAR + MP40", "M4A1 + UMP", "Woodpecker + MP40"],
+  velocidad: ["MP40 + M1887", "UMP + M1014", "Vector + M1887"],
+  apoyo: ["M4A1 + UMP", "SCAR + Woodpecker", "AK + MP40"],
+};
+const TIPS = [
+  "Deja la mira siempre a la altura de la cabeza mientras caminas: así solo arrastras un poquito.",
+  "Rompe la pared gloo del rival y entra justo después: es cuando menos se lo espera.",
+  "Con escopeta, salta y dispara en el aire: la mira sube sola hacia la cabeza.",
+  "Pon el botón de disparo un poco más arriba del centro derecho para jalar hacia arriba fácil.",
+  "Juega con 60 FPS o más si tu celular lo aguanta: la mira se siente más suave.",
+  "Calienta 5 minutos en el campo de entrenamiento antes de jugar clasificatoria.",
+  "En CS, compra chaleco antes que arma si tienes poco dinero.",
+  "No cambies tu sensi cada partida: dale al menos 3 días para acostumbrarte.",
+];
+

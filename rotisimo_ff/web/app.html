@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rotísimo</title>
+<style>
+/*FUENTES*/
+/* Diseño: negro puro, tarjetas grafito con bordes finos, lo elegido se pone blanco; color solo en íconos pequeños */
+:root {
+  --bg: #000;
+  --card: #0c0c0e;
+  --card2: #141417;
+  --card3: #1b1b1f;
+  --line: #232328;
+  --line2: #34343b;
+  --ink: #f4f4f5;
+  --muted: #8d8d96;
+  --dim: #5d5d66;
+  --green: #3ddc84;
+  --red: #ff4d4d;
+  --orange: #ff9f1c;
+  --cyan: #2ec5ff;
+  --purple: #a77bff;
+  --gold: #f5c451;
+  --font: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45; }
+body { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+button { font-family: inherit; color: inherit; }
+svg.i { width: 18px; height: 18px; flex: none; }
+.wrap { max-width: 560px; margin: 0 auto; padding: calc(12px + env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 24px max(12px, env(safe-area-inset-left, 0px)); display: grid; gap: 16px; }
+
+/* barra superior */
+.barra-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border: 1px solid var(--line2); border-radius: 999px; background: linear-gradient(180deg, #121215, #070708); box-shadow: 0 10px 30px #000a; }
+.marca { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: 0.22em; font-size: 15px; }
+.marca svg { width: 26px; height: 26px; }
+.version { font-size: 11px; color: var(--muted); border: 1px solid var(--line2); border-radius: 999px; padding: 4px 10px; letter-spacing: 0.08em; }
+
+/* títulos de página */
+.hero { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 6px 4px 0; }
+.badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line2); background: var(--card2); border-radius: 999px; padding: 6px 12px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+.hero h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+.hero p { margin: 0; color: var(--muted); font-size: 14px; max-width: 40ch; }
+
+/* tarjeta grande tipo panel */
+.panel { background: radial-gradient(130% 60% at 50% 0%, #17171b 0%, var(--card) 55%); border: 1px solid var(--line2); border-radius: 22px; padding: 16px; display: grid; gap: 14px; box-shadow: 0 20px 50px #000c; }
+.panel-head { display: flex; align-items: center; gap: 12px; }
+.panel-head .logo { font-weight: 700; font-size: 22px; letter-spacing: -0.02em; }
+.panel-head .sep { width: 1px; align-self: stretch; background: var(--line2); }
+.panel-head .titulo b { display: block; font-size: 14px; font-weight: 600; }
+.panel-head .titulo span { font-size: 10px; letter-spacing: 0.2em; color: var(--muted); font-weight: 600; }
+.estado { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line2); background: var(--card2); border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.estado::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+.estado.ocupado::before { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+/* mascota */
+.masc { width: 86px; height: 86px; flex: none; position: relative; }
+.masc svg.cuerpo { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 6px #ffffff40); }
+.masc .ojo { animation: parpadeo 4.2s infinite; transform-origin: center; transform-box: fill-box; }
+@keyframes parpadeo { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.12); } }
+.masc.pensando svg.cuerpo { animation: flotar 1.3s ease-in-out infinite; }
+@keyframes flotar { 50% { transform: translateY(-4px); } }
+.nube { position: absolute; top: -8px; right: -22px; width: 44px; height: 38px; border-radius: 20px; background: #fff; color: #000; display: grid; place-items: center; box-shadow: 0 0 18px #ffffff55; }
+.nube svg { width: 20px; height: 20px; }
+.nube::before, .nube::after { content: ""; position: absolute; border-radius: 50%; background: #fff; }
+.nube::before { width: 9px; height: 9px; left: -3px; bottom: -6px; }
+.nube::after { width: 5px; height: 5px; left: -10px; bottom: -12px; }
+
+/* bocadillo de la mascota */
+.dice { display: flex; gap: 12px; align-items: center; background: var(--card2); border: 1px solid var(--line); border-radius: 18px; padding: 10px; }
+.dice .bocadillo { flex: 1; min-width: 0; border: 1px solid var(--line2); background: var(--card); border-radius: 14px; padding: 10px 12px; }
+.dice .bocadillo small { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.2em; color: var(--muted); font-weight: 600; }
+.dice .bocadillo small::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.dice .bocadillo p { margin: 4px 0 0; font-weight: 600; font-size: 14.5px; }
+
+/* pasos */
+.paso { display: grid; gap: 8px; }
+.paso-t { display: flex; align-items: baseline; justify-content: space-between; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; }
+.paso-t span:first-child b { color: var(--muted); font-weight: 600; margin-right: 6px; }
+.paso-t .op { font-size: 11px; letter-spacing: 0.02em; color: var(--muted); font-weight: 500; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.g3 .opt { padding: 9px 8px; gap: 7px; font-size: 13.5px; }
+.g3 .opt.prio { padding: 9px 4px; font-size: 12.5px; gap: 5px; }
+.opt { position: relative; display: flex; align-items: center; gap: 10px; min-width: 0; border: 1px solid var(--line); background: var(--card2); border-radius: 14px; padding: 10px 12px; cursor: pointer; text-align: left; font-size: 14px; font-weight: 600; }
+.opt .sub { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
+.opt.grande { padding: 12px 14px; font-size: 16px; }
+.opt[aria-pressed="true"].blanca { background: #fff; color: #000; border-color: #fff; }
+.opt[aria-pressed="true"].blanca .sub { color: #555; }
+.opt.color[aria-pressed="true"] { border-color: var(--c); background: color-mix(in srgb, var(--c) 10%, var(--card2)); }
+.opt .tile { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); flex: none; }
+.opt .tile svg { width: 16px; height: 16px; }
+.opt .ok { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--c, #fff); color: #000; display: grid; place-items: center; border: 2px solid var(--bg); }
+.opt .ok svg { width: 12px; height: 12px; stroke-width: 3; }
+.opt.punteada { border-style: dashed; }
+.prio { justify-content: center; font-size: 13px; font-weight: 500; padding: 9px 6px; border-radius: 999px; }
+.prio svg { width: 15px; height: 15px; }
+.prio[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+
+/* botones */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid var(--line2); background: var(--card2); border-radius: 14px; padding: 15px 12px; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; white-space: nowrap; text-transform: uppercase; cursor: pointer; width: 100%; }
+.btn.blanco { background: #fff; color: #000; border-color: #fff; box-shadow: 0 0 24px #ffffff22; }
+.btn:active, .opt:active, .prio:active { transform: scale(0.98); }
+.btn-chico { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line2); background: transparent; border-radius: 999px; padding: 9px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; cursor: pointer; }
+.btn-chico svg { width: 15px; height: 15px; }
+
+/* pensando */
+.pensar { display: grid; justify-items: center; gap: 12px; text-align: center; padding: 8px 0 6px; }
+.pensar .escena { width: 100%; display: grid; place-items: center; padding: 26px 0 18px; border: 1px solid var(--line); border-radius: 16px; background: radial-gradient(60% 70% at 50% 60%, #1c1c20, var(--card)); }
+.pensar .escena .masc { width: 110px; height: 110px; }
+.pensar .t { font-size: 12.5px; font-weight: 700; letter-spacing: 0.2em; }
+.pensar .p { font-size: 13px; color: var(--muted); min-height: 19px; }
+.pensar .bar { width: 62%; height: 4px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.pensar .bar div { height: 100%; width: 0; background: #fff; border-radius: 99px; }
+.pensar .pct { font-size: 12px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* resultado de combo */
+.res-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.res-top h2 { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; }
+.res-top h2 svg { color: var(--gold); width: 22px; height: 22px; }
+.etiquetas { display: flex; flex-wrap: wrap; gap: 6px; }
+.etq { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line2); border-radius: 999px; padding: 5px 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; }
+.etq svg { width: 13px; height: 13px; }
+.combo { display: grid; grid-template-columns: 1fr 1.15fr; gap: 8px; }
+.pj { position: relative; display: flex; align-items: center; gap: 10px; min-width: 0; background: var(--card2); border: 1px solid var(--line); border-radius: 16px; padding: 8px; cursor: pointer; text-align: left; }
+.pj.activa { grid-row: span 3; flex-direction: column; justify-content: flex-end; gap: 4px; text-align: center; padding: 10px 8px 14px; border: 1.5px solid var(--green); background: radial-gradient(90% 60% at 50% 35%, #12301f, var(--card2) 75%); box-shadow: inset 0 0 30px #3ddc8414; }
+.pj.sel { border-color: #fff; }
+.pj.activa.sel { border-color: var(--green); box-shadow: 0 0 0 2px #fff, inset 0 0 30px #3ddc8414; }
+.pj .ret { width: 52px; height: 52px; border-radius: 12px; flex: none; overflow: hidden; }
+.pj.activa .ret { width: 100%; height: auto; aspect-ratio: 1 / 1.05; max-width: 150px; border-radius: 0; background: none; }
+.pj .ret svg { width: 100%; height: 100%; display: block; }
+.pj .rol { font-size: 10.5px; letter-spacing: 0.2em; font-weight: 700; }
+.pj .nom { font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pj .txt { min-width: 0; }
+.pj:not(.activa) .nom { white-space: normal; font-size: 15.5px; line-height: 1.15; padding-right: 22px; }
+.candado { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--line2); background: #000a; display: grid; place-items: center; cursor: pointer; color: var(--dim); }
+.candado svg { width: 13px; height: 13px; }
+.candado[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+.habil { border: 1px solid #1f4a33; background: linear-gradient(180deg, #0d1a13, var(--card2)); border-radius: 16px; padding: 12px 14px; display: grid; gap: 4px; }
+.habil small { font-size: 10.5px; letter-spacing: 0.2em; font-weight: 700; color: var(--green); }
+.habil b { font-size: 17px; }
+.habil p { margin: 0; color: #d6d6db; font-size: 14px; }
+.habil .nota { color: var(--muted); font-size: 12.5px; }
+.porque { border: 1px solid #4a3a12; background: linear-gradient(180deg, #19140a, var(--card2)); border-radius: 16px; padding: 12px 14px; display: grid; gap: 8px; }
+.porque small { display: flex; align-items: center; gap: 8px; font-size: 10.5px; letter-spacing: 0.2em; font-weight: 700; color: var(--gold); }
+.porque small svg { width: 15px; height: 15px; }
+.porque ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: #d6d6db; font-size: 14px; }
+.acciones { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; }
+
+/* chat */
+.chat { display: grid; gap: 10px; max-height: 46vh; min-height: 0; overflow-y: auto; padding: 2px; scroll-behavior: smooth; align-content: start; }
+.fila-bot { display: flex; gap: 8px; align-items: flex-end; }
+.fila-bot .mini-masc { width: 30px; height: 30px; flex: none; }
+.msg { max-width: 86%; padding: 10px 13px; border-radius: 16px; font-size: 14.5px; white-space: pre-line; }
+.msg.bot { background: var(--card3); border: 1px solid var(--line2); border-bottom-left-radius: 5px; }
+.msg.yo { justify-self: end; background: var(--card3); border: 1px solid var(--line2); border-bottom-right-radius: 5px; font-weight: 500; }
+.msg.esc { color: var(--muted); }
+.ops { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+.ops button { border: 1px solid var(--line2); background: var(--card); border-radius: 999px; padding: 7px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.ops button:first-child { background: #fff; color: #000; border-color: #fff; }
+.tabla { display: grid; gap: 6px; margin-top: 9px; padding: 10px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); font-size: 13.5px; }
+.tabla div { display: flex; justify-content: space-between; gap: 10px; }
+.tabla span { color: var(--muted); }
+.tabla b { text-align: right; }
+.algo { font-size: 10.5px; letter-spacing: 0.2em; color: var(--muted); font-weight: 700; }
+.rapidas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rapidas button { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line2); background: var(--card); border-radius: 12px; padding: 11px 12px; font-size: 13.5px; font-weight: 600; cursor: pointer; text-align: left; }
+.rapidas button:active { background: #fff; color: #000; }
+.escribir { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line2); background: var(--card2); border-radius: 999px; padding: 6px 6px 6px 16px; }
+.escribir input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink); font: 15px var(--font); padding: 8px 0; outline: none; }
+.escribir button { width: 40px; height: 40px; border-radius: 50%; border: 0; background: #fff; color: #000; display: grid; place-items: center; cursor: pointer; }
+.privado { display: flex; justify-content: center; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); }
+.privado svg { width: 13px; height: 13px; }
+
+/* sensi */
+.valores { display: grid; gap: 12px; }
+.valor { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: end; }
+.valor span { font-size: 14px; font-weight: 500; color: #d6d6db; }
+.valor b { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+.valor .tr { grid-column: 1 / -1; height: 4px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.valor .tr div { height: 100%; background: #fff; border-radius: 99px; transition: width .5s ease; }
+.lista-tips { display: grid; gap: 8px; }
+.tipc { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--line); background: var(--card2); border-radius: 14px; padding: 12px; }
+.tipc .tile { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c, #fff) 14%, transparent); color: var(--c, #fff); flex: none; }
+.tipc .tile svg { width: 17px; height: 17px; }
+.tipc b { display: block; font-size: 14.5px; }
+.tipc p { margin: 2px 0 0; color: var(--muted); font-size: 13.5px; }
+.aviso { border-color: #4a1d1d; background: linear-gradient(180deg, #1a0b0b, var(--card2)); }
+
+/* entrenador */
+.juego { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line2); touch-action: none; user-select: none; -webkit-user-select: none; }
+.juego canvas { display: block; width: 100%; height: 360px; }
+.hud { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; justify-content: space-between; font-weight: 700; font-size: 14px; pointer-events: none; }
+.hud span { background: #000a; border: 1px solid var(--line2); border-radius: 999px; padding: 4px 10px; }
+.fuego { position: absolute; right: 14px; bottom: 14px; width: 78px; height: 78px; border-radius: 50%; background: #ffffffe6; border: 0; color: #000; display: grid; place-items: center; box-shadow: 0 0 24px #fff5; }
+.fuego svg { width: 30px; height: 30px; }
+.inicio { position: absolute; inset: 0; display: grid; place-items: center; background: #000c; text-align: center; padding: 20px; }
+.inicio > div { display: grid; gap: 10px; justify-items: center; max-width: 300px; }
+.inicio h2 { margin: 0; font-size: 22px; }
+.inicio p { margin: 0; color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stats div { border: 1px solid var(--line); background: var(--card2); border-radius: 14px; padding: 10px; text-align: center; }
+.stats b { display: block; font-size: 22px; }
+.stats span { font-size: 10.5px; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; }
+
+/* favoritos */
+.fav { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: var(--card2); border-radius: 14px; padding: 8px 10px; }
+.fav .ret { width: 38px; height: 38px; border-radius: 10px; overflow: hidden; flex: none; }
+.fav .txt { flex: 1; min-width: 0; }
+.fav .txt b { display: block; font-size: 14px; }
+.fav .txt span { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fav button { border: 0; background: none; color: var(--muted); padding: 6px; cursor: pointer; display: grid; place-items: center; }
+
+/* navegación */
+nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); width: min(520px, calc(100% - 20px)); background: #0b0b0dee; border: 1px solid var(--line2); border-radius: 22px; display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px; backdrop-filter: blur(10px); z-index: 5; box-shadow: 0 10px 30px #000; }
+nav button { background: none; border: 0; color: var(--muted); font-size: 11px; font-weight: 600; display: grid; justify-items: center; gap: 3px; padding: 7px 0; cursor: pointer; border-radius: 16px; }
+nav button svg { width: 20px; height: 20px; }
+nav button[aria-selected="true"] { background: #fff; color: #000; }
+.toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #fff; color: #000; font-weight: 600; padding: 10px 18px; border-radius: 999px; z-index: 9; box-shadow: 0 6px 20px #000; }
+button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .masc .ojo, .masc.pensando svg.cuerpo { animation: none; } .valor .tr div { transition: none; } }
+@media (max-width: 360px) { .g3 { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="barra-top">
+    <div class="marca"><span data-i="crosshair"></span>ROTÍSIMO</div>
+    <span class="version">v1.2</span>
+  </header>
+
+  <!-- ============ INICIO: ROTI ============ -->
+  <section id="roti" class="wrap" style="padding:0">
+    <div class="hero">
+      <span class="badge">NUEVO EN ROTÍSIMO</span>
+      <h1>Conoce a Roti</h1>
+      <p>Tu asistente gamer. Dile qué necesitas: combos, sensibilidad, lag o tiros a la cabeza.</p>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="logo">roti</span>
+        <span class="estado" id="roti-estado">En línea</span>
+      </div>
+      <div class="dice">
+        <div class="masc" id="masc-roti"></div>
+        <div class="bocadillo"><small>ROTI</small><p id="roti-dice">¡Hola! Soy Roti. Te armo combos, te calculo la sensi y te doy tips para dar más tiros a la cabeza.</p></div>
+      </div>
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <span class="algo">¿ALGO MÁS?</span>
+      <div class="rapidas" id="rapidas"></div>
+      <form class="escribir" id="f-chat">
+        <input id="in-chat" placeholder="Escríbele a Roti…" autocomplete="off" enterkeyhint="send">
+        <button type="submit" aria-label="Enviar"><span data-i="arrow-right"></span></button>
+      </form>
+      <p class="privado"><span data-i="lock"></span>Corre en tu celular · no guarda lo que escribes</p>
+    </div>
+  </section>
+
+  <!-- ============ COMBOS ============ -->
+  <section id="combos" class="wrap" style="padding:0" hidden>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="logo">roti</span><span class="sep"></span>
+        <div class="titulo"><b>Generador de combos de habilidades</b><span>ROTÍSIMO · FREE FIRE</span></div>
+      </div>
+
+      <div id="c-config" style="display:grid;gap:14px">
+        <div class="dice">
+          <div class="masc" id="masc-combo"></div>
+          <div class="bocadillo"><small>ROTI</small><p id="c-dice">Elige modo y estilo. Si quieres, prioriza algo.</p></div>
+        </div>
+        <div class="paso"><div class="paso-t"><span><b>01</b>MODO</span></div><div class="g2" id="c-modo"></div></div>
+        <div class="paso"><div class="paso-t"><span><b>02</b>ESTILO</span></div><div class="g3" id="c-estilo"></div></div>
+        <div class="paso"><div class="paso-t"><span><b>03</b>PRIORIDAD</span><span class="op">Opcional · máx. 2</span></div><div class="g3" id="c-prio"></div></div>
+        <button class="btn blanco" id="c-generar"><span data-i="sparkles"></span>Generar combo</button>
+      </div>
+
+      <div id="c-quiz" hidden style="display:grid;gap:14px"></div>
+      <div id="c-pensar" hidden></div>
+
+      <div id="c-res" hidden style="display:grid;gap:12px">
+        <div class="dice">
+          <div class="masc" id="masc-res"></div>
+          <div class="bocadillo"><small>ROTI</small><p id="c-consejo"></p></div>
+        </div>
+        <div class="res-top">
+          <h2><span data-i="flame"></span>Tu combo</h2>
+          <button class="btn-chico" id="c-cambiar"><span data-i="pencil"></span>CAMBIAR</button>
+        </div>
+        <div class="etiquetas" id="c-etq"></div>
+        <div class="combo" id="c-combo"></div>
+        <div class="g2" id="c-extra"></div>
+        <div class="habil" id="c-habil"></div>
+        <div class="porque" id="c-porque"></div>
+        <div class="acciones">
+          <button class="btn blanco" id="c-otro"><span data-i="refresh-cw"></span>Otro combo</button>
+          <button class="btn" id="c-copiar"><span data-i="copy"></span>Copiar</button>
+        </div>
+        <button class="btn" id="c-guardar"><span data-i="star"></span>Guardar en favoritos</button>
+      </div>
+    </div>
+    <div class="panel" id="fav-panel">
+      <div class="paso-t"><span>MIS FAVORITOS</span></div>
+      <div style="display:grid;gap:8px" id="favs"></div>
+    </div>
+  </section>
+
+  <!-- ============ SENSI ============ -->
+  <section id="sensi" class="wrap" style="padding:0" hidden>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="logo">roti</span><span class="sep"></span>
+        <div class="titulo"><b>Generador de sensibilidad</b><span>ROTÍSIMO · FREE FIRE</span></div>
+      </div>
+      <div id="s-config" style="display:grid;gap:14px">
+        <div class="paso"><div class="paso-t"><span><b>01</b>TU CELULAR</span></div><div class="g3" id="s-gama"></div></div>
+        <div class="paso"><div class="paso-t"><span><b>02</b>PANTALLA</span></div><div class="g3" id="s-pantalla"></div></div>
+        <div class="paso"><div class="paso-t"><span><b>03</b>DEDOS</span></div><div class="g3" id="s-dedos"></div></div>
+        <div class="paso"><div class="paso-t"><span><b>04</b>OBJETIVO</span></div><div class="g3" id="s-estilo"></div></div>
+        <div class="paso"><div class="paso-t"><span><b>05</b>SENSIBILIDAD MÁXIMA EN TU JUEGO</span></div><div class="g2" id="s-escala"></div></div>
+        <button class="btn blanco" id="s-generar"><span data-i="sparkles"></span>Generar sensi</button>
+      </div>
+      <div id="s-pensar" hidden></div>
+      <div id="s-res" hidden style="display:grid;gap:14px">
+        <div class="res-top">
+          <h2><span data-i="crosshair"></span>Tu sensi</h2>
+          <button class="btn-chico" id="s-cambiar"><span data-i="pencil"></span>CAMBIAR</button>
+        </div>
+        <div class="etiquetas" id="s-etq"></div>
+        <div class="valores" id="s-valores"></div>
+        <div class="acciones">
+          <button class="btn blanco" id="s-otra"><span data-i="refresh-cw"></span>Otra sensi</button>
+          <button class="btn" id="s-copiar"><span data-i="copy"></span>Copiar</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="paso-t"><span>BOTÓN DE DISPARO Y HUD</span></div>
+      <div class="lista-tips" id="s-hud"></div>
+    </div>
+  </section>
+
+  <!-- ============ ENTRENAR ============ -->
+  <section id="entrenar" class="wrap" style="padding:0" hidden>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="logo">roti</span><span class="sep"></span>
+        <div class="titulo"><b>Entrenador de tiro a la cabeza</b><span>30 SEGUNDOS · ARRASTRA HACIA ARRIBA</span></div>
+      </div>
+      <div class="juego" id="juego">
+        <canvas id="cv"></canvas>
+        <div class="hud"><span id="h-tiempo">30s</span><span id="h-score">0 cabezas</span></div>
+        <button class="fuego" id="fuego" aria-label="Disparar"><span data-i="crosshair"></span></button>
+        <div class="inicio" id="inicio">
+          <div>
+            <div class="masc" id="masc-juego"></div>
+            <h2 id="i-titulo">¿Listo?</h2>
+            <p id="i-texto">La mira empieza en el pecho. Arrastra hacia arriba hasta la cabeza y dispara.</p>
+            <button class="btn blanco" id="empezar" style="width:auto;padding:13px 26px"><span data-i="play"></span>Empezar</button>
+          </div>
+        </div>
+      </div>
+      <div class="paso"><div class="paso-t"><span>DIFICULTAD</span></div><div class="g3" id="dificultad"></div></div>
+      <div class="stats">
+        <div><b id="r-hs">–</b><span>% cabeza</span></div>
+        <div><b id="r-mejor">–</b><span>Récord</span></div>
+        <div><b id="r-tiempo">–</b><span>Seg/tiro</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TIPS ============ -->
+  <section id="tips" class="wrap" style="padding:0" hidden>
+    <div class="hero">
+      <h1>Tips para romperla</h1>
+      <p>Técnicas reales para dar más tiros a la cabeza. Sin hacks.</p>
+    </div>
+    <div class="panel"><div class="paso-t"><span>TIRO A LA CABEZA</span></div><div class="lista-tips" id="t-cabeza"></div></div>
+    <div class="panel"><div class="paso-t"><span>ARMAS PARA LA CABEZA</span></div><div class="lista-tips" id="t-armas"></div></div>
+    <div class="panel"><div class="paso-t"><span>RUTINA DE 10 MINUTOS</span></div><div class="lista-tips" id="t-rutina"></div></div>
+    <div class="tipc aviso"><span class="tile" style="--c:var(--red)"><span data-i="shield"></span></span><div><b>Nada de hacks</b><p>Regedit, aimbot y "sensi hack" te banean la cuenta para siempre y muchos traen virus. Rotísimo solo usa ajustes normales del juego.</p></div></div>
+    <button class="btn blanco" id="abrir-ff" hidden><span data-i="play"></span>Abrir el juego</button>
+  </section>
+</div>
+
+<nav role="tablist">
+  <button role="tab" data-tab="roti" aria-selected="true"><span data-i="bot"></span>Roti</button>
+  <button role="tab" data-tab="combos" aria-selected="false"><span data-i="layers"></span>Combos</button>
+  <button role="tab" data-tab="sensi" aria-selected="false"><span data-i="crosshair"></span>Sensi</button>
+  <button role="tab" data-tab="entrenar" aria-selected="false"><span data-i="target"></span>Entrenar</button>
+  <button role="tab" data-tab="tips" aria-selected="false"><span data-i="flame"></span>Tips</button>
+</nav>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/*ICONOS*/
+/*DATOS*/
+
+// ================= ESTILOS (como en el generador) =================
+const ESTILOS = [
+  { id: "rusher", n: "Rusher", i: "zap", c: "var(--red)" },
+  { id: "escudo", n: "Tanque", i: "shield", c: "var(--orange)" },
+  { id: "apoyo", n: "Soporte", i: "users", c: "var(--cyan)" },
+  { id: "vida", n: "Curandero", i: "plus", c: "var(--green)" },
+  { id: "sniper", n: "Sniper", i: "scan-eye", c: "var(--purple)" },
+];
+const PRIORIDADES = [
+  { id: "rusher", n: "Daño", i: "sword" },
+  { id: "velocidad", n: "Velocidad", i: "chevrons-right" },
+  { id: "escudo", n: "Escudo", i: "shield" },
+  { id: "vida", n: "Vida", i: "heart" },
+  { id: "marcaje", n: "Marcaje", i: "eye" },
+  { id: "sorpresa", n: "Sorpréndeme", i: "sparkles" },
+];
+const PORQUE = {
+  rusher: "Entras primero y ganas los 1 vs 1 de cerca.",
+  escudo: "Aguantas en primera línea y ganas los intercambios de paredes gloo.",
+  apoyo: "Tu escuadra rinde más: ves al enemigo antes y revives rápido.",
+  vida: "Mantienes viva a tu escuadra y te curas sin parar de pelear.",
+  sniper: "Controlas la distancia y marcas al enemigo antes de que te vea.",
+};
+const ELOGIO = {
+  rusher: "Rusher, ¡buena elección! Si quieres, prioriza algo o dale a Generar.",
+  escudo: "Tanque: aguantar es ganar. Prioriza escudo o vida si quieres.",
+  apoyo: "Soporte: la escuadra te lo va a agradecer.",
+  vida: "Curandero: nadie se cae contigo cerca.",
+  sniper: "Sniper: paciencia y un tiro limpio a la cabeza.",
+};
+const CONSEJOS = [
+  "Entra justo después de romper la pared gloo del rival: es cuando menos se lo espera.",
+  "Antes de pelear, deja la mira a la altura de la cabeza.",
+  "Usa la activa al inicio del pleito, no cuando ya vas perdiendo.",
+  "Si juegas en escuadra, avisa a quién marcas.",
+  "Cambia de cobertura después de cada derribo.",
+];
+
+// ================= UTILIDADES =================
+const $ = (id) => document.getElementById(id);
+const APP = !!(window.Android && Android.esApp && Android.esApp());
+const leer = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
+const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const azar = (a) => a[Math.floor(Math.random() * a.length)];
+const icono = (n, cls = "i") => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONOS[n] || ""}</svg>`;
+function ponerIconos(raiz = document) { raiz.querySelectorAll("[data-i]").forEach((el) => { el.outerHTML = icono(el.dataset.i); }); }
+function toast(t) { const el = $("toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => (el.hidden = true), 1800); }
+function copiar(texto) {
+  if (APP && Android.copiar) { Android.copiar(texto); toast("Copiado"); return; }
+  (navigator.clipboard ? navigator.clipboard.writeText(texto) : Promise.reject()).then(() => toast("Copiado"), () => toast("No se pudo copiar"));
+}
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+function tono(nombre) { let h = 7; for (const c of nombre) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+// retrato genérico (silueta) con el color propio de cada personaje
+function retrato(nombre, grande) {
+  const h = tono(nombre), id = "g" + h + (grande ? "b" : "");
+  const ini = nombre.replace(/[^A-Za-z]/g, "").slice(0, 2).toUpperCase();
+  return `<svg viewBox="0 0 100 105" aria-hidden="true">
+    <defs>
+      <radialGradient id="${id}f" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="hsl(${h} 70% 30%)"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient>
+      <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(${h} 25% 82%)"/><stop offset="1" stop-color="hsl(${h} 30% 38%)"/></linearGradient>
+    </defs>
+    ${grande ? "" : `<rect width="100" height="105" fill="url(#${id}f)"/>`}
+    ${grande ? `<ellipse cx="50" cy="52" rx="46" ry="46" fill="url(#${id}f)"/>` : ""}
+    <path d="M50 18c11 0 19 9 19 21 0 13-8 24-19 24S31 52 31 39c0-12 8-21 19-21z" fill="url(#${id}s)"/>
+    <path d="M14 105c2-22 16-34 36-34s34 12 36 34z" fill="url(#${id}s)"/>
+    <path d="M31 36c2-12 10-19 19-19s17 6 19 17c-6-5-12-7-19-7-7 0-13 3-19 9z" fill="hsl(${h} 45% 22%)"/>
+    <text x="50" y="96" text-anchor="middle" font-family="Outfit, sans-serif" font-weight="700" font-size="${grande ? 13 : 16}" fill="hsl(${h} 40% 14%)" opacity=".85">${ini}</text>
+  </svg>`;
+}
+
+// ================= MASCOTA ROTI (diseño propio) =================
+function mascotaSVG() {
+  return `<svg class="cuerpo" viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 15V6"/><circle cx="50" cy="5" r="3.2" fill="#fff"/>
+    <path d="M30 10l6 8M70 10l-6 8" stroke-width="2"/>
+    <rect x="16" y="16" width="68" height="54" rx="24" fill="#050506"/>
+    <rect x="25" y="26" width="50" height="34" rx="14" fill="#000" stroke-width="1.6" stroke="#ffffff88"/>
+    <g class="ojo"><ellipse cx="39" cy="42" rx="5.5" ry="7.5" fill="#fff" stroke="none"/></g>
+    <g class="ojo"><ellipse cx="61" cy="42" rx="5.5" ry="7.5" fill="#fff" stroke="none"/></g>
+    <path d="M45 52q5 4 10 0" stroke-width="2"/>
+    <path d="M16 38H9v14h7M84 38h7v14h-7" fill="#050506"/>
+    <path d="M32 70l-4 14h44l-4-14" fill="#050506"/>
+    <path d="M42 77h16" stroke-width="2"/>
+    <path d="M28 84l-7 9M72 84l7 9" stroke-width="2"/>
+  </svg>`;
+}
+function ponerMascota(el, ico) {
+  if (!el) return;
+  el.innerHTML = mascotaSVG() + (ico ? `<div class="nube">${icono(ico)}</div>` : "");
+  el.classList.toggle("pensando", !!ico);
+}
+// animación "Roti está pensando"
+function pensar(cont, titulo, pasos, iconos, fin) {
+  cont.hidden = false;
+  cont.innerHTML = `<div class="pensar"><div class="escena"><div class="masc"></div></div><div class="t">${titulo}</div><div class="p"></div><div class="bar"><div></div></div><div class="pct">0%</div></div>`;
+  const masc = cont.querySelector(".masc"), p = cont.querySelector(".p"), bar = cont.querySelector(".bar div"), pct = cont.querySelector(".pct");
+  const dur = matchMedia("(prefers-reduced-motion: reduce)").matches ? 300 : 2200, t0 = performance.now();
+  let ult = -1;
+  (function cuadro(t) {
+    const k = Math.min(1, (t - t0) / dur);
+    const i = Math.min(pasos.length - 1, Math.floor(k * pasos.length));
+    if (i !== ult) { ult = i; p.textContent = pasos[i]; ponerMascota(masc, iconos[i]); }
+    bar.style.width = k * 100 + "%"; pct.textContent = Math.round(k * 100) + "%";
+    if (k < 1) requestAnimationFrame(cuadro); else { cont.hidden = true; fin(); }
+  })(t0);
+}
+const PASOS_COMBO = ["Analizando tu estilo de juego", "Eligiendo la habilidad activa", "Sumando las 3 pasivas", "Buscando la mascota ideal", "Revisando las armas"];
+const ICON_COMBO = ["zap", "sparkles", "shield", "paw-print", "crosshair"];
+
+// opción genérica
+function opcion({ texto, sub, ico, color, sel, clase = "", alClic }) {
+  const b = document.createElement("button");
+  b.className = "opt " + clase + (color ? " color" : " blanca");
+  if (color) b.style.setProperty("--c", color);
+  b.setAttribute("aria-pressed", !!sel);
+  b.innerHTML = `${ico ? (color ? `<span class="tile">${icono(ico)}</span>` : icono(ico)) : ""}<span style="min-width:0">${esc(texto)}${sub ? `<span class="sub">${esc(sub)}</span>` : ""}</span>${sel && color ? `<span class="ok">${icono("check")}</span>` : ""}`;
+  b.addEventListener("click", alClic);
+  return b;
+}
+
+// ================= COMBOS =================
+let modo = leer("rot-modo", "br");
+let estilo = leer("rot-estilo", "rusher");
+let prios = leer("rot-prios", []);
+let combo = leer("rot-combo2", null);
+let bloqueos = { activa: false, p0: false, p1: false, p2: false, mascota: false, armas: false };
+let seleccion = "activa";
+const buscar = (lista, n) => lista.find((x) => x.n === n);
+
+function pintarConfig() {
+  const m = $("c-modo"); m.innerHTML = "";
+  m.append(opcion({ texto: "BR", sub: "Battle Royale", ico: "crown", sel: modo === "br", clase: "grande", alClic: () => { modo = "br"; escribir("rot-modo", modo); pintarConfig(); } }));
+  m.append(opcion({ texto: "CS", sub: "Duelo de Escuadras", ico: "swords", sel: modo === "cs", clase: "grande", alClic: () => { modo = "cs"; escribir("rot-modo", modo); pintarConfig(); } }));
+  const e = $("c-estilo"); e.innerHTML = "";
+  for (const x of ESTILOS) e.append(opcion({ texto: x.n, ico: x.i, color: x.c, sel: estilo === x.id, alClic: () => { estilo = x.id; escribir("rot-estilo", estilo); $("c-dice").textContent = ELOGIO[estilo]; pintarConfig(); } }));
+  e.append(opcion({ texto: "No sé", sub: "3 preguntas", ico: "circle-help", color: "#9a9aa3", clase: "punteada", alClic: () => iniciarQuiz() }));
+  const p = $("c-prio"); p.innerHTML = "";
+  for (const x of PRIORIDADES) {
+    const b = document.createElement("button");
+    b.className = "opt prio"; b.setAttribute("aria-pressed", prios.includes(x.id));
+    b.innerHTML = icono(x.i) + esc(x.n);
+    b.addEventListener("click", () => {
+      prios = prios.includes(x.id) ? prios.filter((y) => y !== x.id) : [...prios, x.id].slice(-2);
+      escribir("rot-prios", prios); pintarConfig();
+    });
+    p.append(b);
+  }
+}
+function puntaje(item) {
+  let s = 1;
+  if (item.t.includes(estilo)) s += 3;
+  for (const p of prios) if (p !== "sorpresa" && item.t.includes(p)) s += 2;
+  if (prios.includes("sorpresa")) s = 1 + Math.random() * 3;
+  return s;
+}
+function elegir(lista, excluir = []) {
+  const pool = lista.filter((x) => !excluir.includes(x.n));
+  const pesos = pool.map(puntaje), total = pesos.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < pool.length; i++) { r -= pesos[i]; if (r <= 0) return pool[i]; }
+  return pool[0];
+}
+function generar() {
+  const prev = combo, c = {};
+  c.activa = prev && bloqueos.activa ? prev.activa : elegir(ACTIVOS, prev ? [prev.activa] : []).n;
+  const fijas = [0, 1, 2].filter((i) => prev && bloqueos["p" + i]).map((i) => prev.pasivas[i]);
+  c.pasivas = [];
+  for (let i = 0; i < 3; i++) c.pasivas.push(prev && bloqueos["p" + i] ? prev.pasivas[i] : elegir(PASIVOS, [...fijas, ...c.pasivas]).n);
+  c.mascota = prev && bloqueos.mascota ? prev.mascota : elegir(MASCOTAS).n;
+  c.armas = prev && bloqueos.armas ? prev.armas : azar(ARMAS[estilo] || ARMAS.rusher);
+  c.estilo = estilo; c.modo = modo; c.prios = [...prios];
+  combo = c; escribir("rot-combo2", c); seleccion = "activa";
+}
+function vista(cual) { for (const v of ["c-config", "c-quiz", "c-res"]) $(v).hidden = v !== cual; }
+function generarConAnimacion() {
+  vista(null);
+  pensar($("c-pensar"), "ROTI ESTÁ PENSANDO TU COMBO", PASOS_COMBO, ICON_COMBO, () => { generar(); pintarResultado(); vista("c-res"); });
+}
+function pintarResultado() {
+  const c = combo, e = ESTILOS.find((x) => x.id === c.estilo) || ESTILOS[0];
+  ponerMascota($("masc-res"));
+  $("c-consejo").textContent = azar(CONSEJOS);
+  const etq = [[c.modo === "br" ? "crown" : "swords", c.modo.toUpperCase()], [e.i, e.n.toUpperCase()], ...(c.prios || []).map((p) => { const x = PRIORIDADES.find((y) => y.id === p); return [x.i, x.n.toUpperCase()]; })];
+  $("c-etq").innerHTML = etq.map(([i, t]) => `<span class="etq">${icono(i)}${esc(t)}</span>`).join("");
+  const cont = $("c-combo"); cont.innerHTML = "";
+  const tarjeta = (key, rol, color, nombre, activa) => {
+    const d = document.createElement("div");
+    d.className = "pj" + (activa ? " activa" : "") + (seleccion === key ? " sel" : "");
+    d.setAttribute("role", "button"); d.tabIndex = 0;
+    d.innerHTML = `<div class="ret">${retrato(nombre, activa)}</div><div class="txt"><div class="rol" style="color:${color}">${rol}</div><div class="nom">${esc(nombre)}</div></div><button class="candado" aria-label="Fijar ${esc(nombre)}" aria-pressed="${bloqueos[key]}">${icono(bloqueos[key] ? "lock" : "lock-open")}</button>`;
+    d.addEventListener("click", (ev) => {
+      if (ev.target.closest(".candado")) { bloqueos[key] = !bloqueos[key]; toast(bloqueos[key] ? `${nombre} queda fijo` : `${nombre} ya no está fijo`); }
+      else seleccion = key;
+      pintarResultado();
+    });
+    return d;
+  };
+  cont.append(tarjeta("activa", "ACTIVA", "var(--green)", c.activa, true));
+  c.pasivas.forEach((p, i) => cont.append(tarjeta("p" + i, "PASIVA " + (i + 1), "var(--cyan)", p)));
+  const ex = $("c-extra"); ex.innerHTML = "";
+  ex.append(tarjeta("mascota", "MASCOTA", "#ff6fae", c.mascota));
+  ex.append(tarjeta("armas", "ARMAS", "var(--gold)", c.armas));
+  let rol, nom, txt;
+  if (seleccion === "activa") { rol = "HABILIDAD ACTIVA"; nom = c.activa; txt = buscar(ACTIVOS, c.activa).h; }
+  else if (seleccion === "mascota") { rol = "MASCOTA"; nom = c.mascota; txt = buscar(MASCOTAS, c.mascota).h; }
+  else if (seleccion === "armas") { rol = "ARMAS RECOMENDADAS"; nom = c.armas; txt = "Una para pelear de cerca y otra para media distancia, pensadas para tu estilo."; }
+  else { const n = c.pasivas[+seleccion[1]]; rol = "HABILIDAD PASIVA"; nom = n; txt = buscar(PASIVOS, n).h; }
+  $("c-habil").innerHTML = `<small>${rol}</small><b>${esc(nom)}</b><p>${esc(txt)}</p><span class="nota">Toca cualquier personaje para ver su habilidad · el candado lo deja fijo</span>`;
+  const todos = [buscar(ACTIVOS, c.activa), ...c.pasivas.map((p) => buscar(PASIVOS, p)), buscar(MASCOTAS, c.mascota)];
+  const encajan = todos.filter((x) => x.t.includes(c.estilo)).map((x) => x.n);
+  const razones = [PORQUE[c.estilo]];
+  if (encajan.length) razones.push(`Encajan con tu estilo: ${encajan.join(", ")}.`);
+  razones.push(c.modo === "cs" ? "En Duelo de Escuadras cada ronda cuenta: si quedas último, juega por vida y escudo." : "En BR rota temprano y busca altura antes del cierre final.");
+  $("c-porque").innerHTML = `<small>${icono("trophy")}POR QUÉ ES ROTÍSIMO</small><ul>${razones.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>`;
+  pintarFavs();
+}
+function textoCombo(c) {
+  const e = ESTILOS.find((x) => x.id === c.estilo) || ESTILOS[0];
+  return `Combo ${e.n} (${c.modo.toUpperCase()}) · Rotísimo\nActiva: ${c.activa}\nPasivas: ${c.pasivas.join(", ")}\nMascota: ${c.mascota}\nArmas: ${c.armas}`;
+}
+// test "No sé"
+const PREGUNTAS = [
+  { q: "Cuando ves a un enemigo cerca, ¿qué haces?", o: [["Voy directo a por él", { rusher: 2 }], ["Le disparo de lejos", { sniper: 2 }], ["Pongo pared gloo y aguanto", { escudo: 2 }]] },
+  { q: "¿Qué arma usas más?", o: [["Escopeta o subfusil", { rusher: 2 }], ["Francotirador", { sniper: 2 }], ["Rifle de asalto", { escudo: 1, apoyo: 1, vida: 1 }]] },
+  { q: "¿Qué haces por tu escuadra?", o: [["Entro primero", { rusher: 1, escudo: 1 }], ["Los reviso y curo", { vida: 2, apoyo: 1 }], ["Marco y cubro desde atrás", { apoyo: 2, sniper: 1 }]] },
+];
+function iniciarQuiz() { vista("c-quiz"); paso(0, {}); }
+function paso(i, pts) {
+  const q = $("c-quiz");
+  if (i === PREGUNTAS.length) {
+    estilo = Object.entries(pts).sort((a, b) => b[1] - a[1])[0][0]; escribir("rot-estilo", estilo);
+    $("c-dice").textContent = `Eres ${ESTILOS.find((x) => x.id === estilo).n}. ${ELOGIO[estilo]}`;
+    pintarConfig(); vista("c-config"); return;
+  }
+  const P = PREGUNTAS[i];
+  q.innerHTML = `<div class="dice"><div class="masc"></div><div class="bocadillo"><small>PREGUNTA ${i + 1} DE 3</small><p>${esc(P.q)}</p></div></div><div style="display:grid;gap:8px" class="resp"></div>`;
+  ponerMascota(q.querySelector(".masc"), "circle-help");
+  for (const [t, suma] of P.o) q.querySelector(".resp").append(opcion({ texto: t, clase: "grande", alClic: () => { const n = { ...pts }; for (const k in suma) n[k] = (n[k] || 0) + suma[k]; paso(i + 1, n); } }));
+}
+$("c-generar").addEventListener("click", generarConAnimacion);
+$("c-otro").addEventListener("click", generarConAnimacion);
+$("c-cambiar").addEventListener("click", () => { pintarConfig(); vista("c-config"); });
+$("c-copiar").addEventListener("click", () => copiar(textoCombo(combo)));
+$("c-guardar").addEventListener("click", () => { const f = leer("rot-favs2", []); f.unshift(combo); escribir("rot-favs2", f.slice(0, 30)); pintarFavs(); toast("Guardado en favoritos"); });
+function pintarFavs() {
+  const favs = leer("rot-favs2", []), el = $("favs");
+  $("fav-panel").hidden = !favs.length; el.innerHTML = "";
+  favs.forEach((c, i) => {
+    const e = ESTILOS.find((x) => x.id === c.estilo) || ESTILOS[0];
+    const f = document.createElement("div"); f.className = "fav";
+    f.innerHTML = `<div class="ret">${retrato(c.activa)}</div><div class="txt"><b>${esc(c.activa)} · ${e.n} ${c.modo.toUpperCase()}</b><span>${esc(c.pasivas.join(", "))} · ${esc(c.mascota)}</span></div><button aria-label="Usar">${icono("arrow-right")}</button><button aria-label="Borrar">${icono("trash-2")}</button>`;
+    const [usar, borrar] = f.querySelectorAll("button");
+    usar.addEventListener("click", () => { combo = { ...c }; estilo = c.estilo; modo = c.modo; escribir("rot-combo2", combo); pintarResultado(); vista("c-res"); scrollTo({ top: 0, behavior: "smooth" }); });
+    borrar.addEventListener("click", () => { favs.splice(i, 1); escribir("rot-favs2", favs); pintarFavs(); });
+    el.append(f);
+  });
+}
+ponerMascota($("masc-combo"));
+$("c-dice").textContent = ELOGIO[estilo] || ELOGIO.rusher;
+pintarConfig();
+if (combo && buscar(ACTIVOS, combo.activa)) { pintarResultado(); vista("c-res"); } else { vista("c-config"); pintarFavs(); }
+
+// ================= SENSI =================
+const S = leer("rot-sensi", { gama: "media", pantalla: "mediana", dedos: "2", estilo: "cabeza", escala: "200", variante: 0 });
+const OPC = {
+  gama: [{ id: "baja", n: "Gama baja", s: "2-4 GB RAM", i: "smartphone" }, { id: "media", n: "Gama media", s: "6 GB RAM", i: "smartphone" }, { id: "alta", n: "Gama alta", s: "8 GB o más", i: "rocket" }],
+  pantalla: [{ id: "chica", n: "Chica", s: "menos de 6\"" }, { id: "mediana", n: "Mediana", s: "6 a 6.7\"" }, { id: "grande", n: "Grande", s: "tablet o 6.8\"+" }],
+  dedos: [{ id: "2", n: "2 dedos" }, { id: "3", n: "3 dedos" }, { id: "4", n: "4 dedos" }],
+  estilo: [{ id: "cabeza", n: "Cabeza", s: "más rápida", i: "crosshair" }, { id: "equilibrada", n: "Equilibrada", s: "de todo", i: "gauge" }, { id: "control", n: "Control", s: "más precisa", i: "hand" }],
+  escala: [{ id: "100", n: "Hasta 100" }, { id: "200", n: "Hasta 200" }],
+};
+const CAMPOS = [
+  { k: "general", n: "General", base: 95 },
+  { k: "rojo", n: "Punto rojo", base: 88 },
+  { k: "x2", n: "Mira 2x", base: 82 },
+  { k: "x4", n: "Mira 4x", base: 76 },
+  { k: "awm", n: "Mira AWM", base: 46 },
+  { k: "libre", n: "Vista libre", base: 70 },
+];
+function calcularSensi() {
+  let aj = { baja: 4, media: 0, alta: -3 }[S.gama] + { chica: -4, mediana: 0, grande: 5 }[S.pantalla] + { "2": 3, "3": 0, "4": -2 }[S.dedos];
+  const est = { cabeza: 3, equilibrada: 0, control: -7 }[S.estilo];
+  let semilla = S.variante * 7919 + 13;
+  const ruido = () => { semilla = (semilla * 16807) % 2147483647; return (semilla % 7) - 3; };
+  const max = +S.escala, r = {};
+  for (const c of CAMPOS) {
+    let v = c.base + aj + (c.k === "awm" ? Math.round(est / 2) : est) + (S.variante ? ruido() : 0);
+    v = Math.max(1, Math.min(100, v));
+    r[c.k] = max === 200 ? Math.min(200, Math.round(v * 2 - (c.k === "awm" ? 10 : 0))) : v;
+  }
+  return r;
+}
+function pintarSensiConfig() {
+  for (const k of Object.keys(OPC)) {
+    const el = $("s-" + k); el.innerHTML = "";
+    for (const o of OPC[k]) el.append(opcion({ texto: o.n, sub: o.s, ico: o.i, sel: S[k] === o.id, alClic: () => { S[k] = o.id; S.variante = 0; escribir("rot-sensi", S); pintarSensiConfig(); } }));
+  }
+  pintarHud();
+}
+function pintarSensiRes() {
+  const r = calcularSensi(), max = +S.escala;
+  const nom = (k) => OPC[k].find((o) => o.id === S[k]).n.toUpperCase();
+  $("s-etq").innerHTML = [["smartphone", nom("gama")], ["hand", nom("dedos")], ["crosshair", nom("estilo")], ["gauge", "MÁX " + S.escala]].map(([i, t]) => `<span class="etq">${icono(i)}${t}</span>`).join("") + (S.variante ? `<span class="etq">${icono("refresh-cw")}VARIANTE ${S.variante}</span>` : "");
+  $("s-valores").innerHTML = CAMPOS.map((c) => `<div class="valor"><span>${c.n}</span><b>${r[c.k]}</b><div class="tr"><div style="width:0"></div></div></div>`).join("");
+  requestAnimationFrame(() => $("s-valores").querySelectorAll(".tr div").forEach((d, i) => (d.style.width = (r[CAMPOS[i].k] / max) * 100 + "%")));
+}
+function sensiConAnimacion() {
+  $("s-config").hidden = $("s-res").hidden = true;
+  pensar($("s-pensar"), "ROTI ESTÁ CALCULANDO TU SENSI", ["Leyendo tu celular", "Midiendo tu pantalla", "Ajustando cada mira", "Probando el arrastre"], ["smartphone", "gauge", "crosshair", "target"], () => { pintarSensiRes(); $("s-res").hidden = false; });
+}
+function pintarHud() {
+  const tips = [
+    ["crosshair", "var(--red)", "Tamaño del botón de disparo", S.pantalla === "chica" ? "60-70%: más grande para que el pulgar no se salga." : S.pantalla === "grande" ? "45-55%: tu pantalla ya es grande." : "55-60%: grande pero sin tapar la vista."],
+    ["eye", "var(--cyan)", "Transparencia", "30-40%, para ver al enemigo detrás del botón."],
+    ["hand", "var(--gold)", "Posición", "Un poco arriba del centro derecho, para jalar hacia arriba sin chocar con el borde."],
+    ["layers", "var(--purple)", S.dedos + " dedos", S.dedos === "2" ? "Pon agacharse y saltar cerca de los pulgares. Con el tiempo, intenta 3 dedos." : "Agacharse y pared gloo al alcance del índice izquierdo."],
+    ["gauge", "var(--green)", "Gráficos", S.gama === "baja" ? "Fluido con FPS altos: mejor que se vea simple pero que no se trabe." : "Usa los FPS más altos que permita tu celular (60, 90 o 120)."],
+    ["target", "#fff", "Pruébala", "En el campo de entrenamiento: si la mira se pasa de la cabeza, baja 5 la General. Si no llega, súbele 5."],
+  ];
+  $("s-hud").innerHTML = tips.map(([i, c, t, p]) => `<div class="tipc"><span class="tile" style="--c:${c}">${icono(i)}</span><div><b>${esc(t)}</b><p>${esc(p)}</p></div></div>`).join("");
+}
+$("s-generar").addEventListener("click", sensiConAnimacion);
+$("s-otra").addEventListener("click", () => { S.variante = (S.variante % 9) + 1; escribir("rot-sensi", S); pintarSensiRes(); });
+$("s-cambiar").addEventListener("click", () => { $("s-res").hidden = true; $("s-config").hidden = false; });
+$("s-copiar").addEventListener("click", () => { const r = calcularSensi(); copiar("Mi sensi · Rotísimo\n" + CAMPOS.map((c) => `${c.n}: ${r[c.k]}`).join("\n")); });
+pintarSensiConfig();
+
+// ================= TIPS =================
+const T_CABEZA = [
+  ["crosshair", "var(--red)", "Mira siempre a la altura de la cabeza", "Al caminar y al asomarte, deja la mira donde estaría la cabeza del enemigo."],
+  ["chevrons-right", "var(--cyan)", "Jala hacia arriba al disparar", "Toca disparar y en el mismo movimiento sube el pulgar unos centímetros."],
+  ["scan-eye", "var(--purple)", "Punto rojo de cerca", "Sube más rápido a la cabeza que la mira normal."],
+  ["shield", "var(--orange)", "Agáchate al disparar", "Reduce el retroceso con rifles."],
+  ["target", "var(--green)", "El primer tiro decide", "Con escopeta, espera la cabeza en la mira; no dispares al cuerpo."],
+  ["rocket", "var(--gold)", "Salta en la pelea cercana", "Al caer, la mira tiende a la cabeza del rival."],
+];
+const T_ARMAS = [
+  ["flame", "var(--red)", "M1887", "Dos tiros a la cabeza tumban. La reina del 1 vs 1."],
+  ["target", "var(--gold)", "Desert Eagle", "Mucho daño a la cabeza. Ideal para practicar precisión."],
+  ["zap", "var(--cyan)", "MP40 / UMP", "Jala suave y constante hacia arriba mientras disparas."],
+  ["shield-plus", "var(--green)", "Woodpecker", "Atraviesa armadura. Apunta al casco a media distancia."],
+  ["scan-eye", "var(--purple)", "AWM", "Sensi baja en la mira para no pasarte de la cabeza."],
+];
+const T_RUTINA = [
+  ["target", "#fff", "2 min · Entrenador de Rotísimo", "Arrastre hacia arriba en dificultad Normal o Pro."],
+  ["crosshair", "#fff", "3 min · Desert Eagle", "En el campo de entrenamiento, a la cabeza de los muñecos."],
+  ["flame", "#fff", "3 min · M1887 en movimiento", "Muévete de lado y dispara a la cabeza."],
+  ["zap", "#fff", "2 min · MP40 a media distancia", "Ráfagas cortas y jalando suave hacia la cabeza."],
+];
+const tipsHTML = (l) => l.map(([i, c, t, p]) => `<div class="tipc"><span class="tile" style="--c:${c}">${icono(i)}</span><div><b>${esc(t)}</b><p>${esc(p)}</p></div></div>`).join("");
+$("t-cabeza").innerHTML = tipsHTML(T_CABEZA); $("t-armas").innerHTML = tipsHTML(T_ARMAS); $("t-rutina").innerHTML = tipsHTML(T_RUTINA);
+if (APP && Android.abrirJuego) { $("abrir-ff").hidden = false; $("abrir-ff").addEventListener("click", () => Android.abrirJuego()); }
+
+// ================= ENTRENADOR =================
+const cv = $("cv"), ctx = cv.getContext("2d");
+let W = 0, H = 0;
+function medir() { const r = cv.getBoundingClientRect(); if (!r.width) return; W = r.width; H = r.height; cv.width = W * devicePixelRatio; cv.height = H * devicePixelRatio; ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); }
+let dif = leer("rot-dif", "normal");
+const DIFS = { facil: { v: 40, t: 1.6 }, normal: { v: 80, t: 1.2 }, pro: { v: 140, t: 0.85 } };
+function pintarDif() {
+  const el = $("dificultad"); el.innerHTML = "";
+  for (const [id, n] of [["facil", "Fácil"], ["normal", "Normal"], ["pro", "Pro"]]) el.append(opcion({ texto: n, sel: dif === id, alClic: () => { dif = id; escribir("rot-dif", id); pintarDif(); } }));
+}
+pintarDif();
+ponerMascota($("masc-juego"), "target");
+let jugando = false, tiempo = 30, cabezas = 0, cuerpo = 0, fallos = 0, ultimo = 0, tiemposTiro = [];
+let cam = { x: 0, y: 0 }, obj = null, marcas = [];
+function nuevoObjetivo() {
+  const s = 0.8 + Math.random() * 0.6;
+  obj = { x: cam.x + (Math.random() - 0.5) * W * 0.4, y: cam.y + 22 * s, s, dir: Math.random() < 0.5 ? -1 : 1, nace: performance.now() };
+}
+let toque = null;
+cv.addEventListener("pointerdown", (e) => { toque = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", (e) => {
+  if (!toque) return;
+  const f = 0.6 + (calcularSensi().general / +S.escala) * 1.2;
+  cam.x += (e.clientX - toque.x) * f; cam.y += (e.clientY - toque.y) * f;
+  toque = { x: e.clientX, y: e.clientY };
+});
+cv.addEventListener("pointerup", () => (toque = null));
+cv.addEventListener("pointercancel", () => (toque = null));
+$("fuego").addEventListener("pointerdown", (e) => { e.preventDefault(); disparar(); });
+function partes() {
+  const s = obj.s * 1.6, cx = W / 2 + (obj.x - cam.x), base = H / 2 + (obj.y - cam.y);
+  return { cabeza: { x: cx, y: base - 46 * s, r: 9 * s }, cuerpo: { x: cx - 14 * s, y: base - 36 * s, w: 28 * s, h: 44 * s }, piernas: { x: cx - 12 * s, y: base + 8 * s, w: 24 * s, h: 34 * s } };
+}
+function disparar() {
+  if (!jugando || !obj) return;
+  const p = partes(), mx = W / 2, my = H / 2, ahora = performance.now();
+  const dentro = (r) => mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h;
+  if (Math.hypot(mx - p.cabeza.x, my - p.cabeza.y) <= p.cabeza.r + 2) { cabezas++; marcas.push({ t: ahora, txt: "CABEZA", c: "#3ddc84" }); tiemposTiro.push((ahora - obj.nace) / 1000); nuevoObjetivo(); }
+  else if (dentro(p.cuerpo) || dentro(p.piernas)) { cuerpo++; marcas.push({ t: ahora, txt: "cuerpo", c: "#f5c451" }); }
+  else { fallos++; marcas.push({ t: ahora, txt: "fallo", c: "#ff4d4d" }); }
+  $("h-score").textContent = `${cabezas} cabezas`;
+}
+function dibujar(ts) {
+  if (!W) medir();
+  const dt = Math.min(0.05, (ts - (ultimo || ts)) / 1000); ultimo = ts;
+  if (W) {
+    const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#18181c"); g.addColorStop(1, "#050506");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    const hz = H / 2 + 60 - cam.y;
+    ctx.fillStyle = "#0e0e10"; ctx.fillRect(0, hz, W, Math.max(0, H - hz));
+    ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1;
+    for (let i = -20; i <= 20; i++) { const x = W / 2 + i * 60 - (cam.x % 60); ctx.beginPath(); ctx.moveTo(x, hz); ctx.lineTo(W / 2 + (x - W / 2) * 3, H); ctx.stroke(); }
+    if (jugando) {
+      tiempo -= dt; if (tiempo <= 0) terminar();
+      $("h-tiempo").textContent = Math.max(0, Math.ceil(tiempo)) + "s";
+      if (obj) { obj.x += obj.dir * DIFS[dif].v * dt; if (Math.random() < dt * DIFS[dif].t) obj.dir *= -1; if (Math.abs(obj.x - cam.x) > W * 0.45) obj.dir = obj.x > cam.x ? -1 : 1; }
+    }
+    if (obj) {
+      const p = partes();
+      ctx.fillStyle = "#3a3a42"; ctx.fillRect(p.piernas.x, p.piernas.y, p.piernas.w, p.piernas.h);
+      ctx.fillStyle = "#5a5a64"; ctx.fillRect(p.cuerpo.x, p.cuerpo.y, p.cuerpo.w, p.cuerpo.h);
+      ctx.fillStyle = "#ff4d4d"; ctx.beginPath(); ctx.arc(p.cabeza.x, p.cabeza.y, p.cabeza.r, 0, Math.PI * 2); ctx.fill();
+    }
+    const mx = W / 2, my = H / 2;
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.beginPath();
+    ctx.moveTo(mx - 12, my); ctx.lineTo(mx - 4, my); ctx.moveTo(mx + 4, my); ctx.lineTo(mx + 12, my); ctx.moveTo(mx, my - 12); ctx.lineTo(mx, my - 4); ctx.moveTo(mx, my + 4); ctx.lineTo(mx, my + 12); ctx.stroke();
+    marcas = marcas.filter((m) => ts - m.t < 600);
+    for (const m of marcas) { ctx.globalAlpha = 1 - (ts - m.t) / 600; ctx.fillStyle = m.c; ctx.font = "700 17px Outfit, sans-serif"; ctx.textAlign = "center"; ctx.fillText(m.txt, mx, my - 30 - (ts - m.t) / 20); }
+    ctx.globalAlpha = 1;
+  }
+  requestAnimationFrame(dibujar);
+}
+function empezar() { medir(); jugando = true; tiempo = 30; cabezas = cuerpo = fallos = 0; tiemposTiro = []; cam = { x: 0, y: 0 }; nuevoObjetivo(); $("inicio").hidden = true; $("h-score").textContent = "0 cabezas"; }
+function terminar() {
+  jugando = false;
+  const tiros = cabezas + cuerpo + fallos, hs = tiros ? Math.round((cabezas / tiros) * 100) : 0;
+  const mejor = Math.max(leer("rot-record", 0), cabezas); escribir("rot-record", mejor);
+  const prom = tiemposTiro.length ? (tiemposTiro.reduce((a, b) => a + b, 0) / tiemposTiro.length).toFixed(2) : "–";
+  $("r-hs").textContent = hs + "%"; $("r-mejor").textContent = mejor; $("r-tiempo").textContent = prom;
+  $("i-titulo").textContent = `${cabezas} tiros a la cabeza`;
+  $("i-texto").textContent = hs >= 70 ? "¡Rotísimo! Sube la dificultad." : hs >= 40 ? "Bien. Jala hacia arriba justo antes de disparar." : "Deja la mira más alta y no dispares al cuerpo.";
+  $("inicio").hidden = false;
+}
+$("empezar").addEventListener("click", empezar);
+$("r-mejor").textContent = leer("rot-record", 0) || "–";
+addEventListener("resize", medir);
+requestAnimationFrame(dibujar);
+
+// ================= ROTI: asistente =================
+const chat = $("chat");
+ponerMascota($("masc-roti"));
+const norm = (t) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 +.\-]/g, " ").replace(/\s+/g, " ").trim();
+const tiene = (t, ...p) => p.some((x) => t.includes(x));
+function msgYo(texto) { const d = document.createElement("div"); d.className = "msg yo"; d.textContent = texto; chat.append(d); chat.scrollTop = chat.scrollHeight; }
+function filaBot() {
+  const f = document.createElement("div"); f.className = "fila-bot";
+  f.innerHTML = `<div class="masc mini-masc"></div><div class="msg bot"></div>`;
+  ponerMascota(f.querySelector(".mini-masc")); chat.append(f); chat.scrollTop = chat.scrollHeight;
+  return f.querySelector(".msg");
+}
+// r = { texto, html?, ops?: [[etiqueta, accion]] }
+function msgBot(r, demora = 650) {
+  const m = filaBot(); m.classList.add("esc"); m.textContent = "Escribiendo…";
+  $("roti-estado").textContent = "Escribiendo…"; $("roti-estado").classList.add("ocupado"); ponerMascota($("masc-roti"), "message-circle");
+  setTimeout(() => {
+    m.classList.remove("esc"); m.textContent = r.texto;
+    if (r.html) { const h = document.createElement("div"); h.innerHTML = r.html; m.append(h); }
+    if (r.ops) {
+      const ops = document.createElement("div"); ops.className = "ops";
+      for (const [et, acc] of r.ops) { const b = document.createElement("button"); b.textContent = et; b.addEventListener("click", () => { msgYo(et); acc(); }); ops.append(b); }
+      m.append(ops);
+    }
+    $("roti-estado").textContent = "En línea"; $("roti-estado").classList.remove("ocupado"); ponerMascota($("masc-roti"));
+    chat.scrollTop = chat.scrollHeight;
+  }, demora);
+}
+const ir = (tab) => () => abrir(tab);
+const OPS_MENU = () => [["Armar un combo", pedirEstilo], ["Mi sensibilidad", pedirGama], ["Quitar el lag", () => responder("lag")], ["Tiros a la cabeza", () => responder("cabeza")]];
+function pedirEstilo() { msgBot({ texto: "¿Cómo juegas? Elige tu estilo:", ops: [...ESTILOS.map((e) => [e.n, () => comboDeEstilo(e.id)]), ["No sé", () => test(0, {})]] }); }
+function test(i, pts) {
+  if (i === PREGUNTAS.length) {
+    const g = Object.entries(pts).sort((a, b) => b[1] - a[1])[0][0];
+    msgBot({ texto: `Tu estilo es ${ESTILOS.find((x) => x.id === g).n}. ${PORQUE[g]}` });
+    setTimeout(() => comboDeEstilo(g), 900); return;
+  }
+  const P = PREGUNTAS[i];
+  msgBot({ texto: `${i + 1}/3 · ${P.q}`, ops: P.o.map(([et, suma]) => [et, () => { const n = { ...pts }; for (const k in suma) n[k] = (n[k] || 0) + suma[k]; test(i + 1, n); }]) });
+}
+function comboDeEstilo(id, fijarActiva) {
+  estilo = id; escribir("rot-estilo", id); pintarConfig();
+  bloqueos = { activa: false, p0: false, p1: false, p2: false, mascota: false, armas: false };
+  if (fijarActiva) { combo = { ...(combo || { pasivas: ["Jota", "Dasha", "Shirou"] }), activa: fijarActiva }; bloqueos.activa = true; }
+  const m = filaBot(); m.style.width = "86%";
+  pensar(m, "ROTI ESTÁ PENSANDO TU COMBO", PASOS_COMBO, ICON_COMBO, () => {
+    m.parentElement.remove(); generar(); bloqueos.activa = false; pintarResultado(); vista("c-res");
+    const c = combo;
+    msgBot({
+      texto: `Tu combo ${ESTILOS.find((x) => x.id === c.estilo).n} está listo:`,
+      html: `<div class="tabla"><div><span>Activa</span><b>${esc(c.activa)}</b></div><div><span>Pasivas</span><b>${esc(c.pasivas.join(", "))}</b></div><div><span>Mascota</span><b>${esc(c.mascota)}</b></div><div><span>Armas</span><b>${esc(c.armas)}</b></div></div>`,
+      ops: [["Ver con detalle", ir("combos")], ["Otro igual", () => comboDeEstilo(id)], ["Copiar", () => copiar(textoCombo(c))]],
+    }, 200);
+  });
+  chat.scrollTop = chat.scrollHeight;
+}
+function pedirGama() { msgBot({ texto: "¿Qué tan potente es tu celular?", ops: OPC.gama.map((g) => [`${g.n} (${g.s})`, () => pedirDedos(g.id)]) }); }
+function pedirDedos(g) { S.gama = g; msgBot({ texto: "¿Con cuántos dedos juegas?", ops: OPC.dedos.map((d) => [d.n, () => darSensi(d.id)]) }); }
+function darSensi(d) {
+  S.dedos = d; S.variante = 0; escribir("rot-sensi", S); pintarSensiConfig();
+  const r = calcularSensi();
+  msgBot({
+    texto: `Tu sensi (escala hasta ${S.escala}):`,
+    html: `<div class="tabla">${CAMPOS.map((c) => `<div><span>${c.n}</span><b>${r[c.k]}</b></div>`).join("")}</div>`,
+    ops: [["Ver con detalle", () => { pintarSensiRes(); $("s-config").hidden = true; $("s-res").hidden = false; abrir("sensi"); }], ["Copiar", () => copiar("Mi sensi · Rotísimo\n" + CAMPOS.map((c) => `${c.n}: ${r[c.k]}`).join("\n"))], ["Probar en Entrenar", ir("entrenar")]],
+  });
+}
+/*RESPUESTAS*/
+function buscarPersonaje(t) {
+  for (const [lista, tipo] of [[ACTIVOS, "activa"], [PASIVOS, "pasiva"], [MASCOTAS, "mascota"]])
+    for (const x of lista) { const k = norm(x.n); if (new RegExp(`(^| )${k.replace(/[.\-]/g, "\\$&")}( |$)`).test(t)) return { x, tipo }; }
+  return null;
+}
+function responder(tema) { const r = RESP[tema]; msgBot({ ...r, ops: r.ops || OPS_MENU() }); }
+function entender(texto) {
+  const t = norm(texto); if (!t) return;
+  const est = ESTILOS.find((e) => t.includes(norm(e.n))) || (tiene(t, "escudo") ? ESTILOS[1] : tiene(t, "curar", "vida") && tiene(t, "combo") ? ESTILOS[3] : tiene(t, "apoyo") ? ESTILOS[2] : null);
+  const pj = buscarPersonaje(t);
+  if (tiene(t, "hack", "regedit", "aimbot", "trampa", "chetos")) return responder("hack");
+  if (tiene(t, "combo", "armame", "arma un", "habilidad")) {
+    if (pj && pj.tipo === "activa") return comboDeEstilo(est ? est.id : (ESTILOS.find((e) => pj.x.t.includes(e.id)) || ESTILOS[0]).id, pj.x.n);
+    if (est) return comboDeEstilo(est.id);
+    return pedirEstilo();
+  }
+  if (pj) {
+    const ops = pj.tipo === "activa" ? [[`Combo con ${pj.x.n}`, () => comboDeEstilo((ESTILOS.find((e) => pj.x.t.includes(e.id)) || ESTILOS[0]).id, pj.x.n)]] : [["Armar un combo", pedirEstilo]];
+    return msgBot({ texto: `${pj.x.n} (${pj.tipo}): ${pj.x.h}`, ops });
+  }
+  const arma = Object.keys(ARMAS_INFO).find((k) => t.includes(k) || (k === "desert" && tiene(t, "deagle", "desierto")));
+  if (arma) return msgBot({ texto: ARMAS_INFO[arma], ops: [["Practicar cabeza", ir("entrenar")]] });
+  if (tiene(t, "sensi", "sensibilidad", "dpi")) return pedirGama();
+  if (tiene(t, "lag", "traba", "fps", "ping", "lento", "congela")) return responder("lag");
+  if (tiene(t, "calient", "temperatura", "bateria", "quema")) return responder("calienta");
+  if (tiene(t, "calibr")) return responder("calibrar");
+  if (tiene(t, "cabeza", "headshot", "apuntar", "punteria", "mira", "head")) return responder("cabeza");
+  if (tiene(t, "hud", "boton", "dedos", "controles")) return responder("hud");
+  if (tiene(t, " cs", "cs ", "duelo", "escuadras") || t === "cs") return responder("cs");
+  if (tiene(t, "br", "battle", "clasificatoria", "rango", "ranked")) return responder("br");
+  if (est) return comboDeEstilo(est.id);
+  if (tiene(t, "gracias", "grax")) return msgBot({ texto: "¡De nada! A romperla." });
+  if (tiene(t, "hola", "buenas", "hey", "que onda", "ola")) return msgBot({ texto: "¡Hola! ¿En qué te ayudo?", ops: OPS_MENU() });
+  msgBot({ texto: "No te entendí del todo. Puedo ayudarte con combos, sensi, lag, tiros a la cabeza, armas o cualquier personaje. Prueba: \"combo con Tatsuya\" o \"qué hace Jota\".", ops: OPS_MENU() });
+}
+$("f-chat").addEventListener("submit", (e) => { e.preventDefault(); const v = $("in-chat").value.trim(); if (!v) return; $("in-chat").value = ""; msgYo(v); entender(v); });
+const RAPIDAS = [["crosshair", "Mi sensibilidad", pedirGama], ["layers", "Armar un combo", pedirEstilo], ["smartphone", "Sensi para Android", pedirGama], ["target", "Calibrar mi mira", () => responder("calibrar")], ["gauge", "Quitar el lag", () => responder("lag")], ["thermometer", "Se me calienta", () => responder("calienta")]];
+for (const [i, et, acc] of RAPIDAS) {
+  const b = document.createElement("button"); b.innerHTML = icono(i) + esc(et);
+  b.addEventListener("click", () => { msgYo(et); acc(); }); $("rapidas").append(b);
+}
+
+// ================= NAVEGACIÓN =================
+const tabs = [...document.querySelectorAll("nav button")];
+function abrir(t) {
+  tabs.forEach((b) => { const on = b.dataset.tab === t; b.setAttribute("aria-selected", on); $(b.dataset.tab).hidden = !on; });
+  escribir("rot-tab", t); scrollTo(0, 0);
+  if (t === "entrenar") requestAnimationFrame(medir);
+}
+tabs.forEach((b) => b.addEventListener("click", () => abrir(b.dataset.tab)));
+ponerIconos();
+abrir(leer("rot-tab", "roti"));
+</script>
+</body>
+</html>

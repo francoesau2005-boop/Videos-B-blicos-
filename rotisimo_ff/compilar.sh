@@ -3,6 +3,7 @@
 set -e
 cd "$(dirname "$0")"
 mkdir -p dist app_android/app/src/main/assets
+node web/build.mjs
 cp web/index.html app_android/app/src/main/assets/index.html
 cd app_android
 echo "sdk.dir=${ANDROID_HOME:-/opt/android-sdk}" > local.properties
