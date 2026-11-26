@@ -227,9 +227,30 @@ svg.i { width: 18px; height: 18px; flex: none; }
 .fav .txt span { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fav button { border: 0; background: none; color: var(--muted); padding: 6px; cursor: pointer; display: grid; place-items: center; }
 
+/* personajes */
+.ret img.foto, .hoja-ret img.foto { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pj.activa .ret img.foto { border-radius: 14px; }
+.galeria { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.gal { border: 1px solid var(--line); background: var(--card2); border-radius: 16px; padding: 6px 6px 10px; cursor: pointer; text-align: center; display: grid; gap: 4px; min-width: 0; }
+.gal .ret { width: 100%; aspect-ratio: 1 / 1.05; border-radius: 12px; overflow: hidden; }
+.gal .ret svg { width: 100%; height: 100%; display: block; }
+.gal b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gal small { font-size: 9.5px; letter-spacing: 0.16em; font-weight: 700; }
+.sub-t { grid-column: 1 / -1; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; color: var(--muted); margin-top: 6px; }
+.hoja-fondo { position: fixed; inset: 0; background: #000b; z-index: 20; }
+.hoja { overflow-x: hidden; position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: min(560px, 100%); max-height: 88vh; overflow-y: auto; background: var(--card); border: 1px solid var(--line2); border-bottom: 0; border-radius: 24px 24px 0 0; padding: 10px 16px calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 21; display: grid; gap: 12px; }
+.hoja > * { min-width: 0; }
+.hoja .btn { white-space: normal; letter-spacing: 0.08em; font-size: 12px; min-width: 0; padding: 13px 10px; }
+.hoja-barra { width: 44px; height: 5px; border-radius: 9px; background: var(--line2); justify-self: center; }
+.hoja-top { display: flex; gap: 14px; align-items: center; }
+.hoja-ret { width: 108px; height: 113px; border-radius: 18px; overflow: hidden; flex: none; border: 1px solid var(--line2); }
+.hoja-ret svg { width: 100%; height: 100%; display: block; }
+.hoja-top small { font-size: 10.5px; letter-spacing: 0.2em; font-weight: 700; }
+.hoja-top h2 { margin: 2px 0 8px; font-size: 24px; }
+
 /* navegación */
 nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); width: min(520px, calc(100% - 20px)); background: #0b0b0dee; border: 1px solid var(--line2); border-radius: 22px; display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px; backdrop-filter: blur(10px); z-index: 5; box-shadow: 0 10px 30px #000; }
-nav button { background: none; border: 0; color: var(--muted); font-size: 11px; font-weight: 600; display: grid; justify-items: center; gap: 3px; padding: 7px 0; cursor: pointer; border-radius: 16px; }
+nav button { background: none; border: 0; color: var(--muted); font-size: 10.5px; min-width: 0; font-weight: 600; display: grid; justify-items: center; gap: 3px; padding: 7px 0; cursor: pointer; border-radius: 16px; }
 nav button svg { width: 20px; height: 20px; }
 nav button[aria-selected="true"] { background: #fff; color: #000; }
 .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #fff; color: #000; font-weight: 600; padding: 10px 18px; border-radius: 999px; z-index: 9; box-shadow: 0 6px 20px #000; }
@@ -242,7 +263,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 <div class="wrap">
   <header class="barra-top">
     <div class="marca"><span data-i="crosshair"></span>ROTÍSIMO</div>
-    <span class="version">v1.3</span>
+    <span class="version">v1.4</span>
   </header>
 
   <!-- ============ INICIO: ROTI ============ -->
@@ -321,6 +342,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
     </div>
   </section>
 
+  <!-- ============ PERSONAJES ============ -->
+  <section id="personajes" class="wrap" style="padding:0" hidden>
+    <div class="hero">
+      <h1>Personajes</h1>
+      <p>Toca uno para ver su habilidad, armar un combo con él o ponerle tu propia imagen.</p>
+    </div>
+    <div class="escribir" style="padding-left:14px"><span data-i="search"></span><input id="p-buscar" placeholder="Buscar personaje o mascota…" autocomplete="off"></div>
+    <div class="g2" id="p-filtros" style="grid-template-columns:repeat(4,1fr)"></div>
+    <div class="galeria" id="galeria"></div>
+  </section>
+
   <!-- ============ SENSI ============ -->
   <section id="sensi" class="wrap" style="padding:0" hidden>
     <div class="panel">
@@ -383,30 +415,38 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
         <div><b id="r-tiempo">–</b><span>Seg/tiro</span></div>
       </div>
     </div>
-  </section>
-
-  <!-- ============ TIPS ============ -->
-  <section id="tips" class="wrap" style="padding:0" hidden>
-    <div class="hero">
-      <h1>Tips para romperla</h1>
-      <p>Técnicas reales para dar más tiros a la cabeza. Sin hacks.</p>
-    </div>
     <div class="panel"><div class="paso-t"><span>TIRO A LA CABEZA</span></div><div class="lista-tips" id="t-cabeza"></div></div>
     <div class="panel"><div class="paso-t"><span>ARMAS PARA LA CABEZA</span></div><div class="lista-tips" id="t-armas"></div></div>
     <div class="panel"><div class="paso-t"><span>RUTINA DE 10 MINUTOS</span></div><div class="lista-tips" id="t-rutina"></div></div>
     <div class="tipc aviso"><span class="tile" style="--c:var(--red)"><span data-i="shield"></span></span><div><b>Nada de hacks</b><p>Regedit, aimbot y "sensi hack" te banean la cuenta para siempre y muchos traen virus. Rotísimo solo usa ajustes normales del juego.</p></div></div>
     <button class="btn blanco" id="abrir-ff" hidden><span data-i="play"></span>Abrir el juego</button>
   </section>
+
 </div>
 
 <nav role="tablist">
   <button role="tab" data-tab="roti" aria-selected="true"><span data-i="bot"></span>Roti</button>
   <button role="tab" data-tab="combos" aria-selected="false"><span data-i="layers"></span>Combos</button>
+  <button role="tab" data-tab="personajes" aria-selected="false"><span data-i="users"></span>Personajes</button>
   <button role="tab" data-tab="sensi" aria-selected="false"><span data-i="crosshair"></span>Sensi</button>
   <button role="tab" data-tab="entrenar" aria-selected="false"><span data-i="target"></span>Entrenar</button>
-  <button role="tab" data-tab="tips" aria-selected="false"><span data-i="flame"></span>Tips</button>
+
 </nav>
 <div class="toast" id="toast" hidden></div>
+<div class="hoja-fondo" id="hoja-fondo" hidden></div>
+<div class="hoja" id="hoja" hidden role="dialog" aria-modal="true" aria-labelledby="h-nombre">
+  <div class="hoja-barra"></div>
+  <div class="hoja-top"><div class="hoja-ret" id="h-ret"></div><div><small id="h-tipo"></small><h2 id="h-nombre"></h2><div class="etiquetas" id="h-etq"></div></div></div>
+  <div class="habil"><small>HABILIDAD</small><p id="h-hab"></p></div>
+  <div class="acciones" id="h-acc"></div>
+  <div class="g2">
+    <label class="btn" for="h-archivo" style="cursor:pointer"><span data-i="image-plus"></span>Poner imagen</label>
+    <button class="btn" id="h-quitar"><span data-i="trash-2"></span>Quitar imagen</button>
+  </div>
+  <input type="file" id="h-archivo" accept="image/*" hidden>
+  <p class="privado">Puedes usar una captura del juego. La imagen se guarda solo en tu celular.</p>
+  <button class="btn" id="h-cerrar"><span data-i="x"></span>Cerrar</button>
+</div>
 
 <script>
 /*ICONOS*/
@@ -465,23 +505,7 @@ function copiar(texto) {
 }
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 function tono(nombre) { let h = 7; for (const c of nombre) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
-// retrato genérico (silueta) con el color propio de cada personaje
-function retrato(nombre, grande) {
-  const h = tono(nombre), id = "g" + h + (grande ? "b" : "");
-  const ini = nombre.replace(/[^A-Za-z]/g, "").slice(0, 2).toUpperCase();
-  return `<svg viewBox="0 0 100 105" aria-hidden="true">
-    <defs>
-      <radialGradient id="${id}f" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="hsl(${h} 70% 30%)"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient>
-      <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(${h} 25% 82%)"/><stop offset="1" stop-color="hsl(${h} 30% 38%)"/></linearGradient>
-    </defs>
-    ${grande ? "" : `<rect width="100" height="105" fill="url(#${id}f)"/>`}
-    ${grande ? `<ellipse cx="50" cy="52" rx="46" ry="46" fill="url(#${id}f)"/>` : ""}
-    <path d="M50 18c11 0 19 9 19 21 0 13-8 24-19 24S31 52 31 39c0-12 8-21 19-21z" fill="url(#${id}s)"/>
-    <path d="M14 105c2-22 16-34 36-34s34 12 36 34z" fill="url(#${id}s)"/>
-    <path d="M31 36c2-12 10-19 19-19s17 6 19 17c-6-5-12-7-19-7-7 0-13 3-19 9z" fill="hsl(${h} 45% 22%)"/>
-    <text x="50" y="96" text-anchor="middle" font-family="Outfit, sans-serif" font-weight="700" font-size="${grande ? 13 : 16}" fill="hsl(${h} 40% 14%)" opacity=".85">${ini}</text>
-  </svg>`;
-}
+/*PERSONAJES*/
 
 // ================= MASCOTA ROTI (diseño propio) =================
 function mascotaSVG() {
@@ -621,6 +645,8 @@ function pintarResultado() {
   else if (seleccion === "armas") { rol = "ARMAS RECOMENDADAS"; nom = c.armas; txt = "Una para pelear de cerca y otra para media distancia, pensadas para tu estilo."; }
   else { const n = c.pasivas[+seleccion[1]]; rol = "HABILIDAD PASIVA"; nom = n; txt = buscar(PASIVOS, n).h; }
   $("c-habil").innerHTML = `<small>${rol}</small><b>${esc(nom)}</b><p>${esc(txt)}</p><span class="nota">Toca cualquier personaje para ver su habilidad · el candado lo deja fijo</span>`;
+  const fichaDe = seleccion === "activa" ? [buscar(ACTIVOS, c.activa), "activa"] : seleccion === "mascota" ? [buscar(MASCOTAS, c.mascota), "mascota"] : seleccion[0] === "p" ? [buscar(PASIVOS, c.pasivas[+seleccion[1]]), "pasiva"] : null;
+  if (fichaDe) { const b = document.createElement("button"); b.className = "btn-chico"; b.style.justifySelf = "start"; b.innerHTML = icono("image-plus") + "VER FICHA · PONER IMAGEN"; b.addEventListener("click", () => abrirHoja(fichaDe[0], fichaDe[1])); $("c-habil").append(b); }
   const todos = [buscar(ACTIVOS, c.activa), ...c.pasivas.map((p) => buscar(PASIVOS, p)), buscar(MASCOTAS, c.mascota)];
   const encajan = todos.filter((x) => x.t.includes(c.estilo)).map((x) => x.n);
   const razones = [PORQUE[c.estilo]];
@@ -932,12 +958,88 @@ for (const [i, et, acc] of RAPIDAS) {
   b.addEventListener("click", () => { msgYo(et); acc(); }); $("rapidas").append(b);
 }
 
+// ================= PERSONAJES =================
+let filtroP = "todos";
+const TIPOS_P = [["todos", "Todos"], ["activa", "Activas"], ["pasiva", "Pasivas"], ["mascota", "Mascotas"]];
+const COLOR_TIPO = { activa: "var(--green)", pasiva: "var(--cyan)", mascota: "#ff6fae" };
+function pintarFiltros() {
+  const el = $("p-filtros"); el.innerHTML = "";
+  for (const [id, n] of TIPOS_P) {
+    const b = document.createElement("button"); b.className = "opt prio"; b.setAttribute("aria-pressed", filtroP === id); b.textContent = n;
+    b.addEventListener("click", () => { filtroP = id; pintarFiltros(); pintarGaleria(); }); el.append(b);
+  }
+}
+function pintarGaleria() {
+  const q = norm($("p-buscar").value || "");
+  const el = $("galeria"); el.innerHTML = "";
+  for (const [lista, tipo, titulo] of [[ACTIVOS, "activa", "HABILIDAD ACTIVA"], [PASIVOS, "pasiva", "HABILIDAD PASIVA"], [MASCOTAS, "mascota", "MASCOTAS"]]) {
+    if (filtroP !== "todos" && filtroP !== tipo) continue;
+    const items = lista.filter((x) => !q || norm(x.n).includes(q));
+    if (!items.length) continue;
+    el.insertAdjacentHTML("beforeend", `<div class="sub-t">${titulo} · ${items.length}</div>`);
+    for (const x of items) {
+      const b = document.createElement("button"); b.className = "gal";
+      b.innerHTML = `<div class="ret">${retrato(x.n)}</div><small style="color:${COLOR_TIPO[tipo]}">${tipo.toUpperCase()}</small><b>${esc(x.n)}</b>`;
+      b.addEventListener("click", () => abrirHoja(x, tipo));
+      el.append(b);
+    }
+  }
+  if (!el.children.length) el.innerHTML = `<p class="privado" style="grid-column:1/-1">No encontré ese nombre.</p>`;
+}
+let hojaActual = null;
+function abrirHoja(x, tipo) {
+  hojaActual = { x, tipo };
+  $("h-ret").innerHTML = retrato(x.n, false);
+  $("h-tipo").textContent = tipo === "mascota" ? "MASCOTA" : "HABILIDAD " + tipo.toUpperCase();
+  $("h-tipo").style.color = COLOR_TIPO[tipo];
+  $("h-nombre").textContent = x.n;
+  $("h-hab").textContent = x.h;
+  $("h-etq").innerHTML = x.t.map((id) => { const e = ESTILOS.find((y) => y.id === id) || PRIORIDADES.find((y) => y.id === id); return e ? `<span class="etq">${icono(e.i)}${esc(e.n.toUpperCase())}</span>` : ""; }).join("");
+  const acc = $("h-acc"); acc.innerHTML = "";
+  const btn = (txt, ico, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.innerHTML = icono(ico) + esc(txt); b.addEventListener("click", fn); acc.append(b); };
+  btn("Combo con " + (x.n.length > 9 ? "él" : x.n), "sparkles", "blanco", () => comboCon(x, tipo));
+  btn("Preguntar a Roti", "bot", "", () => { cerrarHoja(); abrir("roti"); msgYo("¿Qué hace " + x.n + "?"); entender("que hace " + x.n); });
+  $("h-quitar").hidden = !FOTOS[x.n];
+  $("hoja").hidden = $("hoja-fondo").hidden = false;
+}
+function cerrarHoja() { $("hoja").hidden = $("hoja-fondo").hidden = true; hojaActual = null; }
+function comboCon(x, tipo) {
+  cerrarHoja();
+  bloqueos = { activa: false, p0: false, p1: false, p2: false, mascota: false, armas: false };
+  const base = combo || { activa: ACTIVOS[0].n, pasivas: [PASIVOS[0].n, PASIVOS[1].n, PASIVOS[2].n], mascota: MASCOTAS[0].n, armas: ARMAS.rusher[0] };
+  combo = { ...base, pasivas: [...base.pasivas] };
+  if (tipo === "activa") { combo.activa = x.n; bloqueos.activa = true; }
+  else if (tipo === "pasiva") { combo.pasivas = [x.n, ...combo.pasivas.filter((p) => p !== x.n)].slice(0, 3); bloqueos.p0 = true; }
+  else { combo.mascota = x.n; bloqueos.mascota = true; }
+  const est = ESTILOS.find((e) => x.t.includes(e.id)); if (est) { estilo = est.id; escribir("rot-estilo", estilo); }
+  abrir("combos"); generarConAnimacion();
+}
+$("hoja-fondo").addEventListener("click", cerrarHoja);
+$("h-cerrar").addEventListener("click", cerrarHoja);
+$("h-archivo").addEventListener("change", (e) => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f || !hojaActual) return;
+  const nombre = hojaActual.x.n;
+  leerImagen(f, (url) => {
+    if (!guardarFoto(nombre, url)) return;
+    toast("Imagen guardada"); abrirHoja(hojaActual.x, hojaActual.tipo); pintarGaleria();
+    if (combo) pintarResultado();
+  });
+});
+$("h-quitar").addEventListener("click", () => {
+  if (!hojaActual) return; quitarFoto(hojaActual.x.n); toast("Imagen quitada");
+  abrirHoja(hojaActual.x, hojaActual.tipo); pintarGaleria(); if (combo) pintarResultado();
+});
+$("p-buscar").addEventListener("input", pintarGaleria);
+pintarFiltros(); pintarGaleria();
+
 // ================= NAVEGACIÓN =================
 const tabs = [...document.querySelectorAll("nav button")];
 function abrir(t) {
   tabs.forEach((b) => { const on = b.dataset.tab === t; b.setAttribute("aria-selected", on); $(b.dataset.tab).hidden = !on; });
   escribir("rot-tab", t); scrollTo(0, 0);
   if (t === "entrenar") requestAnimationFrame(medir);
+  if (t === "personajes") pintarGaleria();
 }
 tabs.forEach((b) => b.addEventListener("click", () => abrir(b.dataset.tab)));
 ponerIconos();
