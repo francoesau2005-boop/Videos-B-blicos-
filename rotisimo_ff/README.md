@@ -2,7 +2,9 @@
 
 App Android con ayudas legales para juegos de disparos tipo battle royale:
 
-- **Roti (asistente)**: mascota con chat que entiende preguntas sobre combos, sensi, lag, calentamiento,
+- **Roti (asistente)**: entiende más de 60 temas (combos, personajes, 22 armas, sensi por marca, HUD, gloo,
+  movimiento, zona, rangos, CS, lag, cuenta y seguridad, nombres con letras especiales, chistes) y responde
+  con dibujos propios (HUD, mira, arrastre, gloo, zona, armas, rangos). Base en `web/roti.js`.
   armas y personajes; arma combos guiados (con test de 3 preguntas) y muestra la animación "pensando tu combo".
   Funciona sin internet, con reglas dentro de la app.
 - **Combos**: genera 1 activa + 3 pasivas + mascota + armas según tu estilo (Rusher, Sniper,

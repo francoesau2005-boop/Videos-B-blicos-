@@ -156,7 +156,7 @@ svg.i { width: 18px; height: 18px; flex: none; }
 .chat { display: grid; gap: 10px; max-height: 46vh; min-height: 0; overflow-y: auto; padding: 2px; scroll-behavior: smooth; align-content: start; }
 .fila-bot { display: flex; gap: 8px; align-items: flex-end; }
 .fila-bot .mini-masc { width: 30px; height: 30px; flex: none; }
-.msg { max-width: 86%; padding: 10px 13px; border-radius: 16px; font-size: 14.5px; white-space: pre-line; }
+.msg { max-width: 88%; min-width: 0; padding: 10px 13px; border-radius: 16px; font-size: 14.5px; white-space: pre-line; }
 .msg.bot { background: var(--card3); border: 1px solid var(--line2); border-bottom-left-radius: 5px; }
 .msg.yo { justify-self: end; background: var(--card3); border: 1px solid var(--line2); border-bottom-right-radius: 5px; font-weight: 500; }
 .msg.esc { color: var(--muted); }
@@ -174,6 +174,17 @@ svg.i { width: 18px; height: 18px; flex: none; }
 .escribir { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line2); background: var(--card2); border-radius: 999px; padding: 6px 6px 6px 16px; }
 .escribir input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--ink); font: 15px var(--font); padding: 8px 0; outline: none; }
 .escribir button { width: 40px; height: 40px; border-radius: 50%; border: 0; background: #fff; color: #000; display: grid; place-items: center; cursor: pointer; }
+.ilus { margin-top: 9px; }
+.ilus-svg { width: 100%; height: auto; display: block; border-radius: 12px; font-family: Outfit, sans-serif; }
+.pj-card { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; padding: 10px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); white-space: normal; }
+.pj-card .ret { width: 64px; height: 64px; border-radius: 12px; overflow: hidden; flex: none; }
+.pj-card .ret svg { width: 100%; height: 100%; display: block; }
+.pj-card small { font-size: 10px; letter-spacing: 0.18em; color: var(--green); font-weight: 700; }
+.pj-card b { display: block; font-size: 17px; }
+.pj-card p { margin: 2px 0 0; font-size: 13.5px; color: #d6d6db; }
+.nombres { display: grid; gap: 6px; margin-top: 9px; }
+.nom-btn { text-align: left; border: 1px solid var(--line2); background: var(--card); border-radius: 10px; padding: 9px 12px; font-size: 16px; cursor: pointer; }
+.nom-btn:active { background: #fff; color: #000; }
 .privado { display: flex; justify-content: center; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); }
 .privado svg { width: 13px; height: 13px; }
 
@@ -231,7 +242,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 <div class="wrap">
   <header class="barra-top">
     <div class="marca"><span data-i="crosshair"></span>ROTÍSIMO</div>
-    <span class="version">v1.2</span>
+    <span class="version">v1.3</span>
   </header>
 
   <!-- ============ INICIO: ROTI ============ -->
@@ -861,18 +872,21 @@ function msgBot(r, demora = 650) {
   $("roti-estado").textContent = "Escribiendo…"; $("roti-estado").classList.add("ocupado"); ponerMascota($("masc-roti"), "message-circle");
   setTimeout(() => {
     m.classList.remove("esc"); m.textContent = r.texto;
-    if (r.html) { const h = document.createElement("div"); h.innerHTML = r.html; m.append(h); }
+    if (r.html && r.antes) { const h = document.createElement("div"); h.innerHTML = r.html; m.prepend(h); }
+    if (r.img) { const h = document.createElement("div"); h.className = "ilus"; h.innerHTML = r.img; m.append(h); }
+    if (r.html && !r.antes) { const h = document.createElement("div"); h.innerHTML = r.html; m.append(h); }
     if (r.ops) {
       const ops = document.createElement("div"); ops.className = "ops";
       for (const [et, acc] of r.ops) { const b = document.createElement("button"); b.textContent = et; b.addEventListener("click", () => { msgYo(et); acc(); }); ops.append(b); }
       m.append(ops);
     }
+    if (r.alMostrar) r.alMostrar(m);
     $("roti-estado").textContent = "En línea"; $("roti-estado").classList.remove("ocupado"); ponerMascota($("masc-roti"));
     chat.scrollTop = chat.scrollHeight;
   }, demora);
 }
 const ir = (tab) => () => abrir(tab);
-const OPS_MENU = () => [["Armar un combo", pedirEstilo], ["Mi sensibilidad", pedirGama], ["Quitar el lag", () => responder("lag")], ["Tiros a la cabeza", () => responder("cabeza")]];
+const OPS_MENU = () => [["Armar un combo", pedirEstilo], ["Mi sensibilidad", pedirGama], ["Tiros a la cabeza", accion("cabeza")], ["¿Qué más sabes?", accion("que-puedes")]];
 function pedirEstilo() { msgBot({ texto: "¿Cómo juegas? Elige tu estilo:", ops: [...ESTILOS.map((e) => [e.n, () => comboDeEstilo(e.id)]), ["No sé", () => test(0, {})]] }); }
 function test(i, pts) {
   if (i === PREGUNTAS.length) {
@@ -910,44 +924,9 @@ function darSensi(d) {
     ops: [["Ver con detalle", () => { pintarSensiRes(); $("s-config").hidden = true; $("s-res").hidden = false; abrir("sensi"); }], ["Copiar", () => copiar("Mi sensi · Rotísimo\n" + CAMPOS.map((c) => `${c.n}: ${r[c.k]}`).join("\n"))], ["Probar en Entrenar", ir("entrenar")]],
   });
 }
-/*RESPUESTAS*/
-function buscarPersonaje(t) {
-  for (const [lista, tipo] of [[ACTIVOS, "activa"], [PASIVOS, "pasiva"], [MASCOTAS, "mascota"]])
-    for (const x of lista) { const k = norm(x.n); if (new RegExp(`(^| )${k.replace(/[.\-]/g, "\\$&")}( |$)`).test(t)) return { x, tipo }; }
-  return null;
-}
-function responder(tema) { const r = RESP[tema]; msgBot({ ...r, ops: r.ops || OPS_MENU() }); }
-function entender(texto) {
-  const t = norm(texto); if (!t) return;
-  const est = ESTILOS.find((e) => t.includes(norm(e.n))) || (tiene(t, "escudo") ? ESTILOS[1] : tiene(t, "curar", "vida") && tiene(t, "combo") ? ESTILOS[3] : tiene(t, "apoyo") ? ESTILOS[2] : null);
-  const pj = buscarPersonaje(t);
-  if (tiene(t, "hack", "regedit", "aimbot", "trampa", "chetos")) return responder("hack");
-  if (tiene(t, "combo", "armame", "arma un", "habilidad")) {
-    if (pj && pj.tipo === "activa") return comboDeEstilo(est ? est.id : (ESTILOS.find((e) => pj.x.t.includes(e.id)) || ESTILOS[0]).id, pj.x.n);
-    if (est) return comboDeEstilo(est.id);
-    return pedirEstilo();
-  }
-  if (pj) {
-    const ops = pj.tipo === "activa" ? [[`Combo con ${pj.x.n}`, () => comboDeEstilo((ESTILOS.find((e) => pj.x.t.includes(e.id)) || ESTILOS[0]).id, pj.x.n)]] : [["Armar un combo", pedirEstilo]];
-    return msgBot({ texto: `${pj.x.n} (${pj.tipo}): ${pj.x.h}`, ops });
-  }
-  const arma = Object.keys(ARMAS_INFO).find((k) => t.includes(k) || (k === "desert" && tiene(t, "deagle", "desierto")));
-  if (arma) return msgBot({ texto: ARMAS_INFO[arma], ops: [["Practicar cabeza", ir("entrenar")]] });
-  if (tiene(t, "sensi", "sensibilidad", "dpi")) return pedirGama();
-  if (tiene(t, "lag", "traba", "fps", "ping", "lento", "congela")) return responder("lag");
-  if (tiene(t, "calient", "temperatura", "bateria", "quema")) return responder("calienta");
-  if (tiene(t, "calibr")) return responder("calibrar");
-  if (tiene(t, "cabeza", "headshot", "apuntar", "punteria", "mira", "head")) return responder("cabeza");
-  if (tiene(t, "hud", "boton", "dedos", "controles")) return responder("hud");
-  if (tiene(t, " cs", "cs ", "duelo", "escuadras") || t === "cs") return responder("cs");
-  if (tiene(t, "br", "battle", "clasificatoria", "rango", "ranked")) return responder("br");
-  if (est) return comboDeEstilo(est.id);
-  if (tiene(t, "gracias", "grax")) return msgBot({ texto: "¡De nada! A romperla." });
-  if (tiene(t, "hola", "buenas", "hey", "que onda", "ola")) return msgBot({ texto: "¡Hola! ¿En qué te ayudo?", ops: OPS_MENU() });
-  msgBot({ texto: "No te entendí del todo. Puedo ayudarte con combos, sensi, lag, tiros a la cabeza, armas o cualquier personaje. Prueba: \"combo con Tatsuya\" o \"qué hace Jota\".", ops: OPS_MENU() });
-}
+/*ROTI*/
 $("f-chat").addEventListener("submit", (e) => { e.preventDefault(); const v = $("in-chat").value.trim(); if (!v) return; $("in-chat").value = ""; msgYo(v); entender(v); });
-const RAPIDAS = [["crosshair", "Mi sensibilidad", pedirGama], ["layers", "Armar un combo", pedirEstilo], ["smartphone", "Sensi para Android", pedirGama], ["target", "Calibrar mi mira", () => responder("calibrar")], ["gauge", "Quitar el lag", () => responder("lag")], ["thermometer", "Se me calienta", () => responder("calienta")]];
+const RAPIDAS = [["crosshair", "Mi sensibilidad", pedirGama], ["layers", "Armar un combo", pedirEstilo], ["target", "Calibrar mi mira", accion("calibrar")], ["gauge", "Quitar el lag", accion("lag")], ["thermometer", "Se me calienta", accion("calienta")], ["shield", "Gloo rápido", accion("gloo")], ["layers", "Mi HUD", accion("hud")], ["sparkles", "Nombre especial", accion("nombres")], ["circle-help", "¿Qué más sabes?", accion("que-puedes")]];
 for (const [i, et, acc] of RAPIDAS) {
   const b = document.createElement("button"); b.innerHTML = icono(i) + esc(et);
   b.addEventListener("click", () => { msgYo(et); acc(); }); $("rapidas").append(b);

@@ -16,6 +16,6 @@ const poner = (marca, txt) => { if (!html.includes(marca)) throw new Error("falt
 poner("/*FUENTES*/", fuentes);
 poner("/*ICONOS*/", "// Íconos: Lucide (licencia ISC)\nconst ICONOS = " + JSON.stringify(iconos) + ";");
 poner("/*DATOS*/", leer("datos.js"));
-poner("/*RESPUESTAS*/", leer("respuestas.js"));
+poner("/*ROTI*/", leer("roti.js"));
 writeFileSync(dir + "index.html", html);
 console.log("index.html listo:", Math.round(html.length / 1024), "KB");
