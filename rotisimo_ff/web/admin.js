@@ -47,6 +47,10 @@ async function descargarPaquete(avisar) {
     if (p && p.imagenes && (p.version || 0) !== PAQUETE.version) {
       PAQUETE = { version: p.version || 0, adminPin: p.adminPin || null, imagenes: p.imagenes };
       await BD.set("paquete", PAQUETE);
+      if (PAQUETE.adminPin && leer("rot-admin-pin", null) !== PAQUETE.adminPin) {
+        try { localStorage.removeItem("rot-admin-pin"); sessionStorage.removeItem("rot-admin"); } catch {}
+        if (ADMIN) { ADMIN = false; marcarAdmin(); }
+      }
       repintarImagenes();
       if (avisar) toast("Imágenes actualizadas");
     } else if (avisar) toast("Ya tienes las imágenes más nuevas");
@@ -87,7 +91,7 @@ function tocarVersion() {
   if (toquesVersion >= 5) { toquesVersion = 0; pedirPin(); }
 }
 function pedirPin() {
-  const existe = !!(leer("rot-admin-pin", null) || PAQUETE.adminPin);
+  const existe = !!(PAQUETE.adminPin || leer("rot-admin-pin", null));
   $("pin-titulo").textContent = existe ? "Modo admin" : "Crea tu PIN de admin";
   $("pin-texto").textContent = existe ? "Escribe tu PIN para entrar." : "Elige un PIN de 4 a 8 números. Solo tú lo sabrás; guárdalo bien.";
   $("pin-in").value = ""; $("pin-error").textContent = "";
@@ -98,7 +102,8 @@ async function enviarPin(e) {
   e.preventDefault();
   const pin = $("pin-in").value.trim();
   if (!/^\d{4,8}$/.test(pin)) { $("pin-error").textContent = "Usa de 4 a 8 números."; return; }
-  const guardado = leer("rot-admin-pin", null) || PAQUETE.adminPin || null, h = await hashPin(pin);
+  // si ya hay un paquete publicado, manda el PIN del admin que viene en él
+  const guardado = PAQUETE.adminPin || leer("rot-admin-pin", null) || null, h = await hashPin(pin);
   if (!guardado) escribir("rot-admin-pin", h);
   else if (guardado !== h) {
     const fallos = leer("rot-admin-fallos", 0) + 1; escribir("rot-admin-fallos", fallos);
