@@ -95,13 +95,46 @@ ul.cons b { color: var(--ink); }
 .res b { display: block; font: 700 24px var(--font-display); color: var(--lime); }
 .res span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
 /* navegación */
-nav { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(11, 13, 18, 0.96); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right, 0px)); backdrop-filter: blur(8px); z-index: 5; }
+nav { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(11, 13, 18, 0.96); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right, 0px)); backdrop-filter: blur(8px); z-index: 5; }
 nav button { background: none; border: 0; color: var(--muted); font: 600 11px var(--font-body); display: grid; justify-items: center; gap: 2px; padding: 6px 0; cursor: pointer; border-radius: 12px; }
 nav button i { font-style: normal; font-size: 20px; }
 nav button[aria-selected="true"] { color: var(--lime); background: #161d10; }
 .toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--lime); color: #10140a; font-weight: 700; padding: 10px 16px; border-radius: 999px; z-index: 9; }
 button:focus-visible, .chip:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
+/* asistente Roti */
+.roti-head { display: flex; gap: 12px; align-items: center; }
+.masc { width: 92px; height: 92px; flex: none; position: relative; }
+.masc svg { width: 100%; height: 100%; overflow: visible; }
+.masc .ojo { animation: parpadeo 4s infinite; transform-origin: center; transform-box: fill-box; }
+@keyframes parpadeo { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+.masc.pensando svg { animation: flotar 1.2s ease-in-out infinite; }
+@keyframes flotar { 50% { transform: translateY(-4px); } }
+.burbuja { position: absolute; top: -6px; right: -14px; width: 38px; height: 38px; border-radius: 50%; background: #fff; color: #10140a; display: grid; place-items: center; font-size: 18px; box-shadow: 0 2px 8px #0008; }
+.burbuja::after { content: ""; position: absolute; left: -4px; bottom: -2px; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+.estado { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--lime); }
+.estado::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); }
+.chat { display: grid; gap: 10px; max-height: 52vh; min-height: 180px; overflow-y: auto; padding: 4px 2px; scroll-behavior: smooth; }
+.msg { max-width: 88%; padding: 10px 12px; border-radius: 16px; font-size: 14.5px; white-space: pre-line; }
+.msg.bot { background: var(--card2); border: 1px solid var(--line); border-top-left-radius: 4px; justify-self: start; }
+.msg.yo { background: var(--lime); color: #10140a; border-top-right-radius: 4px; justify-self: end; font-weight: 600; }
+.msg .ops { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.msg .ops button { border: 1px solid var(--lime); background: transparent; color: var(--lime); border-radius: 999px; padding: 6px 11px; font: 600 13px var(--font-body); cursor: pointer; }
+.msg.escribiendo { color: var(--muted); }
+.mini { display: grid; gap: 4px; margin-top: 8px; padding: 10px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); font-size: 13.5px; }
+.mini b { color: var(--lime); }
+.rapidas { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.rapidas button { display: flex; gap: 8px; align-items: center; text-align: left; background: var(--card2); border: 1px solid var(--line); color: var(--ink); border-radius: 12px; padding: 10px; font: 600 13px var(--font-body); cursor: pointer; }
+.escribir { display: flex; gap: 8px; }
+.escribir input { flex: 1; min-width: 0; background: var(--card2); border: 1px solid var(--line); color: var(--ink); border-radius: 999px; padding: 12px 16px; font: 15px var(--font-body); }
+.escribir button { width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--lime); color: #10140a; font-size: 20px; font-weight: 700; cursor: pointer; }
+.privado { font-size: 11px; color: var(--muted); text-align: center; }
+.pensar { display: grid; justify-items: center; gap: 10px; padding: 18px 8px; text-align: center; }
+.pensar .t { font: 700 13px var(--font-display); letter-spacing: 0.16em; }
+.pensar .p { font-size: 13px; color: var(--muted); min-height: 18px; }
+.pensar .bar { width: 70%; height: 6px; border-radius: 99px; background: var(--card2); overflow: hidden; }
+.pensar .bar div { height: 100%; width: 0; background: linear-gradient(90deg, var(--lime), var(--orange)); }
+.pensar .pct { font: 700 13px var(--font-display); color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .fill { transition: none; } .masc .ojo, .masc.pensando svg { animation: none; } }
 </style>
 </head>
 <body>
@@ -115,14 +148,36 @@ button:focus-visible, .chip:focus-visible { outline: 2px solid var(--cyan); outl
     <div><b>TIP RÁPIDO</b><p id="tip"></p></div>
   </div>
 
+  <!-- ROTI (asistente) -->
+  <section id="roti" class="wrap" style="padding:0">
+    <div class="card" style="display:grid;gap:12px">
+      <div class="roti-head">
+        <div class="masc" id="masc-roti"></div>
+        <div style="display:grid;gap:4px">
+          <span class="estado" id="roti-estado">EN LÍNEA</span>
+          <h2>Roti</h2>
+          <p style="color:var(--muted);font-size:13.5px">Tu asistente gamer. Pregúntame por combos, sensi, lag, armas o cualquier personaje.</p>
+        </div>
+      </div>
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <div class="rapidas" id="rapidas"></div>
+      <form class="escribir" id="f-chat">
+        <input id="in-chat" placeholder="Escríbele a Roti..." autocomplete="off" enterkeyhint="send">
+        <button type="submit" aria-label="Enviar">➤</button>
+      </form>
+      <p class="privado">🔒 Roti funciona dentro de tu celular. No guarda lo que escribes.</p>
+    </div>
+  </section>
+
   <!-- COMBOS -->
-  <section id="combos" class="wrap" style="padding:0">
+  <section id="combos" class="wrap" style="padding:0" hidden>
     <div class="card" style="display:grid;gap:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
         <h2>Tu combo</h2>
         <div class="chips" id="modo"></div>
       </div>
       <div class="chips" id="estilos"></div>
+      <div id="combo-pensar" hidden></div>
       <div class="combo" id="combo"></div>
       <div class="extra" id="extra"></div>
     </div>
@@ -209,7 +264,8 @@ button:focus-visible, .chip:focus-visible { outline: 2px solid var(--cyan); outl
 </div>
 
 <nav role="tablist">
-  <button role="tab" data-tab="combos" aria-selected="true"><i>🎲</i>Combos</button>
+  <button role="tab" data-tab="roti" aria-selected="true"><i>🤖</i>Roti</button>
+  <button role="tab" data-tab="combos" aria-selected="false"><i>🎲</i>Combos</button>
   <button role="tab" data-tab="sensi" aria-selected="false"><i>🎯</i>Sensi</button>
   <button role="tab" data-tab="entrenar" aria-selected="false"><i>💥</i>Entrenar</button>
   <button role="tab" data-tab="tips" aria-selected="false"><i>🔥</i>Tips</button>
@@ -412,7 +468,47 @@ function pintarCombo() {
 function textoCombo(c) {
   return `🔥 Combo ${ESTILOS.find((e) => e.id === c.estilo).n} (${c.modo.toUpperCase()})\nActiva: ${c.activa}\nPasivas: ${c.pasivas.join(", ")}\nMascota: ${c.mascota}\nArmas: ${c.armas}`;
 }
-$("generar").addEventListener("click", generar);
+// mascota (SVG propio)
+function mascotaSVG() {
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">
+    <line x1="50" y1="14" x2="50" y2="4" stroke="#b6ff3b" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="50" cy="4" r="5" fill="#ff8a1f"/>
+    <rect x="14" y="14" width="72" height="58" rx="22" fill="#b6ff3b"/>
+    <rect x="22" y="24" width="56" height="38" rx="15" fill="#10140a"/>
+    <g class="ojo"><ellipse cx="38" cy="42" rx="7" ry="9" fill="#e9ffd0"/><circle cx="40" cy="44" r="3.4" fill="#10140a"/></g>
+    <g class="ojo"><ellipse cx="62" cy="42" rx="7" ry="9" fill="#e9ffd0"/><circle cx="64" cy="44" r="3.4" fill="#10140a"/></g>
+    <path d="M44 54 Q50 59 56 54" stroke="#b6ff3b" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <rect x="6" y="36" width="9" height="16" rx="4" fill="#8fd12a"/><rect x="85" y="36" width="9" height="16" rx="4" fill="#8fd12a"/>
+    <rect x="30" y="74" width="40" height="20" rx="9" fill="#8fd12a"/>
+    <circle cx="50" cy="84" r="4" fill="#ff8a1f"/>
+  </svg>`;
+}
+function ponerMascota(el, icono) {
+  el.innerHTML = mascotaSVG() + (icono ? `<div class="burbuja">${icono}</div>` : "");
+  el.classList.toggle("pensando", !!icono);
+}
+const PASOS_COMBO = ["Analizando tu estilo de juego", "Eligiendo la habilidad activa", "Sumando las 3 pasivas", "Buscando la mascota ideal", "Revisando las armas"];
+const ICONOS_PASO = ["🧠", "⚡", "🛡", "🐾", "🔫"];
+// Animación "Roti está pensando tu combo"; llama a fin() al terminar
+function pensar(cont, fin) {
+  cont.hidden = false;
+  cont.innerHTML = `<div class="pensar"><div class="masc"></div><div class="t">ROTI ESTÁ PENSANDO TU COMBO</div><div class="p"></div><div class="bar"><div></div></div><div class="pct">0%</div></div>`;
+  const masc = cont.querySelector(".masc"), paso = cont.querySelector(".p"), bar = cont.querySelector(".bar div"), pct = cont.querySelector(".pct");
+  const dur = matchMedia("(prefers-reduced-motion: reduce)").matches ? 300 : 1900, t0 = performance.now();
+  let ultimo = -1;
+  (function cuadro(t) {
+    const k = Math.min(1, (t - t0) / dur);
+    const i = Math.min(PASOS_COMBO.length - 1, Math.floor(k * PASOS_COMBO.length));
+    if (i !== ultimo) { ultimo = i; paso.textContent = PASOS_COMBO[i]; ponerMascota(masc, ICONOS_PASO[i]); }
+    bar.style.width = k * 100 + "%"; pct.textContent = Math.round(k * 100) + "%";
+    if (k < 1) requestAnimationFrame(cuadro); else { cont.hidden = true; fin(); }
+  })(t0);
+}
+function generarConAnimacion() {
+  $("combo").hidden = $("extra").hidden = true;
+  pensar($("combo-pensar"), () => { $("combo").hidden = $("extra").hidden = false; generar(); });
+}
+$("generar").addEventListener("click", generarConAnimacion);
 $("copiar").addEventListener("click", () => copiar(textoCombo(combo)));
 $("guardar").addEventListener("click", () => {
   const favs = leer("rot-favs", []);
@@ -616,16 +712,171 @@ $("r-mejor").textContent = leer("rot-record", 0) || "–";
 addEventListener("resize", medir);
 requestAnimationFrame(dibujar);
 
+// ================= ROTI: asistente =================
+const chat = $("chat");
+ponerMascota($("masc-roti"));
+const norm = (t) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 +.\-]/g, " ").replace(/\s+/g, " ").trim();
+const tiene = (t, ...p) => p.some((x) => t.includes(x));
+function msgYo(texto) { const d = document.createElement("div"); d.className = "msg yo"; d.textContent = texto; chat.append(d); chat.scrollTop = chat.scrollHeight; }
+// r = { texto, html?, ops?: [[etiqueta, accion]] }
+function msgBot(r, demora = 650) {
+  const esc = document.createElement("div"); esc.className = "msg bot escribiendo"; esc.textContent = "Roti está escribiendo…";
+  chat.append(esc); chat.scrollTop = chat.scrollHeight;
+  $("roti-estado").textContent = "ESCRIBIENDO"; ponerMascota($("masc-roti"), "💬");
+  setTimeout(() => {
+    esc.classList.remove("escribiendo"); esc.textContent = r.texto;
+    if (r.html) { const h = document.createElement("div"); h.innerHTML = r.html; esc.append(h); }
+    if (r.ops) {
+      const ops = document.createElement("div"); ops.className = "ops";
+      for (const [et, acc] of r.ops) { const b = document.createElement("button"); b.textContent = et; b.addEventListener("click", () => { msgYo(et); acc(); }); ops.append(b); }
+      esc.append(ops);
+    }
+    $("roti-estado").textContent = "EN LÍNEA"; ponerMascota($("masc-roti"));
+    chat.scrollTop = chat.scrollHeight;
+  }, demora);
+}
+const ir = (tab) => () => abrir(tab);
+const OPS_MENU = () => [["🎲 Armar un combo", pedirEstilo], ["🎯 Mi sensibilidad", pedirGama], ["🐢 Quitar el lag", () => responder("lag")], ["💥 Cabeza", () => responder("cabeza")]];
+
+// --- combo guiado ---
+function pedirEstilo() {
+  msgBot({ texto: "¿Cómo juegas? Elige tu estilo:", ops: [...ESTILOS.map((e) => [`${e.ico} ${e.n}`, () => comboDeEstilo(e.id)]), ["🤔 No sé", () => test(0, {})]] });
+}
+const PREGUNTAS = [
+  { q: "1/3 · Cuando ves a un enemigo cerca, ¿qué haces?", o: [["Voy directo a por él", { rusher: 2, velocidad: 1 }], ["Le disparo de lejos", { sniper: 2 }], ["Pongo pared gloo y espero", { escudo: 2, vida: 1 }]] },
+  { q: "2/3 · ¿Qué arma usas más?", o: [["Escopeta o subfusil", { rusher: 2, velocidad: 1 }], ["Francotirador", { sniper: 2 }], ["Rifle de asalto", { escudo: 1, apoyo: 1, vida: 1 }]] },
+  { q: "3/3 · ¿Qué haces por tu escuadra?", o: [["Entro primero", { rusher: 1, velocidad: 2 }], ["Los reviso y curo", { apoyo: 2, vida: 2 }], ["Cubro desde atrás", { sniper: 1, apoyo: 1 }]] },
+];
+function test(i, pts) {
+  if (i === PREGUNTAS.length) {
+    const ganador = Object.entries(pts).sort((a, b) => b[1] - a[1])[0][0];
+    const e = ESTILOS.find((x) => x.id === ganador);
+    msgBot({ texto: `Listo: tu estilo es ${e.ico} ${e.n}. ${PORQUE[ganador]}` });
+    setTimeout(() => comboDeEstilo(ganador), 900);
+    return;
+  }
+  const P = PREGUNTAS[i];
+  msgBot({ texto: P.q, ops: P.o.map(([et, suma]) => [et, () => { const n = { ...pts }; for (const k in suma) n[k] = (n[k] || 0) + suma[k]; test(i + 1, n); }]) });
+}
+function comboDeEstilo(id, fijarActiva) {
+  estilo = id; escribir("rot-estilo", id);
+  bloqueos = { activa: false, p0: false, p1: false, p2: false, mascota: false, armas: false };
+  if (fijarActiva) { combo = { ...(combo || {}), activa: fijarActiva, pasivas: combo ? combo.pasivas : ["Jota", "Dasha", "Shirou"] }; bloqueos.activa = true; }
+  const caja = document.createElement("div"); caja.className = "msg bot"; chat.append(caja); chat.scrollTop = chat.scrollHeight;
+  pensar(caja, () => {
+    caja.remove(); generar(); bloqueos.activa = false;
+    const c = combo, e = ESTILOS.find((x) => x.id === c.estilo);
+    msgBot({
+      texto: `Tu combo ${e.ico} ${e.n} está listo:`,
+      html: `<div class="mini"><span><b>Activa:</b> ${c.activa}</span><span><b>Pasivas:</b> ${c.pasivas.join(", ")}</span><span><b>Mascota:</b> ${c.mascota}</span><span><b>Armas:</b> ${c.armas}</span></div>`,
+      ops: [["Ver detalles", ir("combos")], ["Otro igual", () => comboDeEstilo(id)], ["Copiar", () => { copiar(textoCombo(c)); }]],
+    }, 200);
+  });
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// --- sensi guiada ---
+function pedirGama() {
+  msgBot({ texto: "¿Qué tan potente es tu celular?", ops: OPC.gama.map((g) => [g.n, () => pedirDedos(g.id)]) });
+}
+function pedirDedos(gama) {
+  S.gama = gama;
+  msgBot({ texto: "¿Con cuántos dedos juegas?", ops: OPC.dedos.map((d) => [d.n, () => darSensi(d.id)]) });
+}
+function darSensi(dedos) {
+  S.dedos = dedos; S.variante = 0; escribir("rot-sensi", S); pintarSensi();
+  const r = calcularSensi();
+  msgBot({
+    texto: `Esta es tu sensi (escala hasta ${S.escala}):`,
+    html: `<div class="mini">${CAMPOS.map((c) => `<span><b>${c.n}:</b> ${r[c.k]}</span>`).join("")}</div>`,
+    ops: [["Ajustar más", ir("sensi")], ["Copiar", () => copiar("🎯 Mi sensi (Rotísimo)\n" + CAMPOS.map((c) => `${c.n}: ${r[c.k]}`).join("\n"))], ["Probar en Entrenar", ir("entrenar")]],
+  });
+}
+
+// --- respuestas por tema ---
+const RESP = {
+  lag: { texto: "Para quitar el lag:\n• Gráficos en Fluido y activa FPS altos solo si tu celular no se calienta.\n• Cierra las apps de fondo antes de jugar.\n• Usa Wi-Fi de 5 GHz si tu módem lo tiene, o datos con buena señal.\n• Libera al menos 3 GB de almacenamiento.\n• Activa el modo juego / Game Turbo de tu celular.\n• Borra la caché del juego desde Ajustes del celular → Apps." },
+  calienta: { texto: "Si se te calienta:\n• Quítale la funda mientras juegas.\n• No juegues cargando.\n• Baja el brillo y los gráficos a Fluido.\n• Desactiva sombras y FPS altos.\n• Juega en un lugar fresco, no en la cama.\nUn celular caliente baja los FPS y la mira se siente más lenta." },
+  cabeza: { texto: "Para dar más tiros a la cabeza:\n• Camina con la mira a la altura de la cabeza.\n• Toca disparar y en el mismo movimiento jala el pulgar hacia arriba.\n• Usa punto rojo de cerca.\n• Con escopeta: espera la cabeza, no dispares al cuerpo.\nPractica el movimiento en Entrenar.", ops: [["💥 Ir a Entrenar", () => abrir("entrenar")], ["🎯 Mi sensi", () => pedirGama()]] },
+  calibrar: { texto: "Para calibrar tu mira:\n1. Ve al campo de entrenamiento con Desert Eagle.\n2. Dispara a la cabeza de un muñeco a 20 m.\n3. Si la mira se pasa de largo, baja 5 la General.\n4. Si no llega, súbele 5.\n5. Repite hasta que llegues justo a la cabeza con un solo movimiento.", ops: [["🎯 Ver mi sensi", ir("sensi")]] },
+  hud: { texto: "HUD rotísimo:\n• Botón de disparo grande (55-65%) y algo arriba del centro derecho.\n• Transparencia 30-40%.\n• Agacharse y pared gloo al alcance del índice si juegas con 3 o 4 dedos.\n• Mira y recargar cerca del pulgar derecho." },
+  cs: { texto: "Tips para CS (Duelo de escuadras):\n• Compra chaleco antes que arma si tienes poco dinero.\n• Juega en pareja: nunca entres solo.\n• Guarda paredes gloo para el final de la ronda.\n• Si quedas último, usa combo de Escudo o Vida.", ops: [["🛡 Combo para CS", () => { modo = "cs"; escribir("rot-modo", "cs"); comboDeEstilo("escudo"); }]] },
+  br: { texto: "Tips para BR:\n• Cae en zonas medias, no en las más calientes, si quieres subir de rango.\n• Rota temprano hacia la zona.\n• Busca altura antes del cierre final.\n• Lleva siempre 6+ paredes gloo.", ops: [["⚡ Combo para BR", () => { modo = "br"; escribir("rot-modo", "br"); comboDeEstilo("rusher"); }]] },
+  hack: { texto: "No te recomiendo hacks, regedit ni \"sensi hack\". Garena los detecta y banea la cuenta para siempre, y muchos traen virus. Lo que sí funciona: una buena sensi, HUD cómodo y 10 minutos de práctica diaria.", ops: [["🎯 Hacer mi sensi", pedirGama]] },
+};
+const ARMAS_INFO = {
+  m1887: "M1887: dos tiros a la cabeza tumban. Ideal para rusher; combínala con Jota o Caroline.",
+  mp40: "MP40: dispara rapidísimo de cerca. Jala suave hacia arriba mientras disparas.",
+  ump: "UMP: buena penetración de armadura y control fácil. Muy cómoda para empezar.",
+  awm: "AWM: un tiro a la cabeza derriba. Usa sensi baja en la mira y combo de Sniper.",
+  desert: "Desert Eagle: mucho daño a la cabeza. Es la mejor para practicar precisión.",
+  woodpecker: "Woodpecker: atraviesa armadura. Apunta al casco a media distancia.",
+  scar: "SCAR: estable y con buen daño. Rifle cómodo para todo.",
+  m4a1: "M4A1: mucha munición y poco retroceso. Buena para media distancia.",
+  ak: "AK: mucho daño pero retroceso alto. Agáchate al disparar.",
+  m1014: "M1014: escopeta con buen alcance. Apunta a la cabeza en el primer tiro.",
+  svd: "SVD: francotirador semiautomático; dispara varias veces seguidas.",
+  vector: "Vector: subfusil muy rápido para entrar con todo de cerca.",
+};
+function buscarPersonaje(t) {
+  for (const [lista, tipo] of [[ACTIVOS, "activa"], [PASIVOS, "pasiva"], [MASCOTAS, "mascota"]])
+    for (const x of lista) { const k = norm(x.n); if (new RegExp(`(^| )${k.replace(/[.\-]/g, "\\$&")}( |$)`).test(t)) return { x, tipo }; }
+  return null;
+}
+function responder(tema) { const r = RESP[tema]; msgBot({ ...r, ops: r.ops || OPS_MENU() }); }
+function entender(texto) {
+  const t = norm(texto);
+  if (!t) return;
+  const est = ESTILOS.find((e) => t.includes(norm(e.n)) || (e.id === "escudo" && tiene(t, "tanque")) || (e.id === "vida" && tiene(t, "curandero")));
+  const pj = buscarPersonaje(t);
+  if (tiene(t, "hack", "regedit", "aimbot", "trampa", "chetos")) return responder("hack");
+  if (tiene(t, "combo", "armame", "arma un", "habilidad")) {
+    if (pj && pj.tipo === "activa") return comboDeEstilo(est ? est.id : pj.x.t[0], pj.x.n);
+    if (est) return comboDeEstilo(est.id);
+    return pedirEstilo();
+  }
+  if (pj) {
+    const estilos = pj.x.t.map((id) => ESTILOS.find((e) => e.id === id).n.toLowerCase()).join(", ");
+    const ops = pj.tipo === "activa" ? [[`Combo con ${pj.x.n}`, () => comboDeEstilo(pj.x.t[0], pj.x.n)]] : [["🎲 Armar un combo", pedirEstilo]];
+    return msgBot({ texto: `${pj.x.n} (${pj.tipo}): ${pj.x.h}\nVa bien para: ${estilos}.`, ops });
+  }
+  const arma = Object.keys(ARMAS_INFO).find((k) => t.includes(k) || (k === "desert" && tiene(t, "deagle", "desierto")));
+  if (arma) return msgBot({ texto: ARMAS_INFO[arma], ops: [["💥 Practicar cabeza", ir("entrenar")]] });
+  if (tiene(t, "sensi", "sensibilidad", "dpi")) return pedirGama();
+  if (tiene(t, "lag", "traba", "fps", "ping", "lento", "se congela")) return responder("lag");
+  if (tiene(t, "calient", "temperatura", "bateria", "quema")) return responder("calienta");
+  if (tiene(t, "calibr")) return responder("calibrar");
+  if (tiene(t, "cabeza", "headshot", "apuntar", "punteria", "mira", "head")) return responder("cabeza");
+  if (tiene(t, "hud", "boton", "dedos", "controles")) return responder("hud");
+  if (tiene(t, "cs", "duelo", "escuadras")) return responder("cs");
+  if (tiene(t, "br", "battle", "clasificatoria", "rango", "ranked")) return responder("br");
+  if (est) return comboDeEstilo(est.id);
+  if (tiene(t, "gracias", "grax", "thanks")) return msgBot({ texto: "¡De nada! A romperla 🔥" });
+  if (tiene(t, "hola", "buenas", "hey", "que onda", "ola")) return msgBot({ texto: "¡Hola! ¿En qué te ayudo hoy?", ops: OPS_MENU() });
+  msgBot({ texto: "No te entendí del todo 😅. Puedo ayudarte con combos, sensi, lag, tiros a la cabeza, armas o cualquier personaje (por ejemplo: \"combo con Tatsuya\" o \"qué hace Jota\").", ops: OPS_MENU() });
+}
+$("f-chat").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const v = $("in-chat").value.trim(); if (!v) return;
+  $("in-chat").value = ""; msgYo(v); entender(v);
+});
+const RAPIDAS = [["🎯", "Mi sensibilidad", pedirGama], ["🎲", "Armar un combo", pedirEstilo], ["📱", "Sensi para Android", pedirGama], ["🎚", "Calibrar mi mira", () => responder("calibrar")], ["🐢", "Quitar el lag", () => responder("lag")], ["🔥", "Se me calienta", () => responder("calienta")]];
+for (const [ico, et, acc] of RAPIDAS) {
+  const b = document.createElement("button"); b.innerHTML = `<span>${ico}</span><span></span>`; b.lastChild.textContent = et;
+  b.addEventListener("click", () => { msgYo(et); acc(); }); $("rapidas").append(b);
+}
+msgBot({ texto: "¡Hola! Soy Roti 🤖. Te armo combos, te calculo la sensi y te doy tips para dar más tiros a la cabeza. ¿Qué necesitas?" }, 300);
+
 // ================= NAVEGACIÓN =================
 const tabs = [...document.querySelectorAll("nav button")];
 function abrir(t) {
   tabs.forEach((b) => { const on = b.dataset.tab === t; b.setAttribute("aria-selected", on); $(b.dataset.tab).hidden = !on; });
-  $("tip-card").hidden = t === "entrenar";
+  $("tip-card").hidden = t === "entrenar" || t === "roti";
   escribir("rot-tab", t); scrollTo(0, 0);
   if (t === "entrenar") requestAnimationFrame(medir);
 }
 tabs.forEach((b) => b.addEventListener("click", () => abrir(b.dataset.tab)));
-abrir(leer("rot-tab", "combos"));
+abrir(leer("rot-tab", "roti"));
 </script>
 </body>
 </html>
