@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rotísimo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: una pantalla por pestaña, barra de navegación fija abajo (como una app) */
+:root {
+  --bg: #0b0d12;
+  --card: #141821;
+  --card2: #1b2030;
+  --line: #262d3f;
+  --ink: #eef1f7;
+  --muted: #8b94a8;
+  --lime: #b6ff3b;
+  --orange: #ff8a1f;
+  --pink: #ff4f8b;
+  --cyan: #38d6ff;
+  --gold: #ffcc4d;
+  --font-display: "Chakra Petch", "Arial Narrow", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.45; }
+body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+.wrap { max-width: 640px; margin: 0 auto; padding: 16px max(14px, env(safe-area-inset-left, 0px)) 24px max(14px, env(safe-area-inset-right, 0px)); display: grid; gap: 14px; }
+.top { display: flex; align-items: center; gap: 10px; padding-top: env(safe-area-inset-top, 0px); }
+.logo { font-family: var(--font-display); font-weight: 700; font-size: 28px; letter-spacing: 1px; line-height: 1; }
+.logo b { color: var(--lime); }
+.logo small { display: block; font-family: var(--font-body); font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.4px; margin-top: 4px; }
+h2 { font-family: var(--font-display); font-weight: 700; font-size: 22px; margin: 0; letter-spacing: 0.4px; }
+h3 { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 700; }
+p { margin: 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.tip { display: flex; gap: 10px; align-items: flex-start; background: linear-gradient(135deg, #1a2410, var(--card)); border-color: #34481a; }
+.tip .ico { font-size: 22px; line-height: 1; }
+.tip b { display: block; font-size: 11px; letter-spacing: 0.15em; color: var(--lime); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--card2); color: var(--ink); border-radius: 999px; padding: 7px 12px; font: 600 13px var(--font-body); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--lime); color: #10140a; border-color: var(--lime); }
+.combo { display: grid; grid-template-columns: 1fr 1.25fr; gap: 8px; }
+.slot { position: relative; background: var(--card2); border: 1px solid var(--line); border-radius: 14px; padding: 10px; display: flex; gap: 10px; align-items: center; cursor: pointer; text-align: left; color: inherit; font: inherit; min-width: 0; }
+.slot.activa { grid-row: span 3; flex-direction: column; justify-content: center; text-align: center; border-color: var(--lime); background: radial-gradient(120% 80% at 50% 20%, #24361a, var(--card2)); }
+.slot.sel { outline: 2px solid var(--cyan); outline-offset: 1px; }
+.av { flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font: 700 17px var(--font-display); color: #0b0d12; }
+.activa .av { width: 92px; height: 92px; border-radius: 26px; font-size: 36px; }
+.slot .rol { font-size: 10px; letter-spacing: 0.16em; font-weight: 700; text-transform: uppercase; }
+.slot .nom { font: 700 17px var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slot .txt { min-width: 0; }
+.lock { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); font-size: 13px; display: grid; place-items: center; cursor: pointer; }
+.lock[aria-pressed="true"] { background: var(--gold); color: #1a1405; border-color: var(--gold); }
+.extra { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.det { border-left: 3px solid var(--lime); }
+.det .t { font: 700 18px var(--font-display); }
+.porque { background: linear-gradient(135deg, #2a1d06, var(--card)); border-color: #5a4210; }
+.porque h3 { color: var(--gold); }
+.porque ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.acciones { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
+.btn { border: 0; border-radius: 14px; padding: 14px; font: 700 14px var(--font-body); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; background: var(--card2); color: var(--ink); border: 1px solid var(--line); }
+.btn.pri { background: var(--lime); color: #10140a; border-color: var(--lime); }
+.btn.org { background: var(--orange); color: #1a0d00; border-color: var(--orange); }
+.btn:active { transform: scale(0.98); }
+.lista { display: grid; gap: 8px; }
+.fila { display: flex; gap: 10px; align-items: center; background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+.fila .txt { flex: 1; min-width: 0; font-size: 13px; color: var(--muted); }
+.fila .txt b { display: block; color: var(--ink); font-size: 14px; }
+.x { background: none; border: 0; color: var(--pink); font-weight: 700; cursor: pointer; padding: 6px; }
+/* sensi */
+.form { display: grid; gap: 12px; }
+.form label { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; display: block; margin-bottom: 6px; text-transform: uppercase; }
+.barra { display: grid; grid-template-columns: 96px 1fr 44px; gap: 10px; align-items: center; }
+.barra span:first-child { font-weight: 600; font-size: 14px; }
+.track { height: 12px; border-radius: 99px; background: var(--card2); overflow: hidden; border: 1px solid var(--line); }
+.fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--lime), var(--orange)); transition: width .4s ease; }
+.val { font: 700 20px var(--font-display); text-align: right; font-variant-numeric: tabular-nums; }
+.sensi { display: grid; gap: 12px; }
+ul.cons { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: #cfd5e2; }
+ul.cons b { color: var(--ink); }
+.aviso { border-color: #5a1a2c; background: linear-gradient(135deg, #2a0e17, var(--card)); }
+.aviso b { color: var(--pink); }
+/* entrenador */
+.juego { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); touch-action: none; user-select: none; -webkit-user-select: none; }
+.juego canvas { display: block; width: 100%; height: 360px; }
+.hud { position: absolute; top: 8px; left: 10px; right: 10px; display: flex; justify-content: space-between; font: 700 14px var(--font-display); pointer-events: none; text-shadow: 0 1px 3px #000; }
+.fuego { position: absolute; right: 14px; bottom: 14px; width: 84px; height: 84px; border-radius: 50%; background: rgba(255, 79, 139, 0.85); border: 3px solid #fff; color: #fff; font: 700 13px var(--font-display); }
+.inicio { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(11, 13, 18, 0.78); text-align: center; padding: 20px; }
+.inicio div { display: grid; gap: 10px; max-width: 320px; }
+.res { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.res div { background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 10px; text-align: center; }
+.res b { display: block; font: 700 24px var(--font-display); color: var(--lime); }
+.res span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+/* navegación */
+nav { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(11, 13, 18, 0.96); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right, 0px)); backdrop-filter: blur(8px); z-index: 5; }
+nav button { background: none; border: 0; color: var(--muted); font: 600 11px var(--font-body); display: grid; justify-items: center; gap: 2px; padding: 6px 0; cursor: pointer; border-radius: 12px; }
+nav button i { font-style: normal; font-size: 20px; }
+nav button[aria-selected="true"] { color: var(--lime); background: #161d10; }
+.toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--lime); color: #10140a; font-weight: 700; padding: 10px 16px; border-radius: 999px; z-index: 9; }
+button:focus-visible, .chip:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="logo">ROTÍ<b>SIMO</b><small>Combos · Sensi · Tiro a la cabeza</small></div>
+  </div>
+
+  <div class="card tip" id="tip-card">
+    <div class="ico">💡</div>
+    <div><b>TIP RÁPIDO</b><p id="tip"></p></div>
+  </div>
+
+  <!-- COMBOS -->
+  <section id="combos" class="wrap" style="padding:0">
+    <div class="card" style="display:grid;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <h2>Tu combo</h2>
+        <div class="chips" id="modo"></div>
+      </div>
+      <div class="chips" id="estilos"></div>
+      <div class="combo" id="combo"></div>
+      <div class="extra" id="extra"></div>
+    </div>
+    <div class="card det" id="detalle"></div>
+    <div class="card porque" id="porque"></div>
+    <div class="acciones">
+      <button class="btn pri" id="generar">🎲 Generar combo</button>
+      <button class="btn" id="copiar">Copiar</button>
+    </div>
+    <button class="btn org" id="guardar">★ Guardar en favoritos</button>
+    <div class="card" id="fav-card">
+      <h3>Mis favoritos</h3>
+      <div class="lista" id="favs"></div>
+    </div>
+    <p style="color:var(--muted);font-size:12px">Toca un personaje para ver su habilidad. El candado 🔒 lo deja fijo cuando generas otro combo. Las habilidades pueden cambiar con cada actualización del juego.</p>
+  </section>
+
+  <!-- SENSI -->
+  <section id="sensi" class="wrap" style="padding:0" hidden>
+    <div class="card form">
+      <h2>Generador de sensi</h2>
+      <div><label>Tu celular</label><div class="chips" id="s-gama"></div></div>
+      <div><label>Tamaño de pantalla</label><div class="chips" id="s-pantalla"></div></div>
+      <div><label>¿Con cuántos dedos juegas?</label><div class="chips" id="s-dedos"></div></div>
+      <div><label>¿Qué quieres?</label><div class="chips" id="s-estilo"></div></div>
+      <div><label>Máximo de sensibilidad en tu juego</label><div class="chips" id="s-escala"></div></div>
+    </div>
+    <div class="card sensi" id="s-res"></div>
+    <div class="acciones">
+      <button class="btn pri" id="s-otra">🎲 Otra variante</button>
+      <button class="btn" id="s-copiar">Copiar sensi</button>
+    </div>
+    <div class="card">
+      <h3>Botón de disparo y HUD</h3>
+      <ul class="cons" id="s-hud"></ul>
+    </div>
+  </section>
+
+  <!-- ENTRENAR -->
+  <section id="entrenar" class="wrap" style="padding:0" hidden>
+    <div class="card" style="display:grid;gap:10px">
+      <h2>Entrenador de cabeza</h2>
+      <p style="color:var(--muted);font-size:14px">La mira empieza a la altura del pecho, como en el juego. Arrastra hacia arriba para subirla a la cabeza y dispara. Practica el movimiento de "jalar para arriba".</p>
+      <div class="juego" id="juego">
+        <canvas id="cv"></canvas>
+        <div class="hud"><span id="h-tiempo">30s</span><span id="h-score">0 cabezas</span></div>
+        <button class="fuego" id="fuego">FUEGO</button>
+        <div class="inicio" id="inicio">
+          <div>
+            <h2 id="i-titulo">¿Listo?</h2>
+            <p id="i-texto" style="color:var(--muted)">30 segundos. Cuenta cuántos tiros a la cabeza logras.</p>
+            <button class="btn pri" id="empezar">Empezar</button>
+          </div>
+        </div>
+      </div>
+      <div class="chips" id="dificultad"></div>
+      <div class="res">
+        <div><b id="r-hs">–</b><span>% cabeza</span></div>
+        <div><b id="r-mejor">–</b><span>Récord</span></div>
+        <div><b id="r-tiempo">–</b><span>Seg. por tiro</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIPS -->
+  <section id="tips" class="wrap" style="padding:0" hidden>
+    <div class="card">
+      <h3>Cómo dar más tiros a la cabeza</h3>
+      <ul class="cons" id="t-cabeza"></ul>
+    </div>
+    <div class="card">
+      <h3>Armas para la cabeza</h3>
+      <ul class="cons" id="t-armas"></ul>
+    </div>
+    <div class="card">
+      <h3>Rutina de 10 minutos</h3>
+      <ul class="cons" id="t-rutina"></ul>
+    </div>
+    <div class="card aviso">
+      <p><b>Ojo:</b> los "regedit", aimbots, archivos de "sensi hack" y apps que prometen tiros automáticos a la cabeza son trampas y te pueden banear la cuenta para siempre. Rotísimo solo usa ajustes normales del juego.</p>
+    </div>
+    <button class="btn org" id="abrir-ff" hidden>▶ Abrir el juego</button>
+  </section>
+</div>
+
+<nav role="tablist">
+  <button role="tab" data-tab="combos" aria-selected="true"><i>🎲</i>Combos</button>
+  <button role="tab" data-tab="sensi" aria-selected="false"><i>🎯</i>Sensi</button>
+  <button role="tab" data-tab="entrenar" aria-selected="false"><i>💥</i>Entrenar</button>
+  <button role="tab" data-tab="tips" aria-selected="false"><i>🔥</i>Tips</button>
+</nav>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+// ================= DATOS =================
+// tags: rusher, sniper, escudo, vida, velocidad, apoyo
+const ACTIVOS = [
+  { n: "Alok", h: "Crea un aura que cura vida y da más velocidad a ti y a tus aliados cercanos.", t: ["vida", "velocidad", "apoyo"] },
+  { n: "Tatsuya", h: "Da un impulso rápido hacia adelante. El enfriamiento se reinicia cuando derribas a un enemigo.", t: ["rusher", "velocidad"] },
+  { n: "Chrono", h: "Levanta un campo de fuerza que bloquea el daño y te da más velocidad un momento.", t: ["escudo", "rusher"] },
+  { n: "Skyler", h: "Lanza una onda sónica que rompe paredes gloo. Recupera vida cada vez que pones una pared gloo.", t: ["rusher", "vida"] },
+  { n: "Xayne", h: "Gana vida temporal y hace más daño a paredes gloo y escudos.", t: ["rusher", "escudo"] },
+  { n: "K", h: "Dos modos: Jiu-jitsu sube tu EP máximo y ayuda a tus aliados; Psicología convierte EP en vida.", t: ["vida", "apoyo"] },
+  { n: "Dimitri", h: "Crea una zona de curación. Dentro, los derribados se pueden levantar solos.", t: ["vida", "apoyo"] },
+  { n: "Wukong", h: "Se transforma en arbusto para esconderse.", t: ["escudo", "sniper"] },
+  { n: "Clu", h: "Localiza enemigos cercanos que no estén agachados o tumbados.", t: ["sniper", "apoyo"] },
+  { n: "Steffie", h: "Pinta un grafiti que restaura tu chaleco y reduce el daño de proyectiles.", t: ["escudo", "apoyo"] },
+  { n: "Homer", h: "Manda un dron que persigue al enemigo, lo ralentiza y lo daña.", t: ["rusher", "sniper"] },
+  { n: "Kenta", h: "Pone un escudo de espada que reduce el daño que recibes de frente.", t: ["escudo", "rusher"] },
+  { n: "Orion", h: "Absorbe vida de los enemigos cercanos y se vuelve inmune un momento.", t: ["rusher", "vida", "escudo"] },
+];
+const PASIVOS = [
+  { n: "Jota", h: "Recupera vida al hacer daño o derribar con escopetas y subfusiles.", t: ["rusher", "vida"] },
+  { n: "Dasha", h: "Menos retroceso al disparar y menos daño por caída. Ideal para controlar la mira.", t: ["rusher", "sniper"] },
+  { n: "Shirou", h: "Marca a quien te dispara; tu siguiente tiro contra él atraviesa más armadura.", t: ["rusher"] },
+  { n: "Hayato", h: "Más penetración de armadura mientras menos vida tienes.", t: ["rusher"] },
+  { n: "Kelly", h: "Corres más rápido.", t: ["velocidad", "rusher"] },
+  { n: "Moco", h: "Marca al enemigo que le disparas para que tu equipo lo vea.", t: ["apoyo", "sniper"] },
+  { n: "Laura", h: "Más precisión al disparar con mira.", t: ["sniper"] },
+  { n: "Maro", h: "Más daño mientras más lejos está el enemigo.", t: ["sniper"] },
+  { n: "Rafael", h: "Disparos silenciosos con francotirador y rifles de precisión.", t: ["sniper"] },
+  { n: "Maxim", h: "Come champiñones y usa botiquines más rápido.", t: ["vida"] },
+  { n: "Luqueta", h: "Tu vida máxima sube con cada eliminación (Battle Royale).", t: ["vida", "rusher"] },
+  { n: "Leon", h: "Recupera vida al salir del combate.", t: ["vida"] },
+  { n: "Andrew", h: "Tu chaleco se desgasta menos.", t: ["escudo"] },
+  { n: "Antonio", h: "Empiezas cada ronda con vida extra.", t: ["escudo", "vida"] },
+  { n: "Kapella", h: "Los objetos de curación curan más y tus aliados derribados pierden vida más lento.", t: ["vida", "apoyo"] },
+  { n: "Thiva", h: "Reanima más rápido a tus compañeros.", t: ["apoyo", "vida"] },
+  { n: "Olivia", h: "Tus compañeros reanimados vuelven con vida extra.", t: ["apoyo"] },
+  { n: "Miguel", h: "Ganas EP con cada eliminación.", t: ["vida", "rusher"] },
+  { n: "Ford", h: "Recibes menos daño fuera de la zona segura.", t: ["escudo"] },
+  { n: "D-bee", h: "Más velocidad y precisión mientras disparas en movimiento.", t: ["rusher", "velocidad"] },
+  { n: "Caroline", h: "Más velocidad con escopeta en la mano.", t: ["rusher", "velocidad"] },
+  { n: "Joseph", h: "Ganas velocidad al recibir daño.", t: ["velocidad", "escudo"] },
+  { n: "Wolfrahh", h: "Recibes menos daño de tiros a la cabeza.", t: ["escudo"] },
+  { n: "Paloma", h: "Las balas de rifle de asalto no ocupan espacio en la mochila.", t: ["sniper", "apoyo"] },
+];
+const MASCOTAS = [
+  { n: "Mr. Waggor", h: "Te fabrica granadas de pared gloo con el tiempo.", t: ["escudo", "rusher"] },
+  { n: "Rockie", h: "Reduce el enfriamiento de tu habilidad activa.", t: ["rusher", "velocidad", "apoyo"] },
+  { n: "Ottero", h: "Al curarte, recuperas también EP.", t: ["vida"] },
+  { n: "Detective Panda", h: "Recuperas vida con cada eliminación.", t: ["vida", "rusher"] },
+  { n: "Falco", h: "Planeas más rápido al caer del avión.", t: ["velocidad"] },
+  { n: "Dreki", h: "Detecta enemigos que usan botiquín cerca de ti.", t: ["sniper", "apoyo"] },
+  { n: "Beaston", h: "Lanzas granadas y paredes gloo más lejos.", t: ["escudo", "apoyo"] },
+  { n: "Agent Hop", h: "Ganas EP cuando se cierra la zona.", t: ["vida"] },
+];
+const ARMAS = {
+  rusher: ["M1887 + MP40", "M1014 + UMP", "M1887 + Desert Eagle", "MP40 + M590"],
+  sniper: ["AWM + M4A1", "Woodpecker + SCAR", "SVD + M4A1", "AWM + MP40"],
+  escudo: ["M4A1 + M1887", "SCAR + MP40", "AK + M1014"],
+  vida: ["SCAR + MP40", "M4A1 + UMP", "Woodpecker + MP40"],
+  velocidad: ["MP40 + M1887", "UMP + M1014", "Vector + M1887"],
+  apoyo: ["M4A1 + UMP", "SCAR + Woodpecker", "AK + MP40"],
+};
+const ESTILOS = [
+  { id: "rusher", n: "Rusher", ico: "⚡", c: "var(--orange)" },
+  { id: "sniper", n: "Sniper", ico: "🎯", c: "var(--cyan)" },
+  { id: "escudo", n: "Escudo", ico: "🛡", c: "var(--gold)" },
+  { id: "vida", n: "Vida", ico: "❤", c: "var(--pink)" },
+  { id: "velocidad", n: "Velocidad", ico: "💨", c: "var(--lime)" },
+  { id: "apoyo", n: "Apoyo", ico: "🤝", c: "#b28cff" },
+];
+const PORQUE = {
+  rusher: "Entras primero y ganas los 1 vs 1 de cerca.",
+  sniper: "Controlas la distancia y marcas al enemigo antes de que te vea.",
+  escudo: "Aguantas más daño y ganas los intercambios de paredes gloo.",
+  vida: "Te curas solo y sigues peleando sin parar a usar botiquín.",
+  velocidad: "Rotas rápido, cambias de cobertura y llegas primero al combate.",
+  apoyo: "Tu escuadra rinde más: revives rápido y ves al enemigo antes.",
+};
+const TIPS = [
+  "Deja la mira siempre a la altura de la cabeza mientras caminas: así solo arrastras un poquito.",
+  "Rompe la pared gloo del rival y entra justo después: es cuando menos se lo espera.",
+  "Con escopeta, salta y dispara en el aire: la mira sube sola hacia la cabeza.",
+  "Pon el botón de disparo un poco más arriba del centro derecho para jalar hacia arriba fácil.",
+  "Juega con 60 FPS o más si tu celular lo aguanta: la mira se siente más suave.",
+  "Calienta 5 minutos en el campo de entrenamiento antes de jugar clasificatoria.",
+  "En CS, compra chaleco antes que arma si tienes poco dinero.",
+  "No cambies tu sensi cada partida: dale al menos 3 días para acostumbrarte.",
+];
+
+// ================= UTILIDADES =================
+const $ = (id) => document.getElementById(id);
+const APP = !!(window.Android && Android.esApp && Android.esApp());
+const leer = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
+const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const azar = (a) => a[Math.floor(Math.random() * a.length)];
+function toast(t) { const el = $("toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => (el.hidden = true), 1800); }
+function copiar(texto) {
+  if (APP && Android.copiar) { Android.copiar(texto); toast("¡Copiado!"); return; }
+  (navigator.clipboard ? navigator.clipboard.writeText(texto) : Promise.reject()).then(() => toast("¡Copiado!"), () => toast("No se pudo copiar"));
+}
+function colorDe(nombre) {
+  let h = 0; for (const c of nombre) h = (h * 31 + c.charCodeAt(0)) % 360;
+  return `hsl(${h} 85% 62%)`;
+}
+function avatar(nombre) { return `<span class="av" style="background:linear-gradient(135deg, ${colorDe(nombre)}, ${colorDe(nombre + "x")})">${nombre.replace(/[^A-Za-z]/g, "").slice(0, 2).toUpperCase()}</span>`; }
+function chips(cont, opciones, actual, alCambiar) {
+  const el = $(cont); el.innerHTML = "";
+  for (const o of opciones) {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = o.n; b.setAttribute("aria-pressed", o.id === actual);
+    b.addEventListener("click", () => alCambiar(o.id));
+    el.append(b);
+  }
+}
+
+// ================= TIP ROTATIVO =================
+let iTip = Math.floor(Math.random() * TIPS.length);
+function ponerTip() { $("tip").textContent = TIPS[iTip % TIPS.length]; iTip++; }
+ponerTip(); setInterval(ponerTip, 9000);
+
+// ================= COMBOS =================
+let estilo = leer("rot-estilo", "rusher");
+let modo = leer("rot-modo", "br");
+let combo = leer("rot-combo", null);
+let bloqueos = { activa: false, p0: false, p1: false, p2: false, mascota: false, armas: false };
+let seleccion = "activa";
+
+function puntaje(item) { return item.t.includes(estilo) ? 3 : 1; }
+function elegir(lista, excluir = []) {
+  const pool = lista.filter((x) => !excluir.includes(x.n));
+  const total = pool.reduce((s, x) => s + puntaje(x), 0);
+  let r = Math.random() * total;
+  for (const x of pool) { r -= puntaje(x); if (r <= 0) return x; }
+  return pool[0];
+}
+function generar() {
+  const c = combo ? { ...combo } : {};
+  if (!combo || !bloqueos.activa) c.activa = elegir(ACTIVOS).n;
+  const fijos = [0, 1, 2].filter((i) => combo && bloqueos["p" + i]).map((i) => combo.pasivas[i]);
+  const pasivas = [];
+  for (let i = 0; i < 3; i++) {
+    if (combo && bloqueos["p" + i]) pasivas.push(combo.pasivas[i]);
+    else pasivas.push(elegir(PASIVOS, [...fijos, ...pasivas]).n);
+  }
+  c.pasivas = pasivas;
+  if (!combo || !bloqueos.mascota) c.mascota = elegir(MASCOTAS).n;
+  if (!combo || !bloqueos.armas) c.armas = azar(ARMAS[estilo]);
+  c.estilo = estilo; c.modo = modo;
+  combo = c; escribir("rot-combo", combo);
+  pintarCombo();
+}
+const buscar = (lista, n) => lista.find((x) => x.n === n);
+function pintarCombo() {
+  chips("modo", [{ id: "br", n: "BR" }, { id: "cs", n: "CS" }], modo, (m) => { modo = m; escribir("rot-modo", m); pintarCombo(); });
+  chips("estilos", ESTILOS.map((e) => ({ id: e.id, n: `${e.ico} ${e.n}` })), estilo, (e) => { estilo = e; escribir("rot-estilo", e); generar(); });
+  const el = $("combo"); el.innerHTML = "";
+  const slot = (key, rol, color, nombre, activa) => {
+    const b = document.createElement("div");
+    b.className = "slot" + (activa ? " activa" : "") + (seleccion === key ? " sel" : "");
+    b.tabIndex = 0; b.setAttribute("role", "button");
+    b.innerHTML = `${avatar(nombre)}<div class="txt"><div class="rol" style="color:${color}">${rol}</div><div class="nom"></div></div><button class="lock" aria-label="Fijar" aria-pressed="${bloqueos[key]}">${bloqueos[key] ? "🔒" : "🔓"}</button>`;
+    b.querySelector(".nom").textContent = nombre;
+    b.addEventListener("click", (e) => {
+      if (e.target.closest(".lock")) { bloqueos[key] = !bloqueos[key]; pintarCombo(); return; }
+      seleccion = key; pintarCombo();
+    });
+    return b;
+  };
+  el.append(slot("activa", "Activa", "var(--lime)", combo.activa, true));
+  combo.pasivas.forEach((p, i) => el.append(slot("p" + i, "Pasiva " + (i + 1), "var(--cyan)", p)));
+  const ex = $("extra"); ex.innerHTML = "";
+  ex.append(slot("mascota", "Mascota", "var(--pink)", combo.mascota));
+  ex.append(slot("armas", "Armas", "var(--gold)", combo.armas));
+  // detalle
+  let titulo, texto, rol;
+  if (seleccion === "activa") { rol = "Habilidad activa"; titulo = combo.activa; texto = buscar(ACTIVOS, combo.activa).h; }
+  else if (seleccion === "mascota") { rol = "Mascota"; titulo = combo.mascota; texto = buscar(MASCOTAS, combo.mascota).h; }
+  else if (seleccion === "armas") { rol = "Armas recomendadas"; titulo = combo.armas; texto = "Combinación pensada para tu estilo: una para pelear de cerca y otra para media distancia."; }
+  else { const n = combo.pasivas[+seleccion[1]]; rol = "Habilidad pasiva"; titulo = n; texto = buscar(PASIVOS, n).h; }
+  $("detalle").innerHTML = `<h3 style="color:var(--lime)"></h3><div class="t"></div><p style="color:#cfd5e2;margin-top:4px"></p>`;
+  $("detalle").children[0].textContent = rol; $("detalle").children[1].textContent = titulo; $("detalle").children[2].textContent = texto;
+  // por qué funciona
+  const e = ESTILOS.find((x) => x.id === estilo);
+  const razones = [PORQUE[estilo]];
+  const todos = [buscar(ACTIVOS, combo.activa), ...combo.pasivas.map((p) => buscar(PASIVOS, p)), buscar(MASCOTAS, combo.mascota)];
+  const encajan = todos.filter((x) => x.t.includes(estilo)).map((x) => x.n);
+  if (encajan.length) razones.push(`Encajan con ${e.n.toLowerCase()}: ${encajan.join(", ")}.`);
+  if (modo === "cs") razones.push("En CS (Duelo de escuadras) cada ronda cuenta: prioriza vida y escudo si juegas de último.");
+  else razones.push("En BR juega por zona: rota temprano y busca altura antes del cierre final.");
+  $("porque").innerHTML = `<h3>${e.ico} Por qué es rotísimo</h3><ul>${razones.map(() => "<li></li>").join("")}</ul>`;
+  [...$("porque").querySelectorAll("li")].forEach((li, i) => (li.textContent = razones[i]));
+  pintarFavs();
+}
+function textoCombo(c) {
+  return `🔥 Combo ${ESTILOS.find((e) => e.id === c.estilo).n} (${c.modo.toUpperCase()})\nActiva: ${c.activa}\nPasivas: ${c.pasivas.join(", ")}\nMascota: ${c.mascota}\nArmas: ${c.armas}`;
+}
+$("generar").addEventListener("click", generar);
+$("copiar").addEventListener("click", () => copiar(textoCombo(combo)));
+$("guardar").addEventListener("click", () => {
+  const favs = leer("rot-favs", []);
+  favs.unshift(combo); escribir("rot-favs", favs.slice(0, 30)); pintarFavs(); toast("Guardado en favoritos");
+});
+function pintarFavs() {
+  const favs = leer("rot-favs", []);
+  const el = $("favs"); el.innerHTML = "";
+  $("fav-card").hidden = !favs.length;
+  favs.forEach((c, i) => {
+    const f = document.createElement("div"); f.className = "fila";
+    f.innerHTML = `${avatar(c.activa)}<div class="txt"><b></b><span></span></div><button class="x" aria-label="Usar">Usar</button><button class="x" aria-label="Borrar">✕</button>`;
+    f.querySelector("b").textContent = `${c.activa} · ${ESTILOS.find((e) => e.id === c.estilo).n} ${c.modo.toUpperCase()}`;
+    f.querySelector("span").textContent = `${c.pasivas.join(", ")} · ${c.mascota}`;
+    const [usar, borrar] = f.querySelectorAll("button");
+    usar.style.color = "var(--lime)";
+    usar.addEventListener("click", () => { combo = { ...c }; estilo = c.estilo; modo = c.modo; escribir("rot-combo", combo); pintarCombo(); scrollTo({ top: 0, behavior: "smooth" }); });
+    borrar.addEventListener("click", () => { favs.splice(i, 1); escribir("rot-favs", favs); pintarFavs(); });
+    el.append(f);
+  });
+}
+if (!combo || !buscar(ACTIVOS, combo.activa)) generar(); else pintarCombo();
+
+// ================= SENSI =================
+const S = leer("rot-sensi", { gama: "media", pantalla: "mediana", dedos: "2", estilo: "cabeza", escala: "200", variante: 0 });
+const OPC = {
+  gama: [{ id: "baja", n: "Gama baja (2-4 GB)" }, { id: "media", n: "Gama media (6 GB)" }, { id: "alta", n: "Gama alta (8 GB+)" }],
+  pantalla: [{ id: "chica", n: "Chica (<6\")" }, { id: "mediana", n: "Mediana (6-6.7\")" }, { id: "grande", n: "Grande / tablet" }],
+  dedos: [{ id: "2", n: "2 dedos" }, { id: "3", n: "3 dedos" }, { id: "4", n: "4 dedos" }],
+  estilo: [{ id: "cabeza", n: "Más cabeza (rápida)" }, { id: "equilibrada", n: "Equilibrada" }, { id: "control", n: "Más control" }],
+  escala: [{ id: "100", n: "Hasta 100" }, { id: "200", n: "Hasta 200" }],
+};
+const CAMPOS = [
+  { k: "general", n: "General", base: 95 },
+  { k: "rojo", n: "Punto rojo", base: 88 },
+  { k: "x2", n: "Mira 2x", base: 82 },
+  { k: "x4", n: "Mira 4x", base: 76 },
+  { k: "awm", n: "Mira AWM", base: 46 },
+  { k: "libre", n: "Vista libre", base: 70 },
+];
+function calcularSensi() {
+  let aj = 0;
+  aj += { baja: 4, media: 0, alta: -3 }[S.gama];
+  aj += { chica: -4, mediana: 0, grande: 5 }[S.pantalla];
+  aj += { "2": 3, "3": 0, "4": -2 }[S.dedos];
+  const est = { cabeza: 3, equilibrada: 0, control: -7 }[S.estilo];
+  // variante: pequeño cambio repetible
+  let semilla = S.variante * 7919 + 13;
+  const ruido = () => { semilla = (semilla * 16807) % 2147483647; return (semilla % 7) - 3; };
+  const max = +S.escala;
+  const r = {};
+  for (const c of CAMPOS) {
+    let v = c.base + aj + (c.k === "awm" ? Math.round(est / 2) : est) + (S.variante ? ruido() : 0);
+    v = Math.max(1, Math.min(100, v));
+    r[c.k] = max === 200 ? Math.min(200, Math.round(v * 2 - (c.k === "awm" ? 10 : 0))) : v;
+  }
+  return r;
+}
+function pintarSensi() {
+  for (const k of Object.keys(OPC)) chips("s-" + k, OPC[k], S[k], (v) => { S[k] = v; S.variante = 0; escribir("rot-sensi", S); pintarSensi(); });
+  const r = calcularSensi(); const max = +S.escala;
+  $("s-res").innerHTML = `<h3>Tu sensi ${S.variante ? "· variante " + S.variante : ""}</h3>` + CAMPOS.map((c) => `<div class="barra"><span>${c.n}</span><div class="track"><div class="fill" style="width:${(r[c.k] / max) * 100}%"></div></div><span class="val">${r[c.k]}</span></div>`).join("");
+  const hud = [
+    `<b>Tamaño del botón de disparo:</b> ${S.pantalla === "chica" ? "60-70%" : S.pantalla === "grande" ? "45-55%" : "55-60%"}. Grande = más fácil arrastrar hacia arriba.`,
+    `<b>Transparencia del botón:</b> 30-40%, para ver al enemigo detrás.`,
+    `<b>Posición:</b> un poco arriba del centro derecho, para que el pulgar suba sin chocar con el borde.`,
+    S.dedos === "2" ? "<b>2 dedos:</b> activa “agacharse y saltar” fáciles de alcanzar; considera pasar a 3 dedos con el tiempo." : "<b>" + S.dedos + " dedos:</b> pon agacharse y pared gloo al alcance del dedo índice izquierdo.",
+    S.gama === "baja" ? "<b>Gráficos:</b> fluido + FPS altos. Mejor que se vea feo pero que no se trabe." : "<b>Gráficos:</b> usa los FPS más altos que permita tu celular (60, 90 o 120).",
+    "<b>Pruébala:</b> en el campo de entrenamiento, dispara a los muñecos desde lejos. Si la mira pasa de largo la cabeza, baja 5 la General; si no llega, súbele 5.",
+  ];
+  $("s-hud").innerHTML = hud.map((h) => `<li>${h}</li>`).join("");
+}
+$("s-otra").addEventListener("click", () => { S.variante = (S.variante % 9) + 1; escribir("rot-sensi", S); pintarSensi(); });
+$("s-copiar").addEventListener("click", () => { const r = calcularSensi(); copiar("🎯 Mi sensi (Rotísimo)\n" + CAMPOS.map((c) => `${c.n}: ${r[c.k]}`).join("\n")); });
+pintarSensi();
+
+// ================= TIPS =================
+const CABEZA = [
+  "<b>Mira a la altura de la cabeza siempre.</b> Al caminar y al asomarte, deja la mira donde estaría la cabeza del enemigo.",
+  "<b>Jala hacia arriba al disparar.</b> Toca disparo y en el mismo movimiento desliza el pulgar hacia arriba unos centímetros (practícalo en Entrenar).",
+  "<b>Dispara con el punto rojo</b> de cerca y media distancia: sube más rápido a la cabeza que la mira normal.",
+  "<b>Agáchate al disparar</b> para reducir el retroceso con rifles.",
+  "<b>Primer tiro decide.</b> Con escopeta, espera a tener la cabeza en la mira antes de disparar en lugar de disparar al cuerpo.",
+  "<b>Salta en la pelea cercana:</b> al caer, la mira tiende a la cabeza del rival que está abajo.",
+];
+const ARMAS_T = [
+  "<b>M1887:</b> dos tiros a la cabeza tumban. La reina de los 1 vs 1.",
+  "<b>Desert Eagle:</b> mucho daño a la cabeza, ideal para practicar precisión.",
+  "<b>MP40 / UMP:</b> jala suave y constante hacia arriba mientras disparas.",
+  "<b>Woodpecker:</b> atraviesa armadura; apunta al casco a media distancia.",
+  "<b>AWM:</b> sensi baja en la mira para no pasarte de la cabeza.",
+];
+const RUTINA = [
+  "<b>2 min</b> en el entrenador de esta app (arrastre hacia arriba).",
+  "<b>3 min</b> en el campo de entrenamiento con Desert Eagle a los muñecos.",
+  "<b>3 min</b> con M1887 moviéndote de lado y disparando a la cabeza.",
+  "<b>2 min</b> con MP40 a media distancia controlando el retroceso.",
+];
+$("t-cabeza").innerHTML = CABEZA.map((t) => `<li>${t}</li>`).join("");
+$("t-armas").innerHTML = ARMAS_T.map((t) => `<li>${t}</li>`).join("");
+$("t-rutina").innerHTML = RUTINA.map((t) => `<li>${t}</li>`).join("");
+if (APP && Android.abrirJuego) { $("abrir-ff").hidden = false; $("abrir-ff").addEventListener("click", () => Android.abrirJuego()); }
+
+// ================= ENTRENADOR =================
+const cv = $("cv"), ctx = cv.getContext("2d");
+let W = 0, H = 0;
+function medir() { const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * devicePixelRatio; cv.height = H * devicePixelRatio; ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); }
+let dif = leer("rot-dif", "normal");
+const DIFS = { facil: { v: 40, t: 1.6 }, normal: { v: 80, t: 1.2 }, pro: { v: 140, t: 0.85 } };
+chips("dificultad", [{ id: "facil", n: "Fácil" }, { id: "normal", n: "Normal" }, { id: "pro", n: "Pro" }], dif, function cambiar(d) { dif = d; escribir("rot-dif", d); chips("dificultad", [{ id: "facil", n: "Fácil" }, { id: "normal", n: "Normal" }, { id: "pro", n: "Pro" }], dif, cambiar); });
+let jugando = false, tiempo = 30, cabezas = 0, cuerpo = 0, fallos = 0, ultimo = 0, tiemposTiro = [];
+let cam = { x: 0, y: 0 }, obj = null, marcas = [];
+function nuevoObjetivo() {
+  // aparece a la altura del pecho respecto a la mira, para que tengas que subir
+  const esc = 0.8 + Math.random() * 0.6;
+  obj = { x: cam.x + (Math.random() - 0.5) * W * 0.4, y: cam.y + 22 * esc, s: esc, dir: Math.random() < 0.5 ? -1 : 1, nace: performance.now() };
+}
+let toque = null;
+cv.addEventListener("pointerdown", (e) => { toque = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", (e) => {
+  if (!toque) return;
+  const sens = calcularSensi().general / +S.escala; // 0..1
+  const f = 0.6 + sens * 1.2;
+  cam.x += (e.clientX - toque.x) * f; cam.y += (e.clientY - toque.y) * f;
+  toque = { x: e.clientX, y: e.clientY };
+});
+cv.addEventListener("pointerup", () => (toque = null));
+cv.addEventListener("pointercancel", () => (toque = null));
+$("fuego").addEventListener("pointerdown", (e) => { e.preventDefault(); disparar(); });
+function partes() {
+  const s = obj.s * 1.6;
+  const cx = W / 2 + (obj.x - cam.x), base = H / 2 + (obj.y - cam.y);
+  return { cabeza: { x: cx, y: base - 46 * s, r: 9 * s }, cuerpo: { x: cx - 14 * s, y: base - 36 * s, w: 28 * s, h: 44 * s }, piernas: { x: cx - 12 * s, y: base + 8 * s, w: 24 * s, h: 34 * s } };
+}
+function disparar() {
+  if (!jugando || !obj) return;
+  const p = partes(), mx = W / 2, my = H / 2;
+  const dc = Math.hypot(mx - p.cabeza.x, my - p.cabeza.y);
+  const enCuerpo = (r) => mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h;
+  const ahora = performance.now();
+  if (dc <= p.cabeza.r + 2) { cabezas++; marcas.push({ t: ahora, txt: "¡CABEZA!", c: "#b6ff3b" }); tiemposTiro.push((ahora - obj.nace) / 1000); nuevoObjetivo(); }
+  else if (enCuerpo(p.cuerpo) || enCuerpo(p.piernas)) { cuerpo++; marcas.push({ t: ahora, txt: "cuerpo", c: "#ffcc4d" }); }
+  else { fallos++; marcas.push({ t: ahora, txt: "fallo", c: "#ff4f8b" }); }
+  $("h-score").textContent = `${cabezas} cabezas`;
+}
+function dibujar(ts) {
+  if (!W) medir();
+  const dt = Math.min(0.05, (ts - (ultimo || ts)) / 1000); ultimo = ts;
+  // fondo
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, "#1b2a44"); g.addColorStop(1, "#0d1422");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const horizonte = H / 2 + 60 - cam.y;
+  ctx.fillStyle = "#1f2a1a"; ctx.fillRect(0, horizonte, W, H - horizonte);
+  ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
+  for (let i = -20; i <= 20; i++) { const x = W / 2 + i * 60 - (cam.x % 60); ctx.beginPath(); ctx.moveTo(x, horizonte); ctx.lineTo(W / 2 + (x - W / 2) * 3, H); ctx.stroke(); }
+  if (jugando) {
+    tiempo -= dt;
+    if (tiempo <= 0) terminar();
+    $("h-tiempo").textContent = Math.max(0, Math.ceil(tiempo)) + "s";
+    if (obj) {
+      obj.x += obj.dir * DIFS[dif].v * dt;
+      if (Math.random() < dt * DIFS[dif].t) obj.dir *= -1;
+      if (Math.abs(obj.x - cam.x) > W * 0.45) obj.dir = obj.x > cam.x ? -1 : 1;
+    }
+  }
+  if (obj) {
+    const p = partes();
+    ctx.fillStyle = "#38404f"; ctx.fillRect(p.piernas.x, p.piernas.y, p.piernas.w, p.piernas.h);
+    ctx.fillStyle = "#566078"; ctx.fillRect(p.cuerpo.x, p.cuerpo.y, p.cuerpo.w, p.cuerpo.h);
+    ctx.fillStyle = "#ff8a1f"; ctx.beginPath(); ctx.arc(p.cabeza.x, p.cabeza.y, p.cabeza.r, 0, Math.PI * 2); ctx.fill();
+  }
+  // mira
+  const mx = W / 2, my = H / 2;
+  ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(mx - 12, my); ctx.lineTo(mx - 4, my); ctx.moveTo(mx + 4, my); ctx.lineTo(mx + 12, my); ctx.moveTo(mx, my - 12); ctx.lineTo(mx, my - 4); ctx.moveTo(mx, my + 4); ctx.lineTo(mx, my + 12); ctx.stroke();
+  ctx.fillStyle = "#ff3b3b"; ctx.beginPath(); ctx.arc(mx, my, 2, 0, Math.PI * 2); ctx.fill();
+  // marcas
+  marcas = marcas.filter((m) => ts - m.t < 600);
+  for (const m of marcas) { ctx.globalAlpha = 1 - (ts - m.t) / 600; ctx.fillStyle = m.c; ctx.font = "700 18px 'Chakra Petch', sans-serif"; ctx.textAlign = "center"; ctx.fillText(m.txt, mx, my - 30 - (ts - m.t) / 20); }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(dibujar);
+}
+function empezar() {
+  medir(); jugando = true; tiempo = 30; cabezas = cuerpo = fallos = 0; tiemposTiro = []; cam = { x: 0, y: 0 };
+  nuevoObjetivo(); $("inicio").hidden = true; $("h-score").textContent = "0 cabezas";
+}
+function terminar() {
+  jugando = false;
+  const tiros = cabezas + cuerpo + fallos;
+  const hs = tiros ? Math.round((cabezas / tiros) * 100) : 0;
+  const mejor = Math.max(leer("rot-record", 0), cabezas); escribir("rot-record", mejor);
+  const prom = tiemposTiro.length ? (tiemposTiro.reduce((a, b) => a + b, 0) / tiemposTiro.length).toFixed(2) : "–";
+  $("r-hs").textContent = hs + "%"; $("r-mejor").textContent = mejor; $("r-tiempo").textContent = prom;
+  $("i-titulo").textContent = `${cabezas} tiros a la cabeza`;
+  $("i-texto").textContent = hs >= 70 ? "¡Rotísimo! Sube la dificultad." : hs >= 40 ? "Bien. Concéntrate en jalar hacia arriba justo antes de disparar." : "Deja la mira más alta antes de disparar y no dispares al cuerpo.";
+  $("empezar").textContent = "Otra vez"; $("inicio").hidden = false;
+}
+$("empezar").addEventListener("click", empezar);
+$("r-mejor").textContent = leer("rot-record", 0) || "–";
+addEventListener("resize", medir);
+requestAnimationFrame(dibujar);
+
+// ================= NAVEGACIÓN =================
+const tabs = [...document.querySelectorAll("nav button")];
+function abrir(t) {
+  tabs.forEach((b) => { const on = b.dataset.tab === t; b.setAttribute("aria-selected", on); $(b.dataset.tab).hidden = !on; });
+  $("tip-card").hidden = t === "entrenar";
+  escribir("rot-tab", t); scrollTo(0, 0);
+  if (t === "entrenar") requestAnimationFrame(medir);
+}
+tabs.forEach((b) => b.addEventListener("click", () => abrir(b.dataset.tab)));
+abrir(leer("rot-tab", "combos"));
+</script>
+</body>
+</html>

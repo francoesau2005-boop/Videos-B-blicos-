@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.rotisimo.ff'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.rotisimo.ff'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    // Llave propia para que las actualizaciones se instalen encima de la versión anterior
+    signingConfigs {
+        propia {
+            storeFile file('rotisimo.keystore')
+            storePassword 'rotisimo'
+            keyAlias 'rotisimo'
+            keyPassword 'rotisimo'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.propia
+        }
+        debug {
+            signingConfig signingConfigs.propia
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
