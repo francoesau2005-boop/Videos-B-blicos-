@@ -236,6 +236,26 @@ svg.i { width: 18px; height: 18px; flex: none; }
 .campo label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--muted); }
 .campo input { width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line2); background: var(--card2); color: var(--ink); font: 14px var(--font); }
 .btn:disabled { opacity: 0.6; }
+/* combo pro */
+.pro { border: 1.5px solid var(--gold); border-radius: 18px; padding: 14px; display: grid; gap: 12px; background: linear-gradient(180deg, #1c160a, var(--card2)); box-shadow: 0 0 26px #f5c45114; }
+.pro-top { display: flex; align-items: center; gap: 10px; }
+.pro-top .ic { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid var(--gold); color: var(--gold); display: grid; place-items: center; }
+.pro-top b { font-size: 14px; letter-spacing: 0.2em; color: var(--gold); }
+.pro-top .exc { margin-left: auto; background: var(--gold); color: #000; border-radius: 999px; padding: 4px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; }
+.pro p { margin: 0; color: #d6d6db; font-size: 14px; }
+.pro-oculto { display: flex; align-items: center; gap: 12px; border: 1px solid #4a3a12; border-radius: 14px; padding: 12px; }
+.pro-oculto .rombos { display: flex; gap: 8px; }
+.pro-oculto .rombos span { width: 26px; height: 26px; border: 1.5px solid var(--gold); transform: rotate(45deg); border-radius: 5px; display: grid; place-items: center; color: var(--gold); font-weight: 700; font-size: 12px; }
+.pro-oculto .rombos span i { transform: rotate(-45deg); font-style: normal; }
+.pro-oculto small { color: var(--muted); font-size: 12px; display: block; }
+.btn.oro { background: linear-gradient(90deg, #f5c451, #ffe29a); color: #000; border-color: #f5c451; }
+.pro .fino { text-align: center; color: var(--muted); font-size: 12px; }
+.pro-lista { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.pro-lista div { display: grid; gap: 4px; text-align: center; min-width: 0; }
+.pro-lista .ret { width: 100%; aspect-ratio: 1 / 1.05; border-radius: 12px; overflow: hidden; border: 1px solid #4a3a12; }
+.pro-lista .ret svg { width: 100%; height: 100%; display: block; }
+.pro-lista small { font-size: 9px; letter-spacing: 0.14em; color: var(--gold); font-weight: 700; }
+.pro-lista b { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* personajes */
 .ret img.foto, .hoja-ret img.foto { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pj.activa .ret img.foto { border-radius: 14px; }
@@ -272,7 +292,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 <div class="wrap">
   <header class="barra-top">
     <div class="marca"><span data-i="crosshair"></span>ROTÍSIMO</div>
-    <button class="version" id="version" type="button" aria-label="Versión">v1.5</button>
+    <button class="version" id="version" type="button" aria-label="Versión">v1.6</button>
   </header>
 
   <!-- ============ INICIO: ROTI ============ -->
@@ -338,6 +358,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
         <div class="g2" id="c-extra"></div>
         <div class="habil" id="c-habil"></div>
         <div class="porque" id="c-porque"></div>
+        <div class="pro" id="c-pro"></div>
         <div class="acciones">
           <button class="btn blanco" id="c-otro"><span data-i="refresh-cw"></span>Otro combo</button>
           <button class="btn" id="c-copiar"><span data-i="copy"></span>Copiar</button>
@@ -710,12 +731,59 @@ function pintarResultado() {
   if (encajan.length) razones.push(`Encajan con tu estilo: ${encajan.join(", ")}.`);
   razones.push(c.modo === "cs" ? "En Duelo de Escuadras cada ronda cuenta: si quedas último, juega por vida y escudo." : "En BR rota temprano y busca altura antes del cierre final.");
   $("c-porque").innerHTML = `<small>${icono("trophy")}POR QUÉ ES ROTÍSIMO</small><ul>${razones.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>`;
+  pintarPro();
   pintarFavs();
 }
 function textoCombo(c) {
   const e = ESTILOS.find((x) => x.id === c.estilo) || ESTILOS[0];
   return `Combo ${e.n} (${c.modo.toUpperCase()}) · Rotísimo\nActiva: ${c.activa}\nPasivas: ${c.pasivas.join(", ")}\nMascota: ${c.mascota}\nArmas: ${c.armas}`;
 }
+// ---------- Combo PRO (se desbloquea con un anuncio, dura 1 hora) ----------
+const META_ACT = ["Tatsuya", "Chrono", "Alok", "Kenta", "Orion", "Skyler", "Xayne", "Dimitri", "Homer", "Clu", "K", "Steffie", "Wukong"];
+const META_PAS = ["Hayato", "Jota", "Dasha", "Kelly", "D-bee", "Shirou", "Luqueta", "Moco", "Kapella", "Thiva", "Maxim", "Laura", "Maro", "Leon", "Andrew", "Antonio", "Rafael", "Miguel", "Ford", "Caroline", "Joseph", "Wolfrahh", "Olivia", "Paloma"];
+const META_MAS = ["Rockie", "Mr. Waggor", "Detective Panda", "Ottero", "Dreki", "Falco", "Beaston", "Agent Hop"];
+function comboPro(c) {
+  const val = (x, meta) => (x.t.includes(c.estilo) ? 10 : 0) + (c.prios || []).filter((p) => x.t.includes(p)).length * 4 - Math.max(0, meta.indexOf(x.n)) * 0.2;
+  const orden = (lista, meta) => [...lista].sort((a, b) => val(b, meta) - val(a, meta));
+  const acts = orden(ACTIVOS, META_ACT);
+  const activa = (acts[0].n === c.activa ? acts[1] : acts[0]).n;
+  const pasivas = orden(PASIVOS, META_PAS).slice(0, 3).map((x) => x.n);
+  const mascota = orden(MASCOTAS, META_MAS)[0].n;
+  return { activa, pasivas, mascota, armas: (ARMAS[c.estilo] || ARMAS.rusher)[0] };
+}
+const proActivo = () => Date.now() < leer("rot-pro", 0);
+function pintarPro() {
+  const el = $("c-pro"); if (!combo) return;
+  const top = `<div class="pro-top"><span class="ic">${icono("crown")}</span><b>COMBO PRO</b><span class="exc">${proActivo() ? "ACTIVO" : "EXCLUSIVO"}</span></div>`;
+  if (proActivo()) {
+    const p = comboPro(combo), min = Math.max(1, Math.round((leer("rot-pro", 0) - Date.now()) / 60000));
+    const item = (rol, n) => `<div><div class="ret">${retrato(n)}</div><small>${rol}</small><b>${esc(n)}</b></div>`;
+    el.innerHTML = `${top}<p>El combo más fuerte para tu estilo y prioridades, armado con los personajes más usados por los mejores jugadores.</p>
+      <div class="pro-lista">${item("ACTIVA", p.activa)}${p.pasivas.map((n, i) => item("PASIVA " + (i + 1), n)).join("")}</div>
+      <div class="tabla"><div><span>Mascota</span><b>${esc(p.mascota)}</b></div><div><span>Armas</span><b>${esc(p.armas)}</b></div></div>
+      <div class="acciones"><button class="btn oro" id="pro-usar">${icono("check")}Usar este</button><button class="btn" id="pro-copiar">${icono("copy")}Copiar</button></div>
+      <p class="fino">Desbloqueado · quedan ${min} min</p>`;
+    $("pro-usar").addEventListener("click", () => { combo = { ...combo, ...p }; escribir("rot-combo2", combo); pintarResultado(); toast("Ahora usas el Combo PRO"); scrollTo({ top: 0, behavior: "smooth" }); });
+    $("pro-copiar").addEventListener("click", () => copiar(textoCombo({ ...combo, ...p }) + "\n(Combo PRO)"));
+  } else {
+    el.innerHTML = `${top}<p>Hay un combo extra más fuerte para tu mismo estilo.</p>
+      <div class="pro-oculto"><div class="rombos"><span><i>?</i></span><span><i>?</i></span><span><i>?</i></span><span><i>?</i></span></div><div><b>1 activa + 3 pasivas</b><small>+ mascota y armas</small></div></div>
+      <button class="btn oro" id="pro-abrir">${icono("lock-open")}Desbloquear Combo PRO</button>
+      <p class="fino">${APP && Android.hayAnuncios ? "Es opcional · 1 anuncio corto · dura 1 hora" : "Gratis en esta versión"}</p>`;
+    $("pro-abrir").addEventListener("click", desbloquearPro);
+  }
+}
+function desbloquearPro() {
+  if (APP && Android.hayAnuncios) { $("pro-abrir").disabled = true; $("pro-abrir").lastChild.textContent = "Cargando anuncio…"; Android.verAnuncio(); }
+  else finAnuncio(true);
+}
+// la app Android llama a esta función al cerrar el anuncio
+function finAnuncio(premio) {
+  if (premio) { escribir("rot-pro", Date.now() + 60 * 60 * 1000); toast("¡Combo PRO desbloqueado por 1 hora!"); }
+  else toast("El anuncio no terminó o aún está cargando. Intenta en unos segundos.");
+  pintarPro();
+}
+
 // test "No sé"
 const PREGUNTAS = [
   { q: "Cuando ves a un enemigo cerca, ¿qué haces?", o: [["Voy directo a por él", { rusher: 2 }], ["Le disparo de lejos", { sniper: 2 }], ["Pongo pared gloo y aguanto", { escudo: 2 }]] },

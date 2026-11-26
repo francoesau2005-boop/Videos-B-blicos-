@@ -29,3 +29,11 @@ El diseño se edita en `web/app.html` (datos en `web/datos.js` y `web/respuestas
   (fine-grained, permiso de escritura en Contents) que se guarda solo en el celular del admin.
 - Todas las apps descargan ese archivo al abrirse. El PIN cifrado viaja en el archivo, así que en los
   demás celulares solo funciona el PIN del admin. Código en `web/admin.js`.
+
+## Anuncios (AdMob)
+
+- Banner abajo de la app y anuncio con recompensa para desbloquear el **Combo PRO** (1 hora).
+- Los códigos están en `app_android/gradle.properties` (`ADMOB_APP_ID`, `ADMOB_BANNER`, `ADMOB_RECOMPENSA`).
+  Ahora son los códigos **de prueba** de Google: muestran anuncios de ejemplo y no pagan.
+  Para cobrar, reemplázalos por los de tu cuenta de AdMob y vuelve a compilar.
+- Incluye el aviso de consentimiento de Google (UMP), obligatorio en Europa y otros países.

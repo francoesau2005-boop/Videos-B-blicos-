@@ -10,8 +10,15 @@ android {
         applicationId 'com.rotisimo.ff'
         minSdk 26
         targetSdk 34
-        versionCode 7
-        versionName '1.5'
+        versionCode 8
+        versionName '1.6'
+        manifestPlaceholders = [admobAppId: project.property('ADMOB_APP_ID')]
+        buildConfigField 'String', 'ADMOB_BANNER', "\"${project.property('ADMOB_BANNER')}\""
+        buildConfigField 'String', 'ADMOB_RECOMPENSA', "\"${project.property('ADMOB_RECOMPENSA')}\""
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     // Llave propia para que las actualizaciones se instalen encima de la versión anterior
@@ -38,4 +45,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+}
+
+dependencies {
+    implementation 'com.google.android.gms:play-services-ads:23.6.0'
+    implementation 'com.google.android.ump:user-messaging-platform:3.1.0'
 }

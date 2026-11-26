@@ -14,6 +14,8 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -22,6 +24,7 @@ public class MainActivity extends Activity {
     private static final int PEDIR_IMAGEN = 7;
     private WebView web;
     private ValueCallback<Uri[]> alElegir;
+    private Anuncios anuncios;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -58,7 +61,19 @@ public class MainActivity extends Activity {
         });
         web.addJavascriptInterface(new Puente(), "Android");
         web.loadUrl("file:///android_asset/index.html");
-        setContentView(web);
+
+        // la app arriba y el banner de anuncios abajo
+        LinearLayout raiz = new LinearLayout(this);
+        raiz.setOrientation(LinearLayout.VERTICAL);
+        raiz.setBackgroundColor(Color.parseColor("#0b0d12"));
+        raiz.addView(web, new LinearLayout.LayoutParams(-1, 0, 1));
+        FrameLayout banner = new FrameLayout(this);
+        banner.setVisibility(android.view.View.GONE);
+        raiz.addView(banner, new LinearLayout.LayoutParams(-1, -2));
+        setContentView(raiz);
+
+        anuncios = new Anuncios(this, banner);
+        anuncios.iniciar();
     }
 
     @Override
@@ -109,6 +124,14 @@ public class MainActivity extends Activity {
                     Toast.makeText(MainActivity.this, "No se pudo guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
+        }
+
+        @JavascriptInterface public boolean hayAnuncios() { return true; }
+
+        // muestra un anuncio con recompensa y avisa a la página si lo vio completo
+        @JavascriptInterface public void verAnuncio() {
+            runOnUiThread(() -> anuncios.verRecompensa(premio ->
+                    runOnUiThread(() -> web.evaluateJavascript("finAnuncio(" + premio + ")", null))));
         }
 
         @JavascriptInterface public void abrirJuego() {
