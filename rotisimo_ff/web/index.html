@@ -41,7 +41,7 @@ svg.i { width: 18px; height: 18px; flex: none; }
 .barra-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border: 1px solid var(--line2); border-radius: 999px; background: linear-gradient(180deg, #121215, #070708); box-shadow: 0 10px 30px #000a; }
 .marca { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: 0.22em; font-size: 15px; }
 .marca svg { width: 26px; height: 26px; }
-.version { font-size: 11px; color: var(--muted); border: 1px solid var(--line2); border-radius: 999px; padding: 4px 10px; letter-spacing: 0.08em; }
+.version { background: none; font-family: inherit; color: var(--muted); cursor: pointer; font-size: 11px; color: var(--muted); border: 1px solid var(--line2); border-radius: 999px; padding: 4px 10px; letter-spacing: 0.08em; }
 
 /* títulos de página */
 .hero { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 6px 4px 0; }
@@ -230,6 +230,15 @@ svg.i { width: 18px; height: 18px; flex: none; }
 .fav .txt span { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fav button { border: 0; background: none; color: var(--muted); padding: 6px; cursor: pointer; display: grid; place-items: center; }
 
+.version.es-admin { background: var(--gold); color: #000; border-color: var(--gold); font-weight: 700; }
+.modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(360px, calc(100% - 32px)); background: var(--card); border: 1px solid var(--line2); border-radius: 22px; padding: 20px; z-index: 22; display: grid; gap: 12px; text-align: center; }
+.modal h2 { margin: 0; font-size: 21px; }
+.modal p { margin: 0; color: var(--muted); font-size: 14px; }
+.pin-in { width: 100%; text-align: center; font: 700 28px var(--font); letter-spacing: 0.4em; padding: 12px; border-radius: 14px; border: 1px solid var(--line2); background: var(--card2); color: var(--ink); }
+.campo { display: grid; gap: 5px; text-align: left; }
+.campo label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--muted); }
+.campo input { width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line2); background: var(--card2); color: var(--ink); font: 14px var(--font); }
+.btn:disabled { opacity: 0.6; }
 /* personajes */
 .ret img.foto, .hoja-ret img.foto { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pj.activa .ret img.foto { border-radius: 14px; }
@@ -266,7 +275,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 <div class="wrap">
   <header class="barra-top">
     <div class="marca"><span data-i="crosshair"></span>ROTÍSIMO</div>
-    <span class="version">v1.4</span>
+    <button class="version" id="version" type="button" aria-label="Versión">v1.5</button>
   </header>
 
   <!-- ============ INICIO: ROTI ============ -->
@@ -349,11 +358,50 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
   <section id="personajes" class="wrap" style="padding:0" hidden>
     <div class="hero">
       <h1>Personajes</h1>
-      <p>Toca uno para ver su habilidad, armar un combo con él o ponerle tu propia imagen.</p>
+      <p>Toca uno para ver su habilidad o armar un combo con él.</p>
     </div>
     <div class="escribir" style="padding-left:14px"><span data-i="search"></span><input id="p-buscar" placeholder="Buscar personaje o mascota…" autocomplete="off"></div>
     <div class="g2" id="p-filtros" style="grid-template-columns:repeat(4,1fr)"></div>
     <div class="galeria" id="galeria"></div>
+  </section>
+
+  <!-- ============ ADMIN (oculto) ============ -->
+  <section id="admin" class="wrap" style="padding:0" hidden>
+    <div class="hero">
+      <span class="badge">MODO ADMIN</span>
+      <h1>Imágenes de personajes</h1>
+      <p>Toca un personaje para poner su imagen. Cuando termines, publica para que todos la vean.</p>
+    </div>
+    <div class="panel">
+      <div id="adm-estado"></div>
+      <button class="btn blanco" id="adm-publicar"><span data-i="rocket"></span><span>Publicar para todos</span></button>
+      <div class="g2">
+        <button class="btn" id="adm-exportar"><span data-i="package"></span>Exportar</button>
+        <label class="btn" for="adm-importar" style="cursor:pointer"><span data-i="image-plus"></span>Importar</label>
+      </div>
+      <input type="file" id="adm-importar" accept="application/json,.json" hidden>
+      <button class="btn" id="adm-bajar"><span data-i="refresh-cw"></span>Descargar lo publicado</button>
+    </div>
+    <div class="panel">
+      <div class="paso-t"><span>PERSONAJES</span></div>
+      <div class="galeria" id="adm-lista"></div>
+    </div>
+    <div class="panel">
+      <div class="paso-t"><span>CONEXIÓN CON TU GITHUB</span></div>
+      <p class="privado" style="justify-content:flex-start;text-align:left">La clave se guarda solo en este celular. Crea una clave "fine-grained" en GitHub → Settings → Developer settings, con permiso de escritura en Contents solo para este repositorio.</p>
+      <div class="campo"><label for="gh-token">CLAVE DE GITHUB</label><input id="gh-token" type="password" autocomplete="off"></div>
+      <div class="g2">
+        <div class="campo"><label for="gh-owner">USUARIO</label><input id="gh-owner" autocomplete="off"></div>
+        <div class="campo"><label for="gh-repo">REPOSITORIO</label><input id="gh-repo" autocomplete="off"></div>
+      </div>
+      <div class="campo"><label for="gh-ruta">ARCHIVO</label><input id="gh-ruta" autocomplete="off"></div>
+      <div class="campo"><label for="gh-rama">RAMA (vacío = principal)</label><input id="gh-rama" autocomplete="off"></div>
+      <button class="btn" id="gh-guardar"><span data-i="check"></span>Guardar conexión</button>
+    </div>
+    <div class="g2">
+      <button class="btn" id="adm-pin"><span data-i="lock"></span>Cambiar PIN</button>
+      <button class="btn" id="adm-salir"><span data-i="x"></span>Salir de admin</button>
+    </div>
   </section>
 
   <!-- ============ SENSI ============ -->
@@ -437,17 +485,25 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="hoja-fondo" id="hoja-fondo" hidden></div>
+<form class="modal" id="pin-modal" hidden>
+  <div class="masc" id="masc-pin" style="justify-self:center"></div>
+  <h2 id="pin-titulo">Modo admin</h2>
+  <p id="pin-texto"></p>
+  <input class="pin-in" id="pin-in" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="PIN">
+  <p id="pin-error" style="color:var(--red);min-height:18px"></p>
+  <div class="g2"><button type="button" class="btn" id="pin-cancelar">Cancelar</button><button class="btn blanco">Entrar</button></div>
+</form>
 <div class="hoja" id="hoja" hidden role="dialog" aria-modal="true" aria-labelledby="h-nombre">
   <div class="hoja-barra"></div>
   <div class="hoja-top"><div class="hoja-ret" id="h-ret"></div><div><small id="h-tipo"></small><h2 id="h-nombre"></h2><div class="etiquetas" id="h-etq"></div></div></div>
   <div class="habil"><small>HABILIDAD</small><p id="h-hab"></p></div>
   <div class="acciones" id="h-acc"></div>
-  <div class="g2">
+  <div class="g2" id="h-admin">
     <label class="btn" for="h-archivo" style="cursor:pointer"><span data-i="image-plus"></span>Poner imagen</label>
     <button class="btn" id="h-quitar"><span data-i="trash-2"></span>Quitar imagen</button>
   </div>
   <input type="file" id="h-archivo" accept="image/*" hidden>
-  <p class="privado">Puedes usar una captura del juego. La imagen se guarda solo en tu celular.</p>
+  <p class="privado" id="h-nota">Modo admin: el cambio queda pendiente hasta que publiques.</p>
   <button class="btn" id="h-cerrar"><span data-i="x"></span>Cerrar</button>
 </div>
 
@@ -581,6 +637,196 @@ function copiar(texto) {
 }
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 function tono(nombre) { let h = 7; for (const c of nombre) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+// ================= MODO ADMIN Y PAQUETE DE IMÁGENES =================
+// - Las imágenes publicadas (PAQUETE) se descargan de un archivo JSON en GitHub y se guardan en el celular.
+// - Solo el admin (con PIN en su celular y su clave de GitHub) puede cambiarlas y publicarlas.
+const PAQUETE_URL = "https://raw.githubusercontent.com/francoesau2005-boop/Videos-B-blicos-/HEAD/rotisimo_ff/imagenes/imagenes.json";
+const GH_DEF = { owner: "francoesau2005-boop", repo: "Videos-B-blicos-", ruta: "rotisimo_ff/imagenes/imagenes.json", rama: "" };
+
+// ---------- almacenamiento grande (IndexedDB) ----------
+const BD = {
+  _db: null,
+  abrir() {
+    if (this._db) return Promise.resolve(this._db);
+    return new Promise((ok, mal) => {
+      try {
+        const r = indexedDB.open("rotisimo", 1);
+        r.onupgradeneeded = () => r.result.createObjectStore("kv");
+        r.onsuccess = () => ok((this._db = r.result));
+        r.onerror = () => mal(r.error);
+      } catch (e) { mal(e); }
+    });
+  },
+  async get(k) { try { const db = await this.abrir(); return await new Promise((ok) => { const q = db.transaction("kv").objectStore("kv").get(k); q.onsuccess = () => ok(q.result); q.onerror = () => ok(undefined); }); } catch { return undefined; } },
+  async set(k, v) { try { const db = await this.abrir(); return await new Promise((ok) => { const t = db.transaction("kv", "readwrite"); t.objectStore("kv").put(v, k); t.oncomplete = () => ok(true); t.onerror = () => ok(false); }); } catch { return false; } },
+};
+
+let PAQUETE = { version: 0, imagenes: {} };   // lo publicado (todos lo ven)
+let BORRADOR = {};                            // cambios del admin sin publicar
+let ADMIN = false;
+try { ADMIN = sessionStorage.getItem("rot-admin") === "1"; } catch {}
+
+function imagenDe(nombre) { return (ADMIN && BORRADOR[nombre]) || PAQUETE.imagenes[nombre] || null; }
+
+async function cargarImagenes() {
+  PAQUETE = (await BD.get("paquete")) || PAQUETE;
+  BORRADOR = (await BD.get("borrador")) || {};
+  // migrar fotos guardadas por versiones anteriores
+  const viejas = leer("rot-fotos", null);
+  if (viejas) { Object.assign(BORRADOR, viejas); await BD.set("borrador", BORRADOR); try { localStorage.removeItem("rot-fotos"); } catch {} }
+  repintarImagenes();
+  descargarPaquete();
+}
+async function descargarPaquete(avisar) {
+  try {
+    const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 15000);
+    const r = await fetch(PAQUETE_URL + "?t=" + Date.now(), { signal: ctrl.signal, cache: "no-store" });
+    if (!r.ok) { if (avisar) toast(r.status === 404 ? "Aún no hay imágenes publicadas" : "No se pudo descargar"); return; }
+    const p = await r.json();
+    if (p && p.imagenes && (p.version || 0) !== PAQUETE.version) {
+      PAQUETE = { version: p.version || 0, adminPin: p.adminPin || null, imagenes: p.imagenes };
+      await BD.set("paquete", PAQUETE);
+      repintarImagenes();
+      if (avisar) toast("Imágenes actualizadas");
+    } else if (avisar) toast("Ya tienes las imágenes más nuevas");
+  } catch { if (avisar) toast("Sin conexión: se usan las imágenes guardadas"); }
+}
+function repintarImagenes() {
+  try { pintarGaleria(); } catch {}
+  try { if (combo) pintarResultado(); } catch {}
+  try { pintarFavs(); } catch {}
+  try { if (!$("admin").hidden) pintarAdmin(); } catch {}
+}
+async function ponerImagen(nombre, url) { BORRADOR[nombre] = url; await BD.set("borrador", BORRADOR); repintarImagenes(); }
+async function quitarImagen(nombre) {
+  // si está publicada, se marca para quitar ("" = sin imagen)
+  if (PAQUETE.imagenes[nombre]) BORRADOR[nombre] = ""; else delete BORRADOR[nombre];
+  await BD.set("borrador", BORRADOR); repintarImagenes();
+}
+const pendientes = () => Object.keys(BORRADOR).filter((n) => BORRADOR[n] !== PAQUETE.imagenes[n]).length;
+function paqueteFinal() {
+  const imgs = { ...PAQUETE.imagenes };
+  for (const [n, v] of Object.entries(BORRADOR)) { if (v) imgs[n] = v; else delete imgs[n]; }
+  // el PIN (cifrado) viaja con el paquete: en otros celulares solo funcionará el PIN del admin
+  return { version: Date.now(), app: "rotisimo", adminPin: leer("rot-admin-pin", null) || PAQUETE.adminPin || null, imagenes: imgs };
+}
+
+// ---------- PIN ----------
+async function hashPin(pin) {
+  try {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("rotisimo:" + pin));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  } catch { let h = 0; for (const c of "rotisimo:" + pin) h = (h * 131 + c.charCodeAt(0)) >>> 0; return "s" + h; }
+}
+let toquesVersion = 0, tVersion = 0;
+function tocarVersion() {
+  const ahora = Date.now();
+  toquesVersion = ahora - tVersion < 900 ? toquesVersion + 1 : 1; tVersion = ahora;
+  if (ADMIN) { abrirAdmin(); return; }
+  if (toquesVersion >= 5) { toquesVersion = 0; pedirPin(); }
+}
+function pedirPin() {
+  const existe = !!(leer("rot-admin-pin", null) || PAQUETE.adminPin);
+  $("pin-titulo").textContent = existe ? "Modo admin" : "Crea tu PIN de admin";
+  $("pin-texto").textContent = existe ? "Escribe tu PIN para entrar." : "Elige un PIN de 4 a 8 números. Solo tú lo sabrás; guárdalo bien.";
+  $("pin-in").value = ""; $("pin-error").textContent = "";
+  $("pin-modal").hidden = $("hoja-fondo").hidden = false;
+  setTimeout(() => $("pin-in").focus(), 50);
+}
+async function enviarPin(e) {
+  e.preventDefault();
+  const pin = $("pin-in").value.trim();
+  if (!/^\d{4,8}$/.test(pin)) { $("pin-error").textContent = "Usa de 4 a 8 números."; return; }
+  const guardado = leer("rot-admin-pin", null) || PAQUETE.adminPin || null, h = await hashPin(pin);
+  if (!guardado) escribir("rot-admin-pin", h);
+  else if (guardado !== h) {
+    const fallos = leer("rot-admin-fallos", 0) + 1; escribir("rot-admin-fallos", fallos);
+    $("pin-error").textContent = fallos >= 5 ? "Demasiados intentos. Espera un momento." : "PIN incorrecto.";
+    if (fallos >= 5) setTimeout(() => escribir("rot-admin-fallos", 0), 60000);
+    return;
+  }
+  escribir("rot-admin-fallos", 0); escribir("rot-admin-pin", h);
+  ADMIN = true; try { sessionStorage.setItem("rot-admin", "1"); } catch {}
+  cerrarPin(); marcarAdmin(); abrirAdmin(); repintarImagenes();
+  toast(guardado ? "Bienvenido, admin" : "PIN creado. Ya eres admin");
+}
+function cerrarPin() { $("pin-modal").hidden = true; if ($("hoja").hidden) $("hoja-fondo").hidden = true; }
+function salirAdmin() { ADMIN = false; try { sessionStorage.removeItem("rot-admin"); } catch {} marcarAdmin(); abrir("roti"); repintarImagenes(); toast("Saliste del modo admin"); }
+function marcarAdmin() { const v = $("version"); v.textContent = ADMIN ? "ADMIN" : "v1.5"; v.classList.toggle("es-admin", ADMIN); }
+
+// ---------- panel de admin ----------
+function abrirAdmin() {
+  if (!ADMIN) return;
+  tabs.forEach((b) => b.setAttribute("aria-selected", false));
+  document.querySelectorAll("section.wrap").forEach((s) => (s.hidden = s.id !== "admin"));
+  scrollTo(0, 0); pintarAdmin();
+}
+function pintarAdmin() {
+  const total = Object.keys(PAQUETE.imagenes).length, pend = pendientes();
+  const fecha = PAQUETE.version ? new Date(PAQUETE.version).toLocaleString() : "nunca";
+  $("adm-estado").innerHTML = `<div class="tabla"><div><span>Publicadas</span><b>${total} imágenes</b></div><div><span>Última publicación</span><b>${esc(fecha)}</b></div><div><span>Cambios sin publicar</span><b style="color:${pend ? "var(--gold)" : "inherit"}">${pend}</b></div></div>`;
+  const gh = leer("rot-gh", GH_DEF);
+  $("gh-owner").value = gh.owner; $("gh-repo").value = gh.repo; $("gh-ruta").value = gh.ruta; $("gh-rama").value = gh.rama || "";
+  $("gh-token").placeholder = leer("rot-gh-token", "") ? "Clave guardada (escribe otra para cambiarla)" : "github_pat_…";
+  const el = $("adm-lista"); el.innerHTML = "";
+  for (const [lista, tipo] of [[ACTIVOS, "activa"], [PASIVOS, "pasiva"], [MASCOTAS, "mascota"]]) {
+    el.insertAdjacentHTML("beforeend", `<div class="sub-t">${tipo === "mascota" ? "MASCOTAS" : "HABILIDAD " + tipo.toUpperCase()}</div>`);
+    for (const x of lista) {
+      const cambiado = x.n in BORRADOR && BORRADOR[x.n] !== PAQUETE.imagenes[x.n];
+      const b = document.createElement("button"); b.className = "gal";
+      b.innerHTML = `<div class="ret">${retrato(x.n)}</div><small style="color:${cambiado ? "var(--gold)" : imagenDe(x.n) ? "var(--green)" : "var(--muted)"}">${cambiado ? "SIN PUBLICAR" : imagenDe(x.n) ? "CON IMAGEN" : "DIBUJO"}</small><b>${esc(x.n)}</b>`;
+      b.addEventListener("click", () => abrirHoja(x, tipo));
+      el.append(b);
+    }
+  }
+}
+function guardarGh() {
+  const gh = { owner: $("gh-owner").value.trim(), repo: $("gh-repo").value.trim(), ruta: $("gh-ruta").value.trim().replace(/^\/+/, ""), rama: $("gh-rama").value.trim() };
+  escribir("rot-gh", gh);
+  const t = $("gh-token").value.trim(); if (t) { escribir("rot-gh-token", t); $("gh-token").value = ""; }
+  return gh;
+}
+async function publicar() {
+  const gh = guardarGh(), token = leer("rot-gh-token", "");
+  if (!token) { toast("Primero pega tu clave de GitHub"); $("gh-token").focus(); return; }
+  const paq = paqueteFinal(), json = JSON.stringify(paq);
+  const b64 = btoa(unescape(encodeURIComponent(json)));
+  const api = `https://api.github.com/repos/${encodeURIComponent(gh.owner)}/${encodeURIComponent(gh.repo)}/contents/${gh.ruta.split("/").map(encodeURIComponent).join("/")}`;
+  const cab = { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+  const btn = $("adm-publicar"); btn.disabled = true; btn.lastChild.textContent = "Publicando…";
+  try {
+    let sha;
+    const q = await fetch(api + (gh.rama ? "?ref=" + encodeURIComponent(gh.rama) : ""), { headers: cab, cache: "no-store" });
+    if (q.status === 401 || q.status === 403) throw new Error("La clave de GitHub no tiene permiso (revisa que tenga acceso de escritura a Contents).");
+    if (q.ok) sha = (await q.json()).sha;
+    const cuerpo = { message: `Rotísimo: imágenes de personajes (${Object.keys(paq.imagenes).length})`, content: b64 };
+    if (sha) cuerpo.sha = sha; if (gh.rama) cuerpo.branch = gh.rama;
+    const r = await fetch(api, { method: "PUT", headers: { ...cab, "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) });
+    if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.message || "GitHub respondió " + r.status); }
+    PAQUETE = { version: paq.version, adminPin: paq.adminPin, imagenes: paq.imagenes }; BORRADOR = {};
+    await BD.set("paquete", PAQUETE); await BD.set("borrador", BORRADOR);
+    toast("¡Publicado! Todos lo verán en unos minutos"); pintarAdmin(); repintarImagenes();
+  } catch (e) { toast("No se publicó: " + e.message); }
+  finally { btn.disabled = false; btn.lastChild.textContent = "Publicar para todos"; }
+}
+function exportar() {
+  const json = JSON.stringify(paqueteFinal());
+  if (APP && Android.guardarArchivo) { Android.guardarArchivo("imagenes.json", json); return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([json], { type: "application/json" })); a.download = "imagenes.json"; a.click();
+}
+function importar(archivo) {
+  const r = new FileReader();
+  r.onload = async () => {
+    try {
+      const p = JSON.parse(r.result);
+      if (!p.imagenes) throw 0;
+      Object.assign(BORRADOR, p.imagenes); await BD.set("borrador", BORRADOR);
+      toast(`Importadas ${Object.keys(p.imagenes).length} imágenes (sin publicar)`); pintarAdmin(); repintarImagenes();
+    } catch { toast("Ese archivo no es un paquete de imágenes"); }
+  };
+  r.readAsText(archivo);
+}
+
 // ================= AVATARES DE PERSONAJES (dibujos propios) =================
 // Cada personaje tiene: g (h/m), piel, pelo (estilo), pc (color de pelo), ropa (color),
 // prenda (chaqueta/sudadera/chaleco/camiseta), acc (accesorio) e i (ícono de su habilidad).
@@ -727,14 +973,6 @@ function avatarMascota(nombre, grande) {
   return `<svg viewBox="0 0 100 105" aria-hidden="true">${s}</svg>`;
 }
 
-// ---------- fotos propias del usuario ----------
-let FOTOS = leer("rot-fotos", {});
-function guardarFoto(nombre, dataURL) {
-  FOTOS[nombre] = dataURL;
-  try { localStorage.setItem("rot-fotos", JSON.stringify(FOTOS)); return true; }
-  catch { delete FOTOS[nombre]; toast("No hay espacio para más fotos"); return false; }
-}
-function quitarFoto(nombre) { delete FOTOS[nombre]; escribir("rot-fotos", FOTOS); }
 // reduce la imagen a 320 px para que ocupe poco
 function leerImagen(archivo, listo) {
   const lector = new FileReader();
@@ -754,9 +992,10 @@ function leerImagen(archivo, listo) {
   lector.readAsDataURL(archivo);
 }
 
-// retrato que usa toda la app: foto propia si existe; si no, el avatar dibujado
+// retrato que usa toda la app: imagen publicada por el admin si existe; si no, el avatar dibujado
 function retrato(nombre, grande) {
-  if (FOTOS[nombre]) return `<img class="foto" src="${FOTOS[nombre]}" alt="">`;
+  const img = imagenDe(nombre);
+  if (img) return `<img class="foto" src="${img}" alt="">`;
   if (AV_MASC[nombre] || (typeof MASCOTAS !== "undefined" && MASCOTAS.some((m) => m.n === nombre))) return avatarMascota(nombre, grande);
   if (AV[nombre]) return avatarPersona(nombre, grande);
   // armas: mira con el nombre del arma principal
@@ -909,7 +1148,7 @@ function pintarResultado() {
   else { const n = c.pasivas[+seleccion[1]]; rol = "HABILIDAD PASIVA"; nom = n; txt = buscar(PASIVOS, n).h; }
   $("c-habil").innerHTML = `<small>${rol}</small><b>${esc(nom)}</b><p>${esc(txt)}</p><span class="nota">Toca cualquier personaje para ver su habilidad · el candado lo deja fijo</span>`;
   const fichaDe = seleccion === "activa" ? [buscar(ACTIVOS, c.activa), "activa"] : seleccion === "mascota" ? [buscar(MASCOTAS, c.mascota), "mascota"] : seleccion[0] === "p" ? [buscar(PASIVOS, c.pasivas[+seleccion[1]]), "pasiva"] : null;
-  if (fichaDe) { const b = document.createElement("button"); b.className = "btn-chico"; b.style.justifySelf = "start"; b.innerHTML = icono("image-plus") + "VER FICHA · PONER IMAGEN"; b.addEventListener("click", () => abrirHoja(fichaDe[0], fichaDe[1])); $("c-habil").append(b); }
+  if (fichaDe) { const b = document.createElement("button"); b.className = "btn-chico"; b.style.justifySelf = "start"; b.innerHTML = icono("users") + (ADMIN ? "VER FICHA · PONER IMAGEN" : "VER FICHA"); b.addEventListener("click", () => abrirHoja(fichaDe[0], fichaDe[1])); $("c-habil").append(b); }
   const todos = [buscar(ACTIVOS, c.activa), ...c.pasivas.map((p) => buscar(PASIVOS, p)), buscar(MASCOTAS, c.mascota)];
   const encajan = todos.filter((x) => x.t.includes(c.estilo)).map((x) => x.n);
   const razones = [PORQUE[c.estilo]];
@@ -1637,7 +1876,8 @@ function abrirHoja(x, tipo) {
   const btn = (txt, ico, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.innerHTML = icono(ico) + esc(txt); b.addEventListener("click", fn); acc.append(b); };
   btn("Combo con " + (x.n.length > 9 ? "él" : x.n), "sparkles", "blanco", () => comboCon(x, tipo));
   btn("Preguntar a Roti", "bot", "", () => { cerrarHoja(); abrir("roti"); msgYo("¿Qué hace " + x.n + "?"); entender("que hace " + x.n); });
-  $("h-quitar").hidden = !FOTOS[x.n];
+  $("h-admin").hidden = $("h-nota").hidden = !ADMIN;
+  $("h-quitar").hidden = !imagenDe(x.n);
   $("hoja").hidden = $("hoja-fondo").hidden = false;
 }
 function cerrarHoja() { $("hoja").hidden = $("hoja-fondo").hidden = true; hojaActual = null; }
@@ -1658,15 +1898,15 @@ $("h-archivo").addEventListener("change", (e) => {
   const f = e.target.files[0]; e.target.value = "";
   if (!f || !hojaActual) return;
   const nombre = hojaActual.x.n;
-  leerImagen(f, (url) => {
-    if (!guardarFoto(nombre, url)) return;
-    toast("Imagen guardada"); abrirHoja(hojaActual.x, hojaActual.tipo); pintarGaleria();
-    if (combo) pintarResultado();
+  if (!ADMIN) return;
+  leerImagen(f, async (url) => {
+    await ponerImagen(nombre, url);
+    toast("Imagen lista (falta publicar)"); if (hojaActual) abrirHoja(hojaActual.x, hojaActual.tipo);
   });
 });
-$("h-quitar").addEventListener("click", () => {
-  if (!hojaActual) return; quitarFoto(hojaActual.x.n); toast("Imagen quitada");
-  abrirHoja(hojaActual.x, hojaActual.tipo); pintarGaleria(); if (combo) pintarResultado();
+$("h-quitar").addEventListener("click", async () => {
+  if (!hojaActual || !ADMIN) return; await quitarImagen(hojaActual.x.n); toast("Imagen quitada (falta publicar)");
+  abrirHoja(hojaActual.x, hojaActual.tipo);
 });
 $("p-buscar").addEventListener("input", pintarGaleria);
 pintarFiltros(); pintarGaleria();
@@ -1674,6 +1914,7 @@ pintarFiltros(); pintarGaleria();
 // ================= NAVEGACIÓN =================
 const tabs = [...document.querySelectorAll("nav button")];
 function abrir(t) {
+  $("admin").hidden = true;
   tabs.forEach((b) => { const on = b.dataset.tab === t; b.setAttribute("aria-selected", on); $(b.dataset.tab).hidden = !on; });
   escribir("rot-tab", t); scrollTo(0, 0);
   if (t === "entrenar") requestAnimationFrame(medir);
@@ -1682,6 +1923,20 @@ function abrir(t) {
 tabs.forEach((b) => b.addEventListener("click", () => abrir(b.dataset.tab)));
 ponerIconos();
 abrir(leer("rot-tab", "roti"));
+// admin
+ponerMascota($("masc-pin"), "lock");
+$("version").addEventListener("click", tocarVersion);
+$("pin-modal").addEventListener("submit", enviarPin);
+$("pin-cancelar").addEventListener("click", cerrarPin);
+$("adm-publicar").addEventListener("click", publicar);
+$("adm-exportar").addEventListener("click", exportar);
+$("adm-importar").addEventListener("change", (e) => { const f = e.target.files[0]; e.target.value = ""; if (f) importar(f); });
+$("adm-bajar").addEventListener("click", () => descargarPaquete(true));
+$("gh-guardar").addEventListener("click", () => { guardarGh(); toast("Conexión guardada"); pintarAdmin(); });
+$("adm-pin").addEventListener("click", () => { try { localStorage.removeItem("rot-admin-pin"); } catch {} PAQUETE.adminPin = null; ADMIN = false; marcarAdmin(); pedirPin(); toast("Crea tu nuevo PIN y vuelve a publicar"); });
+$("adm-salir").addEventListener("click", salirAdmin);
+marcarAdmin();
+cargarImagenes();
 </script>
 </body>
 </html>

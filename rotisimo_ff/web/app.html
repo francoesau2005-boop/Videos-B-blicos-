@@ -38,7 +38,7 @@ svg.i { width: 18px; height: 18px; flex: none; }
 .barra-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border: 1px solid var(--line2); border-radius: 999px; background: linear-gradient(180deg, #121215, #070708); box-shadow: 0 10px 30px #000a; }
 .marca { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: 0.22em; font-size: 15px; }
 .marca svg { width: 26px; height: 26px; }
-.version { font-size: 11px; color: var(--muted); border: 1px solid var(--line2); border-radius: 999px; padding: 4px 10px; letter-spacing: 0.08em; }
+.version { background: none; font-family: inherit; color: var(--muted); cursor: pointer; font-size: 11px; color: var(--muted); border: 1px solid var(--line2); border-radius: 999px; padding: 4px 10px; letter-spacing: 0.08em; }
 
 /* títulos de página */
 .hero { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 6px 4px 0; }
@@ -227,6 +227,15 @@ svg.i { width: 18px; height: 18px; flex: none; }
 .fav .txt span { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fav button { border: 0; background: none; color: var(--muted); padding: 6px; cursor: pointer; display: grid; place-items: center; }
 
+.version.es-admin { background: var(--gold); color: #000; border-color: var(--gold); font-weight: 700; }
+.modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(360px, calc(100% - 32px)); background: var(--card); border: 1px solid var(--line2); border-radius: 22px; padding: 20px; z-index: 22; display: grid; gap: 12px; text-align: center; }
+.modal h2 { margin: 0; font-size: 21px; }
+.modal p { margin: 0; color: var(--muted); font-size: 14px; }
+.pin-in { width: 100%; text-align: center; font: 700 28px var(--font); letter-spacing: 0.4em; padding: 12px; border-radius: 14px; border: 1px solid var(--line2); background: var(--card2); color: var(--ink); }
+.campo { display: grid; gap: 5px; text-align: left; }
+.campo label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--muted); }
+.campo input { width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line2); background: var(--card2); color: var(--ink); font: 14px var(--font); }
+.btn:disabled { opacity: 0.6; }
 /* personajes */
 .ret img.foto, .hoja-ret img.foto { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pj.activa .ret img.foto { border-radius: 14px; }
@@ -263,7 +272,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 <div class="wrap">
   <header class="barra-top">
     <div class="marca"><span data-i="crosshair"></span>ROTÍSIMO</div>
-    <span class="version">v1.4</span>
+    <button class="version" id="version" type="button" aria-label="Versión">v1.5</button>
   </header>
 
   <!-- ============ INICIO: ROTI ============ -->
@@ -346,11 +355,50 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
   <section id="personajes" class="wrap" style="padding:0" hidden>
     <div class="hero">
       <h1>Personajes</h1>
-      <p>Toca uno para ver su habilidad, armar un combo con él o ponerle tu propia imagen.</p>
+      <p>Toca uno para ver su habilidad o armar un combo con él.</p>
     </div>
     <div class="escribir" style="padding-left:14px"><span data-i="search"></span><input id="p-buscar" placeholder="Buscar personaje o mascota…" autocomplete="off"></div>
     <div class="g2" id="p-filtros" style="grid-template-columns:repeat(4,1fr)"></div>
     <div class="galeria" id="galeria"></div>
+  </section>
+
+  <!-- ============ ADMIN (oculto) ============ -->
+  <section id="admin" class="wrap" style="padding:0" hidden>
+    <div class="hero">
+      <span class="badge">MODO ADMIN</span>
+      <h1>Imágenes de personajes</h1>
+      <p>Toca un personaje para poner su imagen. Cuando termines, publica para que todos la vean.</p>
+    </div>
+    <div class="panel">
+      <div id="adm-estado"></div>
+      <button class="btn blanco" id="adm-publicar"><span data-i="rocket"></span><span>Publicar para todos</span></button>
+      <div class="g2">
+        <button class="btn" id="adm-exportar"><span data-i="package"></span>Exportar</button>
+        <label class="btn" for="adm-importar" style="cursor:pointer"><span data-i="image-plus"></span>Importar</label>
+      </div>
+      <input type="file" id="adm-importar" accept="application/json,.json" hidden>
+      <button class="btn" id="adm-bajar"><span data-i="refresh-cw"></span>Descargar lo publicado</button>
+    </div>
+    <div class="panel">
+      <div class="paso-t"><span>PERSONAJES</span></div>
+      <div class="galeria" id="adm-lista"></div>
+    </div>
+    <div class="panel">
+      <div class="paso-t"><span>CONEXIÓN CON TU GITHUB</span></div>
+      <p class="privado" style="justify-content:flex-start;text-align:left">La clave se guarda solo en este celular. Crea una clave "fine-grained" en GitHub → Settings → Developer settings, con permiso de escritura en Contents solo para este repositorio.</p>
+      <div class="campo"><label for="gh-token">CLAVE DE GITHUB</label><input id="gh-token" type="password" autocomplete="off"></div>
+      <div class="g2">
+        <div class="campo"><label for="gh-owner">USUARIO</label><input id="gh-owner" autocomplete="off"></div>
+        <div class="campo"><label for="gh-repo">REPOSITORIO</label><input id="gh-repo" autocomplete="off"></div>
+      </div>
+      <div class="campo"><label for="gh-ruta">ARCHIVO</label><input id="gh-ruta" autocomplete="off"></div>
+      <div class="campo"><label for="gh-rama">RAMA (vacío = principal)</label><input id="gh-rama" autocomplete="off"></div>
+      <button class="btn" id="gh-guardar"><span data-i="check"></span>Guardar conexión</button>
+    </div>
+    <div class="g2">
+      <button class="btn" id="adm-pin"><span data-i="lock"></span>Cambiar PIN</button>
+      <button class="btn" id="adm-salir"><span data-i="x"></span>Salir de admin</button>
+    </div>
   </section>
 
   <!-- ============ SENSI ============ -->
@@ -434,17 +482,25 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="hoja-fondo" id="hoja-fondo" hidden></div>
+<form class="modal" id="pin-modal" hidden>
+  <div class="masc" id="masc-pin" style="justify-self:center"></div>
+  <h2 id="pin-titulo">Modo admin</h2>
+  <p id="pin-texto"></p>
+  <input class="pin-in" id="pin-in" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="PIN">
+  <p id="pin-error" style="color:var(--red);min-height:18px"></p>
+  <div class="g2"><button type="button" class="btn" id="pin-cancelar">Cancelar</button><button class="btn blanco">Entrar</button></div>
+</form>
 <div class="hoja" id="hoja" hidden role="dialog" aria-modal="true" aria-labelledby="h-nombre">
   <div class="hoja-barra"></div>
   <div class="hoja-top"><div class="hoja-ret" id="h-ret"></div><div><small id="h-tipo"></small><h2 id="h-nombre"></h2><div class="etiquetas" id="h-etq"></div></div></div>
   <div class="habil"><small>HABILIDAD</small><p id="h-hab"></p></div>
   <div class="acciones" id="h-acc"></div>
-  <div class="g2">
+  <div class="g2" id="h-admin">
     <label class="btn" for="h-archivo" style="cursor:pointer"><span data-i="image-plus"></span>Poner imagen</label>
     <button class="btn" id="h-quitar"><span data-i="trash-2"></span>Quitar imagen</button>
   </div>
   <input type="file" id="h-archivo" accept="image/*" hidden>
-  <p class="privado">Puedes usar una captura del juego. La imagen se guarda solo en tu celular.</p>
+  <p class="privado" id="h-nota">Modo admin: el cambio queda pendiente hasta que publiques.</p>
   <button class="btn" id="h-cerrar"><span data-i="x"></span>Cerrar</button>
 </div>
 
@@ -505,6 +561,7 @@ function copiar(texto) {
 }
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 function tono(nombre) { let h = 7; for (const c of nombre) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+/*ADMIN*/
 /*PERSONAJES*/
 
 // ================= MASCOTA ROTI (diseño propio) =================
@@ -646,7 +703,7 @@ function pintarResultado() {
   else { const n = c.pasivas[+seleccion[1]]; rol = "HABILIDAD PASIVA"; nom = n; txt = buscar(PASIVOS, n).h; }
   $("c-habil").innerHTML = `<small>${rol}</small><b>${esc(nom)}</b><p>${esc(txt)}</p><span class="nota">Toca cualquier personaje para ver su habilidad · el candado lo deja fijo</span>`;
   const fichaDe = seleccion === "activa" ? [buscar(ACTIVOS, c.activa), "activa"] : seleccion === "mascota" ? [buscar(MASCOTAS, c.mascota), "mascota"] : seleccion[0] === "p" ? [buscar(PASIVOS, c.pasivas[+seleccion[1]]), "pasiva"] : null;
-  if (fichaDe) { const b = document.createElement("button"); b.className = "btn-chico"; b.style.justifySelf = "start"; b.innerHTML = icono("image-plus") + "VER FICHA · PONER IMAGEN"; b.addEventListener("click", () => abrirHoja(fichaDe[0], fichaDe[1])); $("c-habil").append(b); }
+  if (fichaDe) { const b = document.createElement("button"); b.className = "btn-chico"; b.style.justifySelf = "start"; b.innerHTML = icono("users") + (ADMIN ? "VER FICHA · PONER IMAGEN" : "VER FICHA"); b.addEventListener("click", () => abrirHoja(fichaDe[0], fichaDe[1])); $("c-habil").append(b); }
   const todos = [buscar(ACTIVOS, c.activa), ...c.pasivas.map((p) => buscar(PASIVOS, p)), buscar(MASCOTAS, c.mascota)];
   const encajan = todos.filter((x) => x.t.includes(c.estilo)).map((x) => x.n);
   const razones = [PORQUE[c.estilo]];
@@ -999,7 +1056,8 @@ function abrirHoja(x, tipo) {
   const btn = (txt, ico, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.innerHTML = icono(ico) + esc(txt); b.addEventListener("click", fn); acc.append(b); };
   btn("Combo con " + (x.n.length > 9 ? "él" : x.n), "sparkles", "blanco", () => comboCon(x, tipo));
   btn("Preguntar a Roti", "bot", "", () => { cerrarHoja(); abrir("roti"); msgYo("¿Qué hace " + x.n + "?"); entender("que hace " + x.n); });
-  $("h-quitar").hidden = !FOTOS[x.n];
+  $("h-admin").hidden = $("h-nota").hidden = !ADMIN;
+  $("h-quitar").hidden = !imagenDe(x.n);
   $("hoja").hidden = $("hoja-fondo").hidden = false;
 }
 function cerrarHoja() { $("hoja").hidden = $("hoja-fondo").hidden = true; hojaActual = null; }
@@ -1020,15 +1078,15 @@ $("h-archivo").addEventListener("change", (e) => {
   const f = e.target.files[0]; e.target.value = "";
   if (!f || !hojaActual) return;
   const nombre = hojaActual.x.n;
-  leerImagen(f, (url) => {
-    if (!guardarFoto(nombre, url)) return;
-    toast("Imagen guardada"); abrirHoja(hojaActual.x, hojaActual.tipo); pintarGaleria();
-    if (combo) pintarResultado();
+  if (!ADMIN) return;
+  leerImagen(f, async (url) => {
+    await ponerImagen(nombre, url);
+    toast("Imagen lista (falta publicar)"); if (hojaActual) abrirHoja(hojaActual.x, hojaActual.tipo);
   });
 });
-$("h-quitar").addEventListener("click", () => {
-  if (!hojaActual) return; quitarFoto(hojaActual.x.n); toast("Imagen quitada");
-  abrirHoja(hojaActual.x, hojaActual.tipo); pintarGaleria(); if (combo) pintarResultado();
+$("h-quitar").addEventListener("click", async () => {
+  if (!hojaActual || !ADMIN) return; await quitarImagen(hojaActual.x.n); toast("Imagen quitada (falta publicar)");
+  abrirHoja(hojaActual.x, hojaActual.tipo);
 });
 $("p-buscar").addEventListener("input", pintarGaleria);
 pintarFiltros(); pintarGaleria();
@@ -1036,6 +1094,7 @@ pintarFiltros(); pintarGaleria();
 // ================= NAVEGACIÓN =================
 const tabs = [...document.querySelectorAll("nav button")];
 function abrir(t) {
+  $("admin").hidden = true;
   tabs.forEach((b) => { const on = b.dataset.tab === t; b.setAttribute("aria-selected", on); $(b.dataset.tab).hidden = !on; });
   escribir("rot-tab", t); scrollTo(0, 0);
   if (t === "entrenar") requestAnimationFrame(medir);
@@ -1044,6 +1103,20 @@ function abrir(t) {
 tabs.forEach((b) => b.addEventListener("click", () => abrir(b.dataset.tab)));
 ponerIconos();
 abrir(leer("rot-tab", "roti"));
+// admin
+ponerMascota($("masc-pin"), "lock");
+$("version").addEventListener("click", tocarVersion);
+$("pin-modal").addEventListener("submit", enviarPin);
+$("pin-cancelar").addEventListener("click", cerrarPin);
+$("adm-publicar").addEventListener("click", publicar);
+$("adm-exportar").addEventListener("click", exportar);
+$("adm-importar").addEventListener("change", (e) => { const f = e.target.files[0]; e.target.value = ""; if (f) importar(f); });
+$("adm-bajar").addEventListener("click", () => descargarPaquete(true));
+$("gh-guardar").addEventListener("click", () => { guardarGh(); toast("Conexión guardada"); pintarAdmin(); });
+$("adm-pin").addEventListener("click", () => { try { localStorage.removeItem("rot-admin-pin"); } catch {} PAQUETE.adminPin = null; ADMIN = false; marcarAdmin(); pedirPin(); toast("Crea tu nuevo PIN y vuelve a publicar"); });
+$("adm-salir").addEventListener("click", salirAdmin);
+marcarAdmin();
+cargarImagenes();
 </script>
 </body>
 </html>

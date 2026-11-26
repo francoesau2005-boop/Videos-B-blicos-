@@ -44,7 +44,8 @@ public class MainActivity extends Activity {
                 alElegir = cb;
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("image/*");
+                String[] tipos = params.getAcceptTypes();
+                i.setType(tipos.length > 0 && tipos[0].startsWith("image") ? "image/*" : "*/*");
                 try {
                     startActivityForResult(Intent.createChooser(i, "Elige una imagen"), PEDIR_IMAGEN);
                 } catch (Exception e) {
@@ -83,6 +84,30 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> {
                 ClipboardManager cm = getSystemService(ClipboardManager.class);
                 cm.setPrimaryClip(ClipData.newPlainText("Rotísimo", texto));
+            });
+        }
+
+        // guarda un archivo (paquete de imágenes) en Descargas
+        @JavascriptInterface public void guardarArchivo(String nombre, String contenido) {
+            runOnUiThread(() -> {
+                try {
+                    android.content.ContentValues v = new android.content.ContentValues();
+                    v.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, nombre);
+                    v.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "application/json");
+                    java.io.OutputStream out;
+                    if (android.os.Build.VERSION.SDK_INT >= 29) {
+                        Uri uri = getContentResolver().insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+                        out = getContentResolver().openOutputStream(uri);
+                    } else {
+                        java.io.File f = new java.io.File(getExternalFilesDir(null), nombre);
+                        out = new java.io.FileOutputStream(f);
+                    }
+                    out.write(contenido.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    out.close();
+                    Toast.makeText(MainActivity.this, "Guardado en Descargas: " + nombre, Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "No se pudo guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
             });
         }
 

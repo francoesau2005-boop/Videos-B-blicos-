@@ -144,14 +144,6 @@ function avatarMascota(nombre, grande) {
   return `<svg viewBox="0 0 100 105" aria-hidden="true">${s}</svg>`;
 }
 
-// ---------- fotos propias del usuario ----------
-let FOTOS = leer("rot-fotos", {});
-function guardarFoto(nombre, dataURL) {
-  FOTOS[nombre] = dataURL;
-  try { localStorage.setItem("rot-fotos", JSON.stringify(FOTOS)); return true; }
-  catch { delete FOTOS[nombre]; toast("No hay espacio para más fotos"); return false; }
-}
-function quitarFoto(nombre) { delete FOTOS[nombre]; escribir("rot-fotos", FOTOS); }
 // reduce la imagen a 320 px para que ocupe poco
 function leerImagen(archivo, listo) {
   const lector = new FileReader();
@@ -171,9 +163,10 @@ function leerImagen(archivo, listo) {
   lector.readAsDataURL(archivo);
 }
 
-// retrato que usa toda la app: foto propia si existe; si no, el avatar dibujado
+// retrato que usa toda la app: imagen publicada por el admin si existe; si no, el avatar dibujado
 function retrato(nombre, grande) {
-  if (FOTOS[nombre]) return `<img class="foto" src="${FOTOS[nombre]}" alt="">`;
+  const img = imagenDe(nombre);
+  if (img) return `<img class="foto" src="${img}" alt="">`;
   if (AV_MASC[nombre] || (typeof MASCOTAS !== "undefined" && MASCOTAS.some((m) => m.n === nombre))) return avatarMascota(nombre, grande);
   if (AV[nombre]) return avatarPersona(nombre, grande);
   // armas: mira con el nombre del arma principal

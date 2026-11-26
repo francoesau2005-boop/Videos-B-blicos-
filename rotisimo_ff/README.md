@@ -20,3 +20,12 @@ App Android con ayudas legales para juegos de disparos tipo battle royale:
 Compilar: `./compilar.sh` (requiere el SDK de Android). La app queda en `dist/Rotisimo.apk`.
 
 El diseño se edita en `web/app.html` (datos en `web/datos.js` y `web/respuestas.js`); `node web/build.mjs` genera `web/index.html` con la letra Outfit y los íconos Lucide incluidos, para que funcione sin internet.
+
+## Modo admin (imágenes de personajes)
+
+- Toca 5 veces la versión (arriba a la derecha) y escribe el PIN de admin. La primera vez se crea.
+- En el panel de admin pon la imagen de cada personaje y toca **Publicar para todos**: la app sube
+  `rotisimo_ff/imagenes/imagenes.json` a la rama principal de este repositorio con una clave de GitHub
+  (fine-grained, permiso de escritura en Contents) que se guarda solo en el celular del admin.
+- Todas las apps descargan ese archivo al abrirse. El PIN cifrado viaja en el archivo, así que en los
+  demás celulares solo funciona el PIN del admin. Código en `web/admin.js`.
