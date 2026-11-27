@@ -34,6 +34,6 @@ El diseño se edita en `web/app.html` (datos en `web/datos.js` y `web/respuestas
 
 - Banner abajo de la app y anuncio con recompensa para desbloquear el **Combo PRO** (1 hora).
 - Los códigos están en `app_android/gradle.properties` (`ADMOB_APP_ID`, `ADMOB_BANNER`, `ADMOB_RECOMPENSA`).
-  Ahora son los códigos **de prueba** de Google: muestran anuncios de ejemplo y no pagan.
-  Para cobrar, reemplázalos por los de tu cuenta de AdMob y vuelve a compilar.
+  Ya tienen los códigos reales de la cuenta de AdMob del dueño de la app.
+  Para probar sin riesgo, usa los de prueba de Google (ver developers.google.com/admob/android/test-ads).
 - Incluye el aviso de consentimiento de Google (UMP), obligatorio en Europa y otros países.

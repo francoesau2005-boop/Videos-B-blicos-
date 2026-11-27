@@ -118,7 +118,7 @@ async function enviarPin(e) {
 }
 function cerrarPin() { $("pin-modal").hidden = true; if ($("hoja").hidden) $("hoja-fondo").hidden = true; }
 function salirAdmin() { ADMIN = false; try { sessionStorage.removeItem("rot-admin"); } catch {} marcarAdmin(); abrir("roti"); repintarImagenes(); toast("Saliste del modo admin"); }
-function marcarAdmin() { const v = $("version"); v.textContent = ADMIN ? "ADMIN" : "v1.6"; v.classList.toggle("es-admin", ADMIN); }
+function marcarAdmin() { const v = $("version"); v.textContent = ADMIN ? "ADMIN" : "v1.7"; v.classList.toggle("es-admin", ADMIN); }
 
 // ---------- panel de admin ----------
 function abrirAdmin() {
