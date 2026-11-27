@@ -10,8 +10,8 @@ android {
         applicationId 'com.rotisimo.ff'
         minSdk 26
         targetSdk 34
-        versionCode 9
-        versionName '1.7'
+        versionCode 10
+        versionName '1.8'
         manifestPlaceholders = [admobAppId: project.property('ADMOB_APP_ID')]
         buildConfigField 'String', 'ADMOB_BANNER', "\"${project.property('ADMOB_BANNER')}\""
         buildConfigField 'String', 'ADMOB_RECOMPENSA', "\"${project.property('ADMOB_RECOMPENSA')}\""

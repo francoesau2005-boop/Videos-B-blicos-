@@ -17,6 +17,7 @@ poner("/*FUENTES*/", fuentes);
 poner("/*ICONOS*/", "// Íconos: Lucide (licencia ISC)\nconst ICONOS = " + JSON.stringify(iconos) + ";");
 poner("/*DATOS*/", leer("datos.js"));
 poner("/*ROTI*/", leer("roti.js"));
+poner("/*IMAGENES*/", leer("imagenes_base.js"));
 poner("/*ADMIN*/", leer("admin.js"));
 poner("/*PERSONAJES*/", leer("personajes.js"));
 writeFileSync(dir + "index.html", html);

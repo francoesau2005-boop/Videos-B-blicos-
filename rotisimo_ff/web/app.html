@@ -292,7 +292,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-off
 <div class="wrap">
   <header class="barra-top">
     <div class="marca"><span data-i="crosshair"></span>ROTÍSIMO</div>
-    <button class="version" id="version" type="button" aria-label="Versión">v1.7</button>
+    <button class="version" id="version" type="button" aria-label="Versión">v1.8</button>
   </header>
 
   <!-- ============ INICIO: ROTI ============ -->
@@ -582,6 +582,7 @@ function copiar(texto) {
 }
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 function tono(nombre) { let h = 7; for (const c of nombre) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+/*IMAGENES*/
 /*ADMIN*/
 /*PERSONAJES*/
 
