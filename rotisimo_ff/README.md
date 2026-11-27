@@ -40,4 +40,4 @@ El diseño se edita en `web/app.html` (datos en `web/datos.js` y `web/respuestas
 
 ## Imágenes incluidas
 
-`web/imagenes_base.js` trae las imágenes de 32 personajes que proporcionó el dueño de la app. El admin puede reemplazarlas o publicar otras; las que falten usan el avatar dibujado.
+`web/imagenes_base.js` trae las imágenes de 37 personajes que proporcionó el dueño de la app. El admin puede reemplazarlas o publicar otras; las que falten usan el avatar dibujado.
