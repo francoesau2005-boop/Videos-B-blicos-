@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Rey Pollo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Juego a pantalla completa: escena 3D detrás, HUD flotante arriba, botones abajo a la derecha */
+:root {
+  --rojo: #d8332b;
+  --rojo-osc: #8f1d18;
+  --crema: #fff4dc;
+  --oro: #ffc62e;
+  --verde: #3cbf5a;
+  --tinta: #2b1408;
+  --font-titulo: "Lilita One", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  --font-texto: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: #6fb7e8; color: var(--tinta); font-family: var(--font-texto); user-select: none; -webkit-user-select: none; touch-action: none; }
+#app { position: fixed; inset: 0; }
+#app canvas { display: block; }
+.hud { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); left: 0; right: 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; pointer-events: none; padding: 0 max(12px, env(safe-area-inset-left, 0px)) 0 max(12px, env(safe-area-inset-right, 0px)); }
+.pill { display: flex; align-items: center; gap: 8px; background: var(--crema); border: 3px solid var(--tinta); border-radius: 999px; padding: 6px 16px 6px 8px; box-shadow: 0 4px 0 var(--tinta); font-family: var(--font-titulo); font-size: 22px; }
+.pill .ico { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; }
+.dinero .ico { background: var(--verde); color: #fff; }
+.nivel .ico { background: var(--oro); }
+.barra { width: 90px; height: 10px; border-radius: 9px; background: #e9d9b8; border: 2px solid var(--tinta); overflow: hidden; }
+.barra div { height: 100%; background: var(--oro); width: 0; transition: width .3s; }
+#pista { position: fixed; top: calc(70px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); background: var(--tinta); color: var(--crema); padding: 8px 16px; border-radius: 12px; font-weight: 800; font-size: 15px; pointer-events: none; max-width: calc(100% - 32px); text-align: center; }
+.botones { position: fixed; right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 10px; }
+.btn { font-family: var(--font-titulo); font-size: 19px; color: var(--tinta); background: var(--oro); border: 3px solid var(--tinta); border-radius: 16px; padding: 10px 18px; box-shadow: 0 5px 0 var(--tinta); cursor: pointer; }
+.btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--tinta); }
+.btn.sec { background: var(--crema); }
+.btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+#panel { position: fixed; inset: 0; background: #2b140888; display: grid; place-items: center; padding: 16px; }
+.caja { background: var(--crema); border: 4px solid var(--tinta); border-radius: 22px; box-shadow: 0 8px 0 var(--tinta); width: min(440px, 100%); max-height: calc(100% - 32px); overflow-y: auto; padding: 18px; display: grid; gap: 12px; }
+.caja h2 { margin: 0; font-family: var(--font-titulo); font-weight: 400; font-size: 30px; color: var(--rojo); text-align: center; }
+.mejora { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; background: #fff; border: 3px solid var(--tinta); border-radius: 16px; padding: 10px; }
+.mejora .ic { font-size: 28px; text-align: center; }
+.mejora b { display: block; font-size: 16px; }
+.mejora small { color: #7a5a40; font-size: 13px; }
+.mejora .btn { font-size: 16px; padding: 8px 12px; }
+.mejora .btn:disabled { background: #ddd; cursor: default; }
+.estrellas { color: var(--oro); letter-spacing: 2px; font-size: 13px; }
+#inicio { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(circle at 50% 35%, #ffcf4d 0%, #e2452f 55%, #7d1611 100%); padding: 16px; text-align: center; }
+#inicio .titulo { font-family: var(--font-titulo); font-size: clamp(54px, 13vw, 110px); color: var(--crema); text-shadow: 0 6px 0 var(--tinta), 0 0 30px #0005; line-height: .9; }
+#inicio p { color: var(--crema); font-weight: 800; font-size: 18px; max-width: 30ch; margin: 14px auto 22px; text-shadow: 0 2px 0 #0006; }
+#inicio .btn { font-size: 28px; padding: 14px 40px; }
+#inicio small { display: block; color: #fff8; margin-top: 18px; font-weight: 700; }
+#joy { position: fixed; width: 110px; height: 110px; border-radius: 50%; border: 3px solid #fff9; background: #0002; pointer-events: none; transform: translate(-50%, -50%); }
+#joy div { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px; border-radius: 50%; background: #fffc; }
+#aviso { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); font-family: var(--font-titulo); font-size: 30px; color: var(--oro); text-shadow: 0 4px 0 var(--tinta); pointer-events: none; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .barra div { transition: none; } }
+</style>
+
+<div id="app"></div>
+<div class="hud">
+  <div class="pill dinero"><span class="ico">$</span><span id="dinero">0</span></div>
+  <div class="pill nivel"><span class="ico">★</span><span id="nivel">Nivel 1</span><div class="barra"><div id="barra"></div></div></div>
+</div>
+<div id="pista"></div>
+<div id="aviso" hidden></div>
+<div class="botones">
+  <button class="btn sec" id="btn-sonido" aria-label="Sonido">🔊</button>
+  <button class="btn" id="btn-mejoras">Mejoras</button>
+</div>
+<div id="joy" hidden><div></div></div>
+<div id="panel" hidden>
+  <div class="caja">
+    <h2>Mejoras</h2>
+    <div id="lista-mejoras" style="display:grid;gap:10px"></div>
+    <button class="btn sec" id="btn-reiniciar">Empezar de cero</button>
+    <button class="btn" id="btn-cerrar">Seguir jugando</button>
+  </div>
+</div>
+<div id="inicio">
+  <div>
+    <div class="titulo">REY<br>POLLO</div>
+    <p>Fríe pollo, atiende a los clientes, cobra y haz crecer el mejor restaurante de pollo frito del barrio.</p>
+    <button class="btn" id="btn-jugar">¡A jugar!</button>
+    <small>Muévete con WASD o las flechas · también puedes arrastrar con el mouse</small>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+const T = THREE;
+const $ = (id) => document.getElementById(id);
+const leer = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
+const guardarLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const azar = (a, b) => a + Math.random() * (b - a);
+const dist = (ax, az, bx, bz) => Math.hypot(ax - bx, az - bz);
+
+// ================= ESCENA =================
+const escena = new T.Scene();
+escena.background = new T.Color(0x6fb7e8);
+escena.fog = new T.Fog(0x6fb7e8, 40, 70);
+const render = new T.WebGLRenderer({ antialias: true });
+render.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+render.shadowMap.enabled = true;
+render.shadowMap.type = T.PCFSoftShadowMap;
+$("app").appendChild(render.domElement);
+const cam = new T.PerspectiveCamera(38, 1, 0.1, 200);
+function ajustar() { const w = innerWidth, h = innerHeight; render.setSize(w, h); cam.aspect = w / h; cam.fov = w < h ? 55 : 38; cam.updateProjectionMatrix(); }
+addEventListener("resize", ajustar); ajustar();
+
+escena.add(new T.HemisphereLight(0xffffff, 0xc79a6a, 0.8));
+const sol = new T.DirectionalLight(0xffffff, 0.75);
+sol.position.set(9, 20, 11); sol.castShadow = true; sol.shadow.mapSize.set(2048, 2048);
+Object.assign(sol.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 60 });
+escena.add(sol);
+
+const matCache = {};
+const M = (c) => matCache[c] || (matCache[c] = new T.MeshLambertMaterial({ color: c }));
+function malla(geo, c, x = 0, y = 0, z = 0, padre = escena) { const m = new T.Mesh(geo, M(c)); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; padre.add(m); return m; }
+const caja = (w, h, d, c, x, y, z, p) => malla(new T.BoxGeometry(w, h, d), c, x, y, z, p);
+const cil = (rt, rb, h, c, x, y, z, p, s = 18) => malla(new T.CylinderGeometry(rt, rb, h, s), c, x, y, z, p);
+const esf = (r, c, x, y, z, p) => malla(new T.SphereGeometry(r, 18, 14), c, x, y, z, p);
+
+// texturas dibujadas en canvas
+function texCanvas(w, h, dibujar) { const c = document.createElement("canvas"); c.width = w; c.height = h; dibujar(c.getContext("2d"), w, h); const t = new T.CanvasTexture(c); t.anisotropy = 4; return t; }
+function redondeado(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+
+// etiqueta (sprite) con texto actualizable
+function etiqueta(ancho = 2.2, alto = 1.1, px = 256) {
+  const c = document.createElement("canvas"); c.width = px; c.height = Math.round(px * alto / ancho);
+  const tex = new T.CanvasTexture(c);
+  const s = new T.Sprite(new T.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
+  s.scale.set(ancho, alto, 1); s.renderOrder = 10;
+  s.dibujar = (fn) => { const g = c.getContext("2d"); g.clearRect(0, 0, c.width, c.height); fn(g, c.width, c.height); tex.needsUpdate = true; };
+  return s;
+}
+const EMOJI = '"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+
+// ================= EL LOCAL =================
+// césped y calle
+malla(new T.PlaneGeometry(120, 120), 0x7cc46a, 0, -0.01, 0).rotation.x = -Math.PI / 2;
+caja(120, 0.02, 6, 0x5b5b66, 0, 0, 15.5);
+for (let x = -50; x < 50; x += 4) caja(2, 0.03, 0.25, 0xffffff, x, 0.01, 15.5);
+// piso de cuadros
+const pisoTex = texCanvas(128, 128, (g) => { g.fillStyle = "#fff4dc"; g.fillRect(0, 0, 128, 128); g.fillStyle = "#f3c9a8"; g.fillRect(0, 0, 64, 64); g.fillRect(64, 64, 64, 64); });
+pisoTex.wrapS = pisoTex.wrapT = T.RepeatWrapping; pisoTex.repeat.set(7, 8.5);
+const piso = new T.Mesh(new T.PlaneGeometry(14.4, 17.4), new T.MeshLambertMaterial({ map: pisoTex }));
+piso.rotation.x = -Math.PI / 2; piso.position.set(0, 0.005, 1.5); piso.receiveShadow = true; escena.add(piso);
+// cocina con piso gris
+const coc = caja(14.4, 0.02, 6.2, 0xdcd7cf, 0, 0.012, -4.1); coc.castShadow = false;
+// paredes
+caja(15, 3.2, 0.4, 0xfff4dc, 0, 1.6, -7.4);
+caja(15, 0.5, 0.42, 0xd8332b, 0, 1.0, -7.38);
+caja(0.4, 1.2, 17.6, 0xfff4dc, -7.4, 0.6, 1.4);
+caja(0.4, 1.2, 17.6, 0xfff4dc, 7.4, 0.6, 1.4);
+caja(0.42, 0.25, 17.6, 0xd8332b, -7.4, 1.1, 1.4);
+caja(0.42, 0.25, 17.6, 0xd8332b, 7.4, 1.1, 1.4);
+// valla delantera con puerta
+caja(7.6, 0.8, 0.3, 0xd8332b, -3.6, 0.4, 10.2);
+caja(4.4, 0.8, 0.3, 0xd8332b, 5.2, 0.4, 10.2);
+// letrero con logo (dibujo original: pollo con corona)
+function dibujarLogo(g, w, h) {
+  g.fillStyle = "#d8332b"; redondeado(g, 6, 6, w - 12, h - 12, 40); g.fill();
+  g.lineWidth = 10; g.strokeStyle = "#ffc62e"; redondeado(g, 14, 14, w - 28, h - 28, 34); g.stroke();
+  const cx = 150, cy = h / 2 + 12;
+  g.fillStyle = "#fff4dc"; g.beginPath(); g.arc(cx, cy, 70, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#ffc62e"; g.beginPath(); g.moveTo(cx - 52, cy - 52); g.lineTo(cx - 38, cy - 110); g.lineTo(cx - 14, cy - 72); g.lineTo(cx, cy - 120); g.lineTo(cx + 14, cy - 72); g.lineTo(cx + 38, cy - 110); g.lineTo(cx + 52, cy - 52); g.closePath(); g.fill();
+  g.fillStyle = "#d8332b"; g.beginPath(); g.arc(cx + 8, cy - 64, 12, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#2b1408"; g.beginPath(); g.arc(cx - 20, cy - 8, 9, 0, Math.PI * 2); g.arc(cx + 22, cy - 8, 9, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#ff9a1f"; g.beginPath(); g.moveTo(cx - 14, cy + 12); g.lineTo(cx + 14, cy + 12); g.lineTo(cx, cy + 34); g.closePath(); g.fill();
+  g.fillStyle = "#e2452f"; g.beginPath(); g.ellipse(cx + 4, cy + 44, 10, 14, 0, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#fff4dc"; g.font = '110px "Lilita One", sans-serif'; g.textBaseline = "middle"; g.fillText("REY POLLO", 250, h / 2 + 8);
+}
+const logoTex = texCanvas(1024, 280, dibujarLogo);
+const letrero = new T.Mesh(new T.PlaneGeometry(6.4, 1.75), new T.MeshBasicMaterial({ map: logoTex, transparent: true }));
+letrero.position.set(0, 2.45, -7.18); escena.add(letrero);
+// macetas y detalles
+for (const [x, z] of [[-6.6, 9.4], [6.6, 9.4], [-6.6, -0.5], [6.6, -0.5]]) { cil(0.35, 0.28, 0.5, 0xb5652c, x, 0.25, z); esf(0.45, 0x3f9a45, x, 0.8, z); }
+
+// ================= OBSTÁCULOS =================
+const obstaculos = [];
+const bloquear = (x0, x1, z0, z1) => { const o = { x0, x1, z0, z1 }; obstaculos.push(o); return o; };
+
+// ================= OBJETOS DE COMIDA =================
+function hacerItem(tipo) {
+  const g = new T.Group();
+  if (tipo === "pollo") {
+    cil(0.2, 0.15, 0.27, 0xd8332b, 0, 0.135, 0, g);
+    cil(0.205, 0.2, 0.07, 0xfff4dc, 0, 0.2, 0, g);
+    esf(0.09, 0xc97a2b, -0.06, 0.3, 0.02, g); esf(0.085, 0xb8681f, 0.07, 0.31, -0.03, g); esf(0.08, 0xd88a35, 0.01, 0.33, 0.07, g);
+  } else {
+    cil(0.12, 0.09, 0.3, 0xffffff, 0, 0.15, 0, g);
+    cil(0.123, 0.115, 0.08, 0xd8332b, 0, 0.17, 0, g);
+    cil(0.125, 0.125, 0.03, 0x2b1408, 0, 0.31, 0, g);
+    cil(0.015, 0.015, 0.22, 0xffc62e, 0.04, 0.4, 0, g);
+  }
+  g.userData.tipo = tipo;
+  return g;
+}
+const ALTO_ITEM = 0.3;
+
+// ================= PERSONAS =================
+const PIELES = [0xf1c7a5, 0xd9a27a, 0xa96f4a, 0x7a4a2e];
+const ROPAS = [0x3a7bd5, 0x8e44ad, 0x16a085, 0xe67e22, 0x2c3e50, 0xe84393, 0x00a8a8, 0x6d4c41];
+const PELOS = [0x2b1a10, 0x5a3a1a, 0xd9a441, 0x111111, 0x8a3b12];
+function persona({ ropa, piel, pelo, gorro }) {
+  const g = new T.Group();
+  const cuerpo = new T.Group(); g.add(cuerpo);
+  cil(0.32, 0.36, 0.75, ropa, 0, 0.62, 0, cuerpo);
+  esf(0.33, ropa, 0, 1.0, 0, cuerpo).scale.set(1, 0.5, 1);
+  esf(0.3, piel, 0, 1.35, 0, cuerpo);
+  esf(0.045, 0x1a1a1a, -0.1, 1.38, 0.27, cuerpo); esf(0.045, 0x1a1a1a, 0.1, 1.38, 0.27, cuerpo);
+  if (gorro === "chef") {
+    cil(0.24, 0.26, 0.22, 0xffffff, 0, 1.66, 0, cuerpo); esf(0.3, 0xffffff, 0, 1.86, 0, cuerpo).scale.set(1, 0.7, 1);
+    // pequeña corona dorada en el gorro
+    const cor = cil(0.17, 0.17, 0.12, 0xffc62e, 0, 2.06, 0, cuerpo, 8); cor.scale.set(1, 1, 1);
+    for (let i = 0; i < 5; i++) { const a = (i / 5) * Math.PI * 2; malla(new T.ConeGeometry(0.05, 0.12, 6), 0xffc62e, Math.cos(a) * 0.15, 2.17, Math.sin(a) * 0.15, cuerpo); }
+  } else if (gorro === "gorra") {
+    esf(0.31, ropa, 0, 1.45, 0, cuerpo).scale.set(1, 0.55, 1); caja(0.3, 0.04, 0.25, ropa, 0, 1.47, 0.28, cuerpo);
+  } else {
+    esf(0.31, pelo, 0, 1.43, -0.03, cuerpo).scale.set(1, 0.7, 1);
+  }
+  const bi = cil(0.08, 0.08, 0.5, ropa, -0.38, 0.75, 0.1, cuerpo); bi.rotation.x = -0.9;
+  const bd = cil(0.08, 0.08, 0.5, ropa, 0.38, 0.75, 0.1, cuerpo); bd.rotation.x = -0.9;
+  g.userData.cuerpo = cuerpo;
+  return g;
+}
+function animarCaminar(p, t, moviendo) {
+  const c = p.userData.cuerpo;
+  c.position.y = moviendo ? Math.abs(Math.sin(t * 12)) * 0.08 : 0;
+  c.rotation.z = moviendo ? Math.sin(t * 12) * 0.05 : 0;
+}
+
+// ================= ESTADO DEL JUEGO =================
+const EST = Object.assign({ dinero: 0, desbloqueos: [], mejoras: { vel: 0, cap: 0, frei: 0, precio: 0 }, atendidos: 0 }, leer("reypollo", {}));
+EST.mejoras = Object.assign({ vel: 0, cap: 0, frei: 0, precio: 0 }, EST.mejoras);
+const tiene = (id) => EST.desbloqueos.includes(id);
+const nivel = () => 1 + Math.floor(EST.atendidos / 8);
+const capacidad = () => 4 + EST.mejoras.cap * 2;
+const velocidad = () => 4.2 + EST.mejoras.vel * 0.55;
+const precio = (tipo) => Math.round((tipo === "pollo" ? 6 : 3) * (1 + EST.mejoras.precio * 0.2) * (1 + (nivel() - 1) * 0.04));
+function guardar() { guardarLS("reypollo", EST); }
+setInterval(guardar, 4000);
+
+// ================= ESTACIONES =================
+const estaciones = []; // freidoras y máquina de refrescos
+function crearEstacion(id, tipo, x) {
+  const g = new T.Group(); g.position.set(x, 0, -6.1); escena.add(g);
+  if (tipo === "pollo") {
+    caja(1.7, 1.0, 1.0, 0xb9c0c8, 0, 0.5, 0, g);
+    caja(1.72, 0.12, 1.02, 0x8d949c, 0, 1.0, 0, g);
+    caja(0.65, 0.04, 0.7, 0xe0a62a, -0.4, 1.07, 0, g); caja(0.65, 0.04, 0.7, 0xe0a62a, 0.4, 1.07, 0, g);
+    caja(1.7, 0.5, 0.15, 0xd8332b, 0, 0.55, 0.51, g);
+    caja(0.08, 0.6, 0.08, 0x555555, -0.4, 1.35, -0.2, g); caja(0.08, 0.6, 0.08, 0x555555, 0.4, 1.35, -0.2, g);
+  } else {
+    caja(1.2, 1.9, 0.9, 0xd8332b, 0, 0.95, 0, g);
+    caja(0.9, 0.7, 0.05, 0x2b1408, 0, 1.35, 0.46, g);
+    caja(0.5, 0.15, 0.3, 0xcccccc, 0, 0.7, 0.4, g);
+    const t = texCanvas(128, 64, (c) => { c.fillStyle = "#ffc62e"; c.font = 'bold 34px "Lilita One",sans-serif'; c.textAlign = "center"; c.fillText("REFRESCOS", 64, 44); });
+    const pl = new T.Mesh(new T.PlaneGeometry(0.85, 0.4), new T.MeshBasicMaterial({ map: t, transparent: true })); pl.position.set(0, 1.4, 0.48); g.add(pl);
+  }
+  // bandeja de salida
+  caja(1.2, 0.08, 0.7, 0x8d949c, 0, 0.55, 0.95, g);
+  caja(0.1, 0.55, 0.1, 0x8d949c, -0.5, 0.27, 0.95, g); caja(0.1, 0.55, 0.1, 0x8d949c, 0.5, 0.27, 0.95, g);
+  const e = { id, tipo, x, g, items: [], t: 0, max: 6 };
+  e.obs = bloquear(x - 0.9, x + 0.9, -6.65, -5.2);
+  estaciones.push(e);
+  return e;
+}
+function colocarEnBandeja(e) {
+  e.items.forEach((m, i) => { const col = i % 3, fila = Math.floor(i / 3); m.position.set(-0.35 + col * 0.35, 0.59 + fila * ALTO_ITEM, 0.95); });
+}
+function tiempoProduccion(e) { return (e.tipo === "pollo" ? 1.9 : 1.7) * Math.pow(0.85, EST.mejoras.frei); }
+
+// ================= MOSTRADOR =================
+caja(7.2, 1.0, 0.9, 0xfff4dc, 0, 0.5, -1.0);
+caja(7.3, 0.12, 1.0, 0xd8332b, 0, 1.06, -1.0);
+for (let x = -3.3; x <= 3.3; x += 0.6) caja(0.3, 0.8, 0.02, 0xd8332b, x, 0.45, -0.54);
+bloquear(-3.65, 3.65, -1.5, -0.5);
+// caja registradora
+caja(0.7, 0.35, 0.5, 0x2b1408, 1.5, 1.3, -1.1); caja(0.5, 0.3, 0.06, 0x3cbf5a, 1.5, 1.55, -0.95).rotation.x = -0.4;
+// vitrina (zona de comida sobre el mostrador)
+const vitrina = { items: [], max: 24 };
+const vitrinaVidrio = new T.Mesh(new T.BoxGeometry(2.6, 0.7, 0.85), new T.MeshLambertMaterial({ color: 0xbfe8ff, transparent: true, opacity: 0.25 }));
+vitrinaVidrio.position.set(-1.9, 1.47, -1.0); escena.add(vitrinaVidrio);
+function colocarVitrina() {
+  vitrina.items.sort((a, b) => (a.userData.tipo > b.userData.tipo ? 1 : -1));
+  vitrina.items.forEach((m, i) => { const col = i % 6, fila = Math.floor(i / 6) % 2, piso = Math.floor(i / 12); m.position.set(-3.0 + col * 0.42, 1.12 + piso * ALTO_ITEM, -1.25 + fila * 0.45); });
+}
+const ZONA_VITRINA = { x: -1.9, z: -2.15 }, ZONA_CAJA = { x: 1.5, z: -2.15 }, ZONA_DINERO = { x: 2.9, z: -2.15 };
+// pila de dinero del mostrador
+const pilaDinero = { valor: 0, billetes: [] };
+function actualizarPila() {
+  const n = Math.min(30, Math.ceil(pilaDinero.valor / 6));
+  while (pilaDinero.billetes.length < n) { const i = pilaDinero.billetes.length; const b = caja(0.42, 0.06, 0.22, 0x3cbf5a, 2.9 + (i % 2) * 0.04, 1.15 + i * 0.065, -1.05); b.rotation.y = azar(-0.2, 0.2); pilaDinero.billetes.push(b); }
+  while (pilaDinero.billetes.length > n) escena.remove(pilaDinero.billetes.pop());
+}
+// marcas en el piso
+function marcaPiso(x, z, color, icono) {
+  const t = texCanvas(128, 128, (g) => { g.strokeStyle = color; g.lineWidth = 10; g.setLineDash([18, 12]); redondeado(g, 8, 8, 112, 112, 26); g.stroke(); g.font = `56px ${EMOJI}`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(icono, 64, 68); });
+  const m = new T.Mesh(new T.PlaneGeometry(1.3, 1.3), new T.MeshBasicMaterial({ map: t, transparent: true, opacity: 0.85 }));
+  m.rotation.x = -Math.PI / 2; m.position.set(x, 0.03, z); escena.add(m); return m;
+}
+marcaPiso(ZONA_VITRINA.x, ZONA_VITRINA.z, "#d8332b", "🍗");
+const marcaCaja = marcaPiso(ZONA_CAJA.x, ZONA_CAJA.z, "#3cbf5a", "🛎️");
+marcaPiso(ZONA_DINERO.x, ZONA_DINERO.z, "#3cbf5a", "💵");
+
+// ================= MESAS =================
+const MESAS_POS = { mesaA: [-4.6, 2.4], mesaB: [-4.6, 6.0], mesaC: [-1.4, 4.2], mesaD: [4.9, 2.4], mesaE: [4.9, 6.0], mesaF: [-1.4, 7.8] };
+const mesas = [];
+function crearMesa(id) {
+  const [x, z] = MESAS_POS[id];
+  const g = new T.Group(); g.position.set(x, 0, z); escena.add(g);
+  cil(0.75, 0.75, 0.1, 0xfff4dc, 0, 0.78, 0, g); cil(0.77, 0.77, 0.04, 0xd8332b, 0, 0.72, 0, g); cil(0.08, 0.12, 0.72, 0x6b4a33, 0, 0.36, 0, g);
+  // sillas
+  for (const dz of [1.05, -1.05]) { cil(0.3, 0.3, 0.08, 0xd8332b, 0, 0.45, dz, g); cil(0.05, 0.05, 0.45, 0x6b4a33, 0, 0.22, dz, g); caja(0.55, 0.5, 0.08, 0xd8332b, 0, 0.75, dz + Math.sign(dz) * 0.28, g); }
+  const basura = new T.Group(); g.add(basura); basura.visible = false;
+  cil(0.22, 0.22, 0.03, 0xffffff, -0.2, 0.85, 0.1, basura); cil(0.22, 0.22, 0.03, 0xffffff, 0.25, 0.85, -0.15, basura);
+  for (let i = 0; i < 4; i++) { const h = caja(0.18, 0.04, 0.05, 0xf3e2c6, azar(-0.3, 0.3), 0.89, azar(-0.3, 0.3), basura); h.rotation.y = azar(0, 3); }
+  const m = { id, x, z, g, basura, estado: "libre", cliente: null, limpieza: 0, comida: null };
+  m.obs = bloquear(x - 0.8, x + 0.8, z - 0.8, z + 0.8);
+  mesas.push(m);
+  return m;
+}
+
+// ================= JUGADOR =================
+const jugador = persona({ ropa: 0xffffff, piel: 0xf1c7a5, gorro: "chef" });
+caja(0.5, 0.55, 0.05, 0xd8332b, 0, 0.65, 0.34, jugador.userData.cuerpo);
+jugador.position.set(0, 0, -3.5); escena.add(jugador);
+const manos = []; // pila que lleva el jugador
+function colocarManos(dueno, pila) { pila.forEach((m, i) => { m.position.set(0, 1.0 + i * ALTO_ITEM, 0.5); }); }
+
+// ================= DESBLOQUEOS =================
+const PROGRESO = [
+  { id: "mesaC", nombre: "Mesa", costo: 30, x: -1.4, z: 4.2 },
+  { id: "frei2", nombre: "Freidora", costo: 60, x: -1.6, z: -5.3 },
+  { id: "mesaD", nombre: "Mesa", costo: 90, x: 4.9, z: 2.4 },
+  { id: "cajero", nombre: "Cajero", costo: 150, x: 1.5, z: -2.9 },
+  { id: "refrescos", nombre: "Refrescos", costo: 200, x: 1.6, z: -5.3 },
+  { id: "mesaE", nombre: "Mesa", costo: 220, x: 4.9, z: 6.0 },
+  { id: "repartidor", nombre: "Ayudante", costo: 300, x: -5.9, z: -3.0 },
+  { id: "limpiador", nombre: "Limpiador", costo: 320, x: -6.0, z: 0.6 },
+  { id: "mesaF", nombre: "Mesa", costo: 380, x: -1.4, z: 7.8 },
+  { id: "frei3", nombre: "Freidora", costo: 450, x: 4.8, z: -5.3 },
+];
+const pads = [];
+function crearPad(p) {
+  const g = new T.Group(); g.position.set(p.x, 0.02, p.z); escena.add(g);
+  const base = new T.Mesh(new T.BoxGeometry(1.7, 0.06, 1.7), new T.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 })); base.position.y = 0.03; g.add(base);
+  const relleno = new T.Mesh(new T.BoxGeometry(1.7, 0.07, 1.7), M(0x3cbf5a)); relleno.position.y = 0.035; relleno.scale.x = 0.001; g.add(relleno);
+  const borde = new T.Mesh(new T.BoxGeometry(1.8, 0.04, 1.8), M(0xffc62e)); borde.position.y = 0.01; g.add(borde);
+  const et = etiqueta(2.4, 1.2); et.position.set(0, 1.4, 0); g.add(et);
+  const pad = { ...p, g, relleno, et, pagado: 0, t: 0 };
+  dibujarPad(pad); pads.push(pad);
+  return pad;
+}
+function dibujarPad(pad) {
+  pad.et.dibujar((g, w, h) => {
+    g.fillStyle = "#2b1408"; redondeado(g, 4, 4, w - 8, h - 8, 28); g.fill();
+    g.fillStyle = "#fff4dc"; g.font = '34px "Lilita One", sans-serif'; g.textAlign = "center"; g.fillText(pad.nombre, w / 2, 48);
+    g.fillStyle = "#3cbf5a"; g.font = '44px "Lilita One", sans-serif'; g.fillText("$" + Math.max(0, Math.ceil(pad.costo - pad.pagado)), w / 2, 100);
+  });
+  pad.relleno.scale.x = Math.max(0.001, pad.pagado / pad.costo);
+  pad.relleno.position.x = -0.85 + 0.85 * pad.relleno.scale.x;
+}
+function actualizarPads() {
+  const pendientes = PROGRESO.filter((p) => !tiene(p.id));
+  const visibles = pendientes.slice(0, 2).map((p) => p.id);
+  for (const pad of [...pads]) if (!visibles.includes(pad.id)) { escena.remove(pad.g); pads.splice(pads.indexOf(pad), 1); }
+  for (const p of pendientes.slice(0, 2)) if (!pads.some((x) => x.id === p.id)) crearPad(p);
+}
+const ayudantes = [];
+function desbloquear(id, silencioso) {
+  if (!tiene(id)) EST.desbloqueos.push(id);
+  if (id.startsWith("mesa")) crearMesa(id);
+  else if (id === "frei2") crearEstacion(id, "pollo", -1.6);
+  else if (id === "frei3") crearEstacion(id, "pollo", 4.8);
+  else if (id === "refrescos") crearEstacion(id, "refresco", 1.6);
+  else if (id === "cajero") crearAyudante("cajero");
+  else if (id === "repartidor") crearAyudante("repartidor");
+  else if (id === "limpiador") crearAyudante("limpiador");
+  if (!silencioso) { avisar("¡Nuevo: " + (PROGRESO.find((p) => p.id === id) || { nombre: id }).nombre + "!"); sonido(880, 0.15); sonido(1320, 0.2, 0.08); guardar(); }
+  actualizarPads();
+}
+
+// ================= AYUDANTES =================
+function crearAyudante(tipo) {
+  const ropa = { cajero: 0xd8332b, repartidor: 0xff9a1f, limpiador: 0x3a7bd5 }[tipo];
+  const p = persona({ ropa, piel: PIELES[ayudantes.length % 4], gorro: "gorra" });
+  const inicio = { cajero: [1.5, -2.0], repartidor: [-5.6, -3.2], limpiador: [-6.0, 0.6] }[tipo];
+  p.position.set(inicio[0], 0, inicio[1]); escena.add(p);
+  if (tipo === "cajero") { p.rotation.y = 0; marcaCaja.visible = false; }
+  const a = { tipo, p, ruta: [], carga: [], estado: "libre", t: 0, casa: inicio, objetivo: null };
+  ayudantes.push(a);
+  return a;
+}
+
+// ================= CLIENTES =================
+const clientes = [];
+const cola = [];
+const PUERTA = { x: 1.5, z: 12.5 };
+const posCola = (i) => ({ x: 1.5, z: 0.25 + i * 1.05 });
+let siguienteCliente = 2;
+function crearCliente() {
+  const p = persona({ ropa: ROPAS[Math.floor(Math.random() * ROPAS.length)], piel: PIELES[Math.floor(Math.random() * 4)], pelo: PELOS[Math.floor(Math.random() * PELOS.length)], gorro: Math.random() < 0.3 ? "gorra" : "" });
+  p.position.set(PUERTA.x, 0, PUERTA.z); p.rotation.y = Math.PI; escena.add(p);
+  const pollos = 1 + Math.floor(Math.random() * Math.min(3, 1 + nivel() / 2));
+  const pedido = { pollo: pollos, refresco: tiene("refrescos") && Math.random() < 0.45 ? 1 : 0 };
+  const burbuja = etiqueta(1.7, 0.85); burbuja.position.set(0, 2.35, 0); burbuja.visible = false; p.add(burbuja);
+  const c = { p, pedido, recibido: { pollo: 0, refresco: 0 }, estado: "cola", ruta: [], burbuja, mesa: null, t: 0, carga: [] };
+  clientes.push(c); cola.push(c);
+  irA(c, posCola(cola.length - 1));
+  return c;
+}
+function dibujarBurbuja(c) {
+  c.burbuja.dibujar((g, w, h) => {
+    g.fillStyle = "#ffffff"; redondeado(g, 6, 6, w - 12, h - 30, 30); g.fill();
+    g.beginPath(); g.moveTo(w / 2 - 14, h - 26); g.lineTo(w / 2 + 14, h - 26); g.lineTo(w / 2, h - 4); g.fill();
+    g.textAlign = "center"; g.textBaseline = "middle"; g.font = `50px ${EMOJI}`;
+    if (c.estado === "feliz") { g.fillText("😋", w / 2, (h - 24) / 2 + 4); return; }
+    const faltaP = c.pedido.pollo - c.recibido.pollo, faltaR = c.pedido.refresco - c.recibido.refresco;
+    const partes = []; if (faltaP > 0) partes.push(["🍗", faltaP]); if (faltaR > 0) partes.push(["🥤", faltaR]);
+    const ancho = partes.length * 110; let x = w / 2 - ancho / 2 + 40;
+    for (const [ico, n] of partes) { g.font = `46px ${EMOJI}`; g.fillText(ico, x, (h - 24) / 2 + 4); g.fillStyle = "#2b1408"; g.font = '40px "Lilita One", sans-serif'; g.fillText("" + n, x + 46, (h - 24) / 2 + 6); x += 110; }
+  });
+}
+function irA(ent, ...puntos) { ent.ruta = puntos; }
+function mover(ent, dt, vel) {
+  if (!ent.ruta.length) return true;
+  const d = ent.ruta[0], p = ent.p.position;
+  const dx = d.x - p.x, dz = d.z - p.z, L = Math.hypot(dx, dz);
+  if (L < 0.06) { p.x = d.x; p.z = d.z; ent.ruta.shift(); return !ent.ruta.length; }
+  const paso = Math.min(L, vel * dt);
+  p.x += (dx / L) * paso; p.z += (dz / L) * paso;
+  ent.p.rotation.y = Math.atan2(dx, dz);
+  return false;
+}
+// camino hasta la silla de una mesa evitando la fila y las otras mesas
+function rutaAMesa(desde, mesa) {
+  const pasillo = mesa.x < 0 ? mesa.x + 1.55 : mesa.x - 1.55;
+  return [{ x: pasillo, z: Math.max(desde.z, 1.0) + 0.6 }, { x: pasillo, z: mesa.z + 1.05 }, { x: mesa.x, z: mesa.z + 1.05 }];
+}
+function rutaSalida(desde, pasillo) { return [{ x: pasillo, z: desde.z }, { x: pasillo, z: 9.6 }, { x: PUERTA.x, z: PUERTA.z }]; }
+
+// ================= CONTROLES =================
+const teclas = {};
+addEventListener("keydown", (e) => { teclas[e.key.toLowerCase()] = true; if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key.toLowerCase())) e.preventDefault(); });
+addEventListener("keyup", (e) => { teclas[e.key.toLowerCase()] = false; });
+let joy = null;
+const lienzo = render.domElement;
+lienzo.addEventListener("pointerdown", (e) => { joy = { x0: e.clientX, y0: e.clientY, dx: 0, dy: 0, id: e.pointerId }; lienzo.setPointerCapture(e.pointerId); const j = $("joy"); j.hidden = false; j.style.left = e.clientX + "px"; j.style.top = e.clientY + "px"; j.firstElementChild.style.transform = ""; });
+lienzo.addEventListener("pointermove", (e) => { if (!joy || e.pointerId !== joy.id) return; let dx = e.clientX - joy.x0, dy = e.clientY - joy.y0; const L = Math.hypot(dx, dy), max = 45; if (L > max) { dx *= max / L; dy *= max / L; } joy.dx = dx / max; joy.dy = dy / max; $("joy").firstElementChild.style.transform = `translate(${dx}px,${dy}px)`; });
+const soltar = () => { joy = null; $("joy").hidden = true; };
+lienzo.addEventListener("pointerup", soltar); lienzo.addEventListener("pointercancel", soltar);
+function direccion() {
+  let x = 0, z = 0;
+  if (teclas.w || teclas.arrowup) z -= 1; if (teclas.s || teclas.arrowdown) z += 1;
+  if (teclas.a || teclas.arrowleft) x -= 1; if (teclas.d || teclas.arrowright) x += 1;
+  if (joy && Math.hypot(joy.dx, joy.dy) > 0.15) { x = joy.dx; z = joy.dy; }
+  const L = Math.hypot(x, z); return L > 1 ? { x: x / L, z: z / L } : { x, z };
+}
+function chocar(p, r = 0.42) {
+  p.x = Math.max(-6.9, Math.min(6.9, p.x)); p.z = Math.max(-6.7, Math.min(9.7, p.z));
+  for (const o of obstaculos) {
+    if (p.x > o.x0 - r && p.x < o.x1 + r && p.z > o.z0 - r && p.z < o.z1 + r) {
+      const izq = p.x - (o.x0 - r), der = o.x1 + r - p.x, arr = p.z - (o.z0 - r), aba = o.z1 + r - p.z;
+      const m = Math.min(izq, der, arr, aba);
+      if (m === izq) p.x = o.x0 - r; else if (m === der) p.x = o.x1 + r; else if (m === arr) p.z = o.z0 - r; else p.z = o.z1 + r;
+    }
+  }
+}
+
+// ================= SONIDO =================
+let audio = null, sonidoOn = leer("reypollo-sonido", true);
+function sonido(f, d = 0.08, retraso = 0) {
+  if (!sonidoOn || !audio) return;
+  const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + retraso;
+  o.type = "triangle"; o.frequency.setValueAtTime(f, t);
+  g.gain.setValueAtTime(0.12, t); g.gain.exponentialRampToValueAtTime(0.001, t + d);
+  o.connect(g).connect(audio.destination); o.start(t); o.stop(t + d + 0.02);
+}
+$("btn-sonido").textContent = sonidoOn ? "🔊" : "🔇";
+$("btn-sonido").addEventListener("click", () => { sonidoOn = !sonidoOn; guardarLS("reypollo-sonido", sonidoOn); $("btn-sonido").textContent = sonidoOn ? "🔊" : "🔇"; });
+
+// ================= AVISOS Y FLECHA GUÍA =================
+let avisoT = 0;
+function avisar(txt) { const a = $("aviso"); a.textContent = txt; a.hidden = false; avisoT = 2; }
+const flecha = malla(new T.ConeGeometry(0.35, 0.7, 4), 0xffc62e, 0, 3, 0); flecha.rotation.x = Math.PI; flecha.castShadow = false;
+// números flotantes de dinero
+const flotantes = [];
+function flotar(texto, x, y, z, color = "#3cbf5a") {
+  const s = etiqueta(1.6, 0.6); s.dibujar((g, w, h) => { g.font = '62px "Lilita One", sans-serif'; g.textAlign = "center"; g.lineWidth = 10; g.strokeStyle = "#2b1408"; g.strokeText(texto, w / 2, h - 30); g.fillStyle = color; g.fillText(texto, w / 2, h - 30); });
+  s.position.set(x, y, z); escena.add(s); flotantes.push({ s, t: 0 });
+}
+
+// ================= HUD =================
+function hud() {
+  $("dinero").textContent = Math.floor(EST.dinero);
+  const n = nivel(); $("nivel").textContent = "Nivel " + n;
+  $("barra").style.width = ((EST.atendidos % 8) / 8) * 100 + "%";
+}
+const MEJORAS = [
+  { k: "vel", ic: "👟", n: "Velocidad", d: "Caminas más rápido", base: 50 },
+  { k: "cap", ic: "🧺", n: "Capacidad", d: "Cargas 2 cosas más", base: 60 },
+  { k: "frei", ic: "🔥", n: "Freidoras rápidas", d: "Cocinan 15% más rápido", base: 80 },
+  { k: "precio", ic: "💰", n: "Mejor receta", d: "Cobras 20% más", base: 100 },
+];
+const costoMejora = (m) => m.base * (EST.mejoras[m.k] + 1) * (EST.mejoras[m.k] + 1);
+function pintarMejoras() {
+  const el = $("lista-mejoras"); el.innerHTML = "";
+  for (const m of MEJORAS) {
+    const lv = EST.mejoras[m.k], max = lv >= 5, c = costoMejora(m);
+    const fila = document.createElement("div"); fila.className = "mejora";
+    fila.innerHTML = `<span class="ic">${m.ic}</span><div><b>${m.n}</b><small>${m.d}</small><div class="estrellas">${"★".repeat(lv)}${"☆".repeat(5 - lv)}</div></div><button class="btn">${max ? "Máx." : "$" + c}</button>`;
+    const b = fila.querySelector("button"); b.disabled = max || EST.dinero < c;
+    b.addEventListener("click", () => { if (EST.dinero < c || max) return; EST.dinero -= c; EST.mejoras[m.k]++; sonido(660, 0.1); sonido(990, 0.15, 0.08); guardar(); hud(); pintarMejoras(); });
+    el.append(fila);
+  }
+}
+let reiniciarListo = false;
+$("btn-mejoras").addEventListener("click", () => { pintarMejoras(); reiniciarListo = false; $("btn-reiniciar").textContent = "Empezar de cero"; $("panel").hidden = false; });
+$("btn-cerrar").addEventListener("click", () => { $("panel").hidden = true; });
+$("btn-reiniciar").addEventListener("click", () => {
+  if (!reiniciarListo) { reiniciarListo = true; $("btn-reiniciar").textContent = "¿Seguro? Toca otra vez para borrar todo"; return; }
+  try { localStorage.removeItem("reypollo"); } catch {}
+  location.reload();
+});
+
+// ================= INICIO =================
+crearMesa("mesaA"); crearMesa("mesaB");
+crearEstacion("frei1", "pollo", -4.6);
+for (const id of EST.desbloqueos) desbloquear(id, true);
+actualizarPads(); hud();
+$("btn-jugar").addEventListener("click", () => {
+  $("inicio").hidden = true;
+  try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
+  sonido(523, 0.1); sonido(784, 0.15, 0.1);
+});
+
+// ================= BUCLE =================
+let ultimo = performance.now(), reloj = 0, tomaT = 0, dejaT = 0, servirT = 0, cobrarT = 0;
+function paso(ahora) {
+  const dt = Math.min(0.05, (ahora - ultimo) / 1000); ultimo = ahora; reloj += dt;
+  const jugando = $("inicio").hidden && $("panel").hidden;
+
+  // --- jugador ---
+  const d = jugando ? direccion() : { x: 0, z: 0 };
+  const moviendo = Math.hypot(d.x, d.z) > 0.05;
+  if (moviendo) {
+    const p = jugador.position;
+    p.x += d.x * velocidad() * dt; p.z += d.z * velocidad() * dt;
+    jugador.rotation.y = Math.atan2(d.x, d.z);
+  }
+  chocar(jugador.position);
+  animarCaminar(jugador, reloj, moviendo);
+  const jx = jugador.position.x, jz = jugador.position.z;
+
+  // --- estaciones producen ---
+  for (const e of estaciones) {
+    if (e.items.length < e.max) { e.t += dt; if (e.t >= tiempoProduccion(e)) { e.t = 0; const it = hacerItem(e.tipo); e.g.add(it); e.items.push(it); colocarEnBandeja(e); } }
+  }
+  // --- tomar de la bandeja ---
+  tomaT -= dt;
+  if (tomaT <= 0 && manos.length < capacidad()) {
+    for (const e of estaciones) {
+      if (e.items.length && dist(jx, jz, e.x, -4.75) < 1.3) {
+        const it = e.items.pop(); e.g.remove(it); jugador.add(it); manos.push(it); colocarManos(jugador, manos); colocarEnBandeja(e);
+        tomaT = 0.12; sonido(520 + manos.length * 30, 0.05); break;
+      }
+    }
+  }
+  // --- dejar en la vitrina ---
+  dejaT -= dt;
+  if (dejaT <= 0 && manos.length && vitrina.items.length < vitrina.max && dist(jx, jz, ZONA_VITRINA.x, ZONA_VITRINA.z) < 1.2) {
+    const it = manos.pop(); jugador.remove(it); escena.add(it); vitrina.items.push(it); colocarVitrina(); colocarManos(jugador, manos);
+    dejaT = 0.1; sonido(700, 0.04);
+  }
+  // --- atender en la caja ---
+  const cajero = ayudantes.some((a) => a.tipo === "cajero");
+  const atendiendo = cajero || dist(jx, jz, ZONA_CAJA.x, ZONA_CAJA.z) < 1.0;
+  servirT -= dt;
+  const frente = cola[0];
+  if (frente && frente.estado === "esperando" && atendiendo && servirT <= 0) {
+    const falta = frente.recibido.pollo < frente.pedido.pollo ? "pollo" : frente.recibido.refresco < frente.pedido.refresco ? "refresco" : null;
+    if (falta) {
+      const i = vitrina.items.findIndex((m) => m.userData.tipo === falta);
+      if (i >= 0) {
+        const it = vitrina.items.splice(i, 1)[0]; escena.remove(it); frente.p.add(it); frente.carga.push(it); colocarManos(frente.p, frente.carga);
+        frente.recibido[falta]++; colocarVitrina(); dibujarBurbuja(frente); servirT = cajero ? 0.28 : 0.35; sonido(600, 0.05);
+      }
+    }
+    if (frente.recibido.pollo >= frente.pedido.pollo && frente.recibido.refresco >= frente.pedido.refresco) pagar(frente);
+  }
+  // --- cobrar la pila de dinero ---
+  cobrarT -= dt;
+  if (pilaDinero.valor > 0 && cobrarT <= 0 && dist(jx, jz, ZONA_DINERO.x, ZONA_DINERO.z) < 1.3) {
+    const tomar = Math.min(pilaDinero.valor, Math.max(3, Math.ceil(pilaDinero.valor / 6)));
+    pilaDinero.valor -= tomar; EST.dinero += tomar; actualizarPila(); hud(); cobrarT = 0.05;
+    if (Math.random() < 0.5) sonido(1200 + Math.random() * 200, 0.04);
+    if (pilaDinero.valor <= 0) flotar("+$" + tomar, jx, 2.6, jz);
+  }
+  // --- limpiar mesas ---
+  for (const m of mesas) {
+    if (m.estado === "sucia" && dist(jx, jz, m.x, m.z) < 1.55) {
+      m.limpieza += dt;
+      if (m.limpieza > 0.7) limpiarMesa(m, true);
+    } else if (m.estado === "sucia" && !m.limpiando) m.limpieza = Math.max(0, m.limpieza - dt);
+  }
+  // --- pagar desbloqueos ---
+  for (const pad of [...pads]) {
+    if (dist(jx, jz, pad.x, pad.z) < 0.95 && EST.dinero > 0) {
+      pad.t -= dt;
+      if (pad.t <= 0) {
+        const pago = Math.min(EST.dinero, pad.costo - pad.pagado, Math.max(1, Math.ceil(pad.costo / 40)));
+        EST.dinero -= pago; pad.pagado += pago; pad.t = 0.03; dibujarPad(pad); hud();
+        if (Math.random() < 0.4) sonido(400 + (pad.pagado / pad.costo) * 600, 0.04);
+        if (pad.pagado >= pad.costo) { escena.remove(pad.g); pads.splice(pads.indexOf(pad), 1); desbloquear(pad.id); }
+      }
+    }
+  }
+
+  // --- clientes ---
+  siguienteCliente -= dt;
+  const intervalo = Math.max(2.2, 6.5 - mesas.length * 0.45 - nivel() * 0.15);
+  if (jugando && siguienteCliente <= 0 && cola.length < 7) { crearCliente(); siguienteCliente = intervalo * azar(0.8, 1.2); }
+  for (const c of [...clientes]) {
+    const llego = mover(c, dt, 2.4);
+    animarCaminar(c.p, reloj + c.p.id, c.ruta.length > 0);
+    if (c.estado === "cola" && llego && cola[0] === c) { c.estado = "esperando"; c.p.rotation.y = Math.PI; c.burbuja.visible = true; dibujarBurbuja(c); }
+    else if (c.estado === "cola" && llego) c.p.rotation.y = Math.PI;
+    else if (c.estado === "yendo" && llego) {
+      c.estado = "comiendo"; c.t = azar(4, 6); c.p.rotation.y = Math.PI; c.burbuja.visible = false;
+      c.carga.forEach((it) => { c.p.remove(it); c.mesa.g.add(it); }); c.carga.forEach((it, i) => it.position.set(-0.25 + (i % 3) * 0.25, 0.83, 0.15 + Math.floor(i / 3) * 0.25)); c.mesa.comida = c.carga; c.carga = [];
+    } else if (c.estado === "comiendo") {
+      c.t -= dt;
+      if (c.t <= 0) {
+        const m = c.mesa; m.comida.forEach((it) => m.g.remove(it)); m.comida = null; m.basura.visible = true; m.estado = "sucia"; m.cliente = null; m.limpieza = 0;
+        c.estado = "saliendo"; const pasillo = m.x < 0 ? m.x + 1.55 : m.x - 1.55; c.ruta = rutaSalida(c.p.position, pasillo);
+      }
+    } else if (c.estado === "saliendo" && llego) { escena.remove(c.p); clientes.splice(clientes.indexOf(c), 1); }
+    else if (c.estado === "feliz") { c.t -= dt; if (c.t <= 0) c.burbuja.visible = false; }
+  }
+
+  // --- ayudantes ---
+  for (const a of ayudantes) {
+    const llego = mover(a, dt, 3.0);
+    animarCaminar(a.p, reloj + 3, a.ruta.length > 0);
+    if (a.tipo === "repartidor") {
+      if (a.estado === "libre") {
+        const e = [...estaciones].sort((x, y) => y.items.length - x.items.length)[0];
+        if (e && e.items.length >= 2 && vitrina.items.length < vitrina.max - 2) { a.estado = "aEstacion"; a.objetivo = e; irA(a, { x: e.x, z: -4.75 }); }
+      } else if (a.estado === "aEstacion" && llego) {
+        a.t -= dt;
+        if (a.t <= 0) { const e = a.objetivo; if (e.items.length && a.carga.length < 4) { const it = e.items.pop(); e.g.remove(it); a.p.add(it); a.carga.push(it); colocarManos(a.p, a.carga); colocarEnBandeja(e); a.t = 0.2; } else { a.estado = a.carga.length ? "aVitrina" : "libre"; if (a.carga.length) irA(a, { x: ZONA_VITRINA.x - 0.6, z: ZONA_VITRINA.z }); } }
+      } else if (a.estado === "aVitrina" && llego) {
+        a.t -= dt;
+        if (a.t <= 0) { if (a.carga.length && vitrina.items.length < vitrina.max) { const it = a.carga.pop(); a.p.remove(it); escena.add(it); vitrina.items.push(it); colocarVitrina(); a.t = 0.15; } else { a.estado = "libre"; } }
+      }
+    } else if (a.tipo === "limpiador") {
+      if (a.estado === "libre") {
+        const m = mesas.find((x) => x.estado === "sucia" && !x.limpiando);
+        if (m) { m.limpiando = true; a.objetivo = m; a.estado = "aMesa"; const pas = m.x < 0 ? m.x + 1.55 : m.x - 1.55; irA(a, { x: a.p.position.x, z: 1.0 }, { x: pas, z: 1.0 }, { x: pas, z: m.z }); }
+        else if (!a.ruta.length && dist(a.p.position.x, a.p.position.z, a.casa[0], a.casa[1]) > 0.3) irA(a, { x: a.p.position.x, z: 1.0 }, { x: a.casa[0], z: a.casa[1] });
+      } else if (a.estado === "aMesa" && llego) {
+        a.objetivo.limpieza += dt;
+        if (a.objetivo.limpieza > 1.2 || a.objetivo.estado !== "sucia") { if (a.objetivo.estado === "sucia") limpiarMesa(a.objetivo, false); a.objetivo.limpiando = false; a.estado = "libre"; }
+      }
+    } else if (a.tipo === "cajero") { a.p.rotation.y = 0; }
+  }
+
+  // --- flecha guía y pista ---
+  guia();
+  flecha.position.y = 2.8 + Math.sin(reloj * 5) * 0.2; flecha.rotation.y += dt * 2;
+  for (const f of [...flotantes]) { f.t += dt; f.s.position.y += dt * 1.2; f.s.material.opacity = 1 - f.t; if (f.t > 1) { escena.remove(f.s); flotantes.splice(flotantes.indexOf(f), 1); } }
+  if (avisoT > 0) { avisoT -= dt; if (avisoT <= 0) $("aviso").hidden = true; }
+
+  // --- cámara ---
+  const objetivoCam = new T.Vector3(jx, 15.5, jz + 12.5);
+  cam.position.lerp(objetivoCam, Math.min(1, dt * 4));
+  cam.lookAt(cam.position.x, 0, cam.position.z - 12.5);
+  sol.position.set(jx + 9, 20, jz + 11); sol.target.position.set(jx, 0, jz); sol.target.updateMatrixWorld();
+
+  render.render(escena, cam);
+  requestAnimationFrame(paso);
+}
+function pagar(c) {
+  const total = c.pedido.pollo * precio("pollo") + c.pedido.refresco * precio("refresco");
+  pilaDinero.valor += total; actualizarPila(); EST.atendidos++; hud();
+  flotar("+$" + total, 2.9, 2.2, -1.0);
+  sonido(988, 0.08); sonido(1319, 0.12, 0.07);
+  cola.shift(); cola.forEach((x, i) => { if (x.estado === "cola" || x.estado === "esperando") { x.estado = "cola"; x.burbuja.visible = false; irA(x, posCola(i)); } });
+  const libre = mesas.filter((m) => m.estado === "libre").sort((a, b) => dist(a.x, a.z, 1.5, 0) - dist(b.x, b.z, 1.5, 0))[0];
+  c.estado = "feliz"; c.t = 1.2; dibujarBurbuja(c); c.burbuja.visible = true;
+  if (libre) {
+    libre.estado = "ocupada"; libre.cliente = c; c.mesa = libre;
+    setTimeout(() => { c.estado = "yendo"; c.ruta = rutaAMesa(c.p.position, libre); }, 250);
+  } else {
+    setTimeout(() => { c.estado = "saliendo"; c.ruta = [{ x: 3.4, z: 0.9 }, { x: 3.4, z: 9.6 }, { x: PUERTA.x, z: PUERTA.z }]; }, 250);
+  }
+}
+function limpiarMesa(m, porJugador) {
+  m.basura.visible = false; m.estado = "libre"; m.limpieza = 0;
+  if (porJugador) { EST.dinero += 2; hud(); flotar("+$2", m.x, 1.8, m.z); }
+  sonido(1500, 0.05);
+}
+function guia() {
+  let obj = null, txt = "";
+  const frente = cola[0];
+  const cajero = ayudantes.some((a) => a.tipo === "cajero");
+  const totalBandeja = estaciones.reduce((s, e) => s + e.items.length, 0);
+  const sucia = mesas.find((m) => m.estado === "sucia" && !m.limpiando);
+  const padBarato = pads.find((p) => EST.dinero >= p.costo - p.pagado);
+  if (pilaDinero.valor >= 15) { obj = ZONA_DINERO; txt = "Recoge el dinero del mostrador 💵"; }
+  else if (manos.length && vitrina.items.length < vitrina.max) { obj = ZONA_VITRINA; txt = "Deja la comida en la vitrina 🍗"; }
+  else if (frente && frente.estado === "esperando" && !cajero && vitrina.items.length) { obj = ZONA_CAJA; txt = "Atiende en la caja 🛎️"; }
+  else if (sucia) { obj = { x: sucia.x, z: sucia.z }; txt = "Limpia la mesa sucia 🧽"; }
+  else if (padBarato) { obj = padBarato; txt = "¡Ya puedes comprar: " + padBarato.nombre + "! Párate encima"; }
+  else if (totalBandeja && manos.length < capacidad()) { const e = [...estaciones].sort((a, b) => b.items.length - a.items.length)[0]; obj = { x: e.x, z: -4.75 }; txt = "Recoge el pollo frito 🍗"; }
+  else if (pilaDinero.valor > 0) { obj = ZONA_DINERO; txt = "Recoge el dinero 💵"; }
+  else { txt = "¡El pollo se está friendo! Espera un momento…"; }
+  $("pista").textContent = txt;
+  flecha.visible = !!obj;
+  if (obj) { flecha.position.x = obj.x; flecha.position.z = obj.z; }
+}
+requestAnimationFrame(paso);
+</script>
+
+</body>
+</html>
